@@ -1,0 +1,33 @@
+<aside [class.collapsed]="collapsed" class="sidebar border-end d-flex flex-column">
+
+  <!-- Sidebar Header -->
+  <div class="sidebar-header d-flex align-items-center px-3 py-2 position-relative">
+    <img src="Logo.png" alt="">
+    <span class="logo fw-bold mx-2">ALMUDAQIQ</span>
+  </div>
+
+  <!-- Menu -->
+  <ul class="menu list-unstyled mt-3 flex-grow-1">
+  <li *ngFor="let item of menuItems">
+    <a [routerLink]="item.route"
+       routerLinkActive="active-route"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="d-flex align-items-center text-decoration-none">
+
+      <i [class]="item.icon + ' me-2'"></i>
+      <span class="label" *ngIf="!collapsed">{{ t(item.key) }}</span>
+
+    </a>
+  </li>
+</ul>
+
+<div class="sidebar-footer">
+  <li class="btn btn-sm d-flex align-items-center">
+    <i class="fas fa-sign-out-alt mx-2"></i>
+    <a href="" class="text-decoration-none text-muted fs-6">{{ t('logout') }}</a>
+  </li>
+</div>
+
+
+
+</aside>

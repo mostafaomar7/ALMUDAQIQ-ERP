@@ -1,0 +1,616 @@
+<div class="tabs-container d-flex align-items-center mb-4">
+
+  <div class="tab-item"
+       [class.active]="activeTab === 'subscribers'"
+       (click)="setActiveTab('subscribers')">
+    {{ t('subscribers') }}
+  </div>
+
+  <div class="tab-item"
+       [class.active]="activeTab === 'renewal'"
+       (click)="setActiveTab('renewal')">
+    {{ t('renewal') }}
+  </div>
+
+</div>
+
+<div class="tab-content">
+
+  <div *ngIf="activeTab === 'subscribers'">
+     <div class="row mt-4">
+  <div class="col-12">
+    <div class="card shadow-sm border-0 px-4">
+      <div class="d-flex align-items-center flex-wrap py-4">
+
+        <!-- العنوان وأزرار Edit/Delete -->
+        <div class="d-flex align-items-center gap-4 flex-nowrap mx-4">
+          <h5 class="mb-0 table-title">{{ t('subscribersTable') }}</h5>
+          <div class="d-flex gap-3 text-muted small">
+            <span role="button" class="d-flex align-items-center gap-1 hover-primary" (click)="updateSelectedUsers()">
+              <i class="fas fa-pen"></i> {{ t('edit') }}
+            </span>
+            <span role="button" class="d-flex align-items-center gap-1 hover-danger" (click)="deleteSelectedUsers()">
+              <i class="fas fa-trash"></i> {{ t('delete') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- البحث والأزرار -->
+        <div class="d-flex align-items-center gap-2 flex-nowrap">
+          <div class="search-container">
+            <input type="text" [placeholder]="t('search')">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+
+          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                  (click)="toggleFilter()">
+            <i class="fas fa-filter"></i> {{ t('filter') }}
+          </button>
+
+          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+            <i class="fas fa-cloud-arrow-down"></i> {{ t('export') }}
+          </button>
+
+          <button class="btn btn-success btn-sm d-flex align-items-center gap-2" (click)="openAddUserModal()">
+            <i class="fas fa-plus"></i> {{ t('addNewUser') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="bg-light">
+            <tr class="text-muted small text-uppercase">
+              <th scope="col" style="width: 50px;">
+                <input type="checkbox" [checked]="allSelected" (change)="toggleAllSelection($event)">
+              </th>
+              <th scope="col">{{ t('name') }}</th>
+              <th scope="col">{{ t('email') }}</th>
+              <th scope="col">{{ t('mobile') }}</th>
+              <th scope="col">{{ t('country') }}</th>
+              <th scope="col">{{ t('city') }}</th>
+              <th scope="col">{{ t('region') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+  <tr *ngFor="let user of subscribers; let i = index" class="border-bottom">
+    <td>
+      <input
+        type="checkbox"
+        [(ngModel)]="user.selected"
+        class="custom-checkbox"
+        id="chk{{i}}"
+      />
+    </td>
+    <td class="fw-bold text-dark">{{ user.name }}</td>
+    <td class="text-muted">{{ user.email }}</td>
+    <td class="text-muted">{{ user.mobile }}</td>
+    <td class="text-muted">{{ user.country }}</td>
+    <td class="text-muted">{{ user.city }}</td>
+    <td class="text-muted">{{ user.region }}</td>
+  </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pb-3 px-2">
+          <div class="text-muted small">
+            {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }}
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-light text-dark pagination-btn"
+                    (click)="changePage(currentPage - 1)"
+                    [disabled]="currentPage === 1">
+              <i class="fas fa-chevron-left small"></i> {{ t('back') }}
+            </button>
+
+            <div class="d-flex gap-1">
+              <ng-container *ngFor="let page of paginationArray">
+                <button *ngIf="page !== '...'"
+                        class="btn pagination-btn"
+                        [class.active]="page === currentPage"
+                        (click)="changePage(page)">
+                  {{ page }}
+                </button>
+                <span *ngIf="page === '...'" class="px-2 text-muted">...</span>
+              </ng-container>
+            </div>
+
+            <button class="btn btn-outline-light text-dark pagination-btn"
+                    (click)="changePage(currentPage + 1)"
+                    [disabled]="currentPage === totalPages">
+              {{ t('next') }} <i class="fas fa-chevron-right small"></i>
+            </button>
+
+            <div class="d-flex align-items-center gap-2 ms-3">
+              <span class="text-muted small">Page</span>
+              <input type="number" class="form-control pagination-input" [(ngModel)]="goToPageInput">
+              <button class="btn fw-bold text-dark" (click)="goToPage()">Go</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Filter Modal Overlay -->
+<div class="filter-overlay" *ngIf="showFilterModal" (click)="closeFilter()" [dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
+  <div class="filter-modal" (click)="$event.stopPropagation()">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="fw-bold mb-0">{{ t('filter') }}</h5>
+      <i class="fas fa-times text-muted fs-5" style="cursor: pointer;" (click)="closeFilter()"></i>
+    </div>
+
+    <div class="filter-body">
+      <div class="mb-3">
+        <label class="form-label text-muted small">{{ t('country') }}</label>
+        <select class="form-select text-muted">
+          <option selected>{{ t('selectCountry') }}</option>
+          <option value="sa">{{ t('saudiArabia') }}</option>
+          <option value="eg">{{ t('egypt') }}</option>
+        </select>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-6">
+          <label class="form-label text-muted small">{{ t('city') }}</label>
+          <select class="form-select text-muted">
+            <option selected>{{ t('selectCity') }}</option>
+            <option value="jeddah">{{ t('jeddah') }}</option>
+            <option value="riyadh">{{ t('riyadh') }}</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label class="form-label text-muted small">{{ t('region') }}</label>
+          <select class="form-select text-muted">
+            <option selected>{{ t('selectRegion') }}</option>
+            <option value="makkah">{{ t('makkahRegion') }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small">{{ t('status') }}</label>
+        <select class="form-select text-muted">
+          <option selected>{{ t('selectStatus') }}</option>
+          <option value="active">{{ t('active') }}</option>
+          <option value="inactive">{{ t('inactive') }}</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small">{{ t('newSubscribers') }}</label>
+        <input type="text" class="form-control" [placeholder]="t('eg30Days')">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label text-muted small">{{ t('subscriptionEnding') }}</label>
+        <input type="text" class="form-control" [placeholder]="t('eg15Days')">
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button class="btn text-success fw-bold" (click)="resetFilter()">{{ t('reset') }}</button>
+      <button class="btn btn-success px-4" (click)="applyFilter()">{{ t('applyFilters') }}</button>
+    </div>
+
+  </div>
+</div>
+</div>
+  </div>
+
+  <div *ngIf="activeTab === 'renewal'">
+    <div><div class="row mt-4">
+  <div class="col-12">
+    <div class="card shadow-sm border-0 px-4">
+      <div class="d-flex align-items-center justify-content-between flex-wrap py-4">
+        <div>
+          <h6>{{ t('SubscriptionRenewals') }}</h6>
+            <p>{{ t('Monitorrenewal') }}</p>
+        </div>
+            <div class="d-flex align-items-center">
+              <i class="fa-solid fa-recycle"></i>
+              <button class="btn btn-white fw-bold" (click)="openReminderModal()">{{ t('reminder') }}</button>
+            </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="bg-light">
+            <tr class="text-muted small text-uppercase">
+              <th scope="col" style="width: 50px;">
+                <input type="checkbox" [checked]="allSelected" (change)="toggleAllSelection($event)">
+              </th>
+              <th scope="col">{{ t('name') }}</th>
+              <th scope="col">{{ t('email') }}</th>
+              <th scope="col">{{ t('mobile') }}</th>
+              <th scope="col">{{ t('country') }}</th>
+              <th scope="col">{{ t('city') }}</th>
+              <th scope="col">{{ t('region') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+  <tr *ngFor="let user of subscribers; let i = index" class="border-bottom">
+    <td>
+      <input
+        type="checkbox"
+        [(ngModel)]="user.selected"
+        class="custom-checkbox"
+        id="chk{{i}}"
+      />
+    </td>
+    <td class="fw-bold text-dark">{{ user.name }}</td>
+    <td class="text-muted">{{ user.email }}</td>
+    <td class="text-muted">{{ user.mobile }}</td>
+    <td class="text-muted">{{ user.country }}</td>
+    <td class="text-muted">{{ user.city }}</td>
+    <td class="text-muted">{{ user.region }}</td>
+  </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pb-3 px-2">
+          <div class="text-muted small">
+            {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }}
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-light text-dark pagination-btn"
+                    (click)="changePage(currentPage - 1)"
+                    [disabled]="currentPage === 1">
+              <i class="fas fa-chevron-left small"></i> {{ t('back') }}
+            </button>
+
+            <div class="d-flex gap-1">
+              <ng-container *ngFor="let page of paginationArray">
+                <button *ngIf="page !== '...'"
+                        class="btn pagination-btn"
+                        [class.active]="page === currentPage"
+                        (click)="changePage(page)">
+                  {{ page }}
+                </button>
+                <span *ngIf="page === '...'" class="px-2 text-muted">...</span>
+              </ng-container>
+            </div>
+
+            <button class="btn btn-outline-light text-dark pagination-btn"
+                    (click)="changePage(currentPage + 1)"
+                    [disabled]="currentPage === totalPages">
+              {{ t('next') }} <i class="fas fa-chevron-right small"></i>
+            </button>
+
+            <div class="d-flex align-items-center gap-2 ms-3">
+              <span class="text-muted small">Page</span>
+              <input type="number" class="form-control pagination-input" [(ngModel)]="goToPageInput">
+              <button class="btn fw-bold text-dark" (click)="goToPage()">Go</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Filter Modal Overlay -->
+<div class="filter-overlay" *ngIf="showFilterModal" (click)="closeFilter()">
+  <div class="filter-modal" (click)="$event.stopPropagation()">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="fw-bold mb-0">{{ t('filter') }}</h5>
+      <i class="fas fa-times text-muted fs-5" style="cursor: pointer;" (click)="closeFilter()"></i>
+    </div>
+
+    <div class="filter-body">
+      <div class="mb-3">
+        <label class="form-label text-muted small">{{ t('country') }}</label>
+        <select class="form-select text-muted">
+          <option selected>{{ t('selectCountry') }}</option>
+          <option value="sa">{{ t('saudiArabia') }}</option>
+          <option value="eg">{{ t('egypt') }}</option>
+        </select>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-6">
+          <label class="form-label text-muted small">{{ t('city') }}</label>
+          <select class="form-select text-muted">
+            <option selected>{{ t('selectCity') }}</option>
+            <option value="jeddah">{{ t('jeddah') }}</option>
+            <option value="riyadh">{{ t('riyadh') }}</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label class="form-label text-muted small">{{ t('region') }}</label>
+          <select class="form-select text-muted">
+            <option selected>{{ t('selectRegion') }}</option>
+            <option value="makkah">{{ t('makkahRegion') }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small">{{ t('status') }}</label>
+        <select class="form-select text-muted">
+          <option selected>{{ t('selectStatus') }}</option>
+          <option value="active">{{ t('active') }}</option>
+          <option value="inactive">{{ t('inactive') }}</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small">{{ t('newSubscribers') }}</label>
+        <input type="text" class="form-control" [placeholder]="t('eg30Days')">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label text-muted small">{{ t('subscriptionEnding') }}</label>
+        <input type="text" class="form-control" [placeholder]="t('eg15Days')">
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button class="btn text-success fw-bold" (click)="resetFilter()">{{ t('reset') }}</button>
+      <button class="btn btn-success px-4" (click)="applyFilter()">{{ t('applyFilters') }}</button>
+    </div>
+
+  </div>
+</div>
+</div></div>
+  </div>
+
+</div>
+<div class="filter-overlay" *ngIf="showAddUserModal" [dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
+  <div class="filter-modal modal-lg" (click)="$event.stopPropagation()">
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <h4 class="fw-bold mb-1">
+          <span *ngIf="currentStep === 1">{{ t('addNewSubscriberTitle') }}</span>
+          <span *ngIf="currentStep === 2">{{ t('licenseInfoTitle') }}</span>
+          <span *ngIf="currentStep === 3">{{ t('legalEntityTitle') }}</span>
+          <span *ngIf="currentStep === 4">{{ t('subscriptionBillingTitle') }}</span>
+          <span *ngIf="currentStep === 5">{{ t('technicalInfoTitle') }}</span>
+        </h4>
+        <p class="text-muted small mb-0">
+          <span *ngIf="currentStep === 1">{{ t('addNewSubscriberDesc') }}</span>
+          <span *ngIf="currentStep === 2">{{ t('licenseInfoDesc') }}</span>
+          <span *ngIf="currentStep === 3">{{ t('legalEntityDesc') }}</span>
+          <span *ngIf="currentStep === 4">{{ t('subscriptionBillingDesc') }}</span>
+          <span *ngIf="currentStep === 5">{{ t('technicalInfoDesc') }}</span>
+        </p>
+      </div>
+      <div class="d-flex flex-column align-items-end">
+        <i class="fas fa-times text-muted fs-5 mb-2" style="cursor: pointer;" (click)="closeAddUserModal()"></i>
+        <span class="fw-bold small">{{ t('step') }} {{currentStep}} {{ t('of') }} {{totalSteps}}</span>
+      </div>
+    </div>
+
+    <div class="wizard-body">
+
+      <div *ngIf="currentStep === 1">
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('country') }}</label>
+          <select class="form-select"><option>{{ t('selectCountry') }}</option></select>
+        </div>
+        <div class="row mb-4">
+          <div class="col-6">
+            <label class="form-label text-muted small">{{ t('city') }}</label>
+            <select class="form-select"><option>{{ t('selectCity') }}</option></select>
+          </div>
+          <div class="col-6">
+            <label class="form-label text-muted small">{{ t('region') }}</label>
+            <select class="form-select"><option>{{ t('selectRegion') }}</option></select>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fas fa-gavel text-muted mt-1"></i>
+              <div>
+                <div class="fw-bold small">{{ t('cpa') }}</div>
+                <a href="#" class="text-muted x-small text-decoration-none">https://socpa.org.sa</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fas fa-building text-muted mt-1"></i>
+              <div>
+                <div class="fw-bold small">{{ t('commerceMinistry') }}</div>
+                <a href="#" class="text-muted x-small text-decoration-none">https://mc.gov.sa</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fas fa-file-invoice-dollar text-muted mt-1"></i>
+              <div>
+                <div class="fw-bold small">{{ t('taxAuthority') }}</div>
+                <a href="#" class="text-muted x-small text-decoration-none">https://Tax.gov.sa</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fas fa-hand-holding-usd text-muted mt-1"></i>
+              <div>
+                <div class="fw-bold small">{{ t('zakatAuthority') }}</div>
+                <a href="#" class="text-muted x-small text-decoration-none">https://zatca.gov.sa</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 2">
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('licenseName') }}</label>
+          <input type="text" class="form-control" [placeholder]="t('enterLicenseName')">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('licenseNumber') }}</label>
+          <input type="text" class="form-control" [placeholder]="t('enterLicenseNumber')">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('licenseDate') }}</label>
+          <input type="date" class="form-control text-muted">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('licenseType') }}</label>
+          <select class="form-select"><option>{{ t('selectLicenseType') }}</option></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('licenseCertificate') }}</label>
+          <div class="input-group">
+            <input type="text" class="form-control" [placeholder]="t('uploadLicenseCert')" readonly>
+            <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 3">
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('ownersName') }}</label><input class="form-control" [placeholder]="t('enterOwnerName')"></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('subscriberEmail') }}</label><input class="form-control" [placeholder]="t('enterSubscriberEmail')"></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('mobile') }}</label><input class="form-control" [placeholder]="t('enterMobile')"></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('subscriberStatus') }}</label><select class="form-select"><option>{{ t('selectSubscriberStatus') }}</option></select></div>
+
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('legalEntityType') }}</label><input class="form-control" [placeholder]="t('enterLegalEntityType')"></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('legalEntityNationality') }}</label><input class="form-control" [placeholder]="t('enterNationality')"></div>
+
+        <div class="mb-3">
+            <label class="form-label text-muted small">{{ t('taxNumber') }}</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [placeholder]="t('enterTaxNumber')">
+              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
+            </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('commRegisterDate') }}</label>
+          <input type="date" class="form-control text-muted">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('fiscalYear') }}</label>
+          <input type="date" class="form-control text-muted">
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small">{{ t('unifiedNumber') }}</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [placeholder]="t('enterUnifiedNumber')">
+              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small">{{ t('commRegisterActivity') }}</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [placeholder]="t('enterCommActivity')">
+              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
+            </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 4">
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('subPackage') }}</label><select class="form-select"><option>{{ t('selectSubPackage') }}</option></select></div>
+        <div class="row mb-3">
+           <div class="col-6"><label class="form-label text-muted small">{{ t('startDate') }}</label><select class="form-select"><option>{{ t('selectStartDate') }}</option></select></div>
+           <div class="col-6"><label class="form-label text-muted small">{{ t('endDate') }}</label><select class="form-select"><option>{{ t('selectEndDate') }}</option></select></div>
+        </div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('numOfUsers') }}</label><input class="form-control" [placeholder]="t('enterNumOfUsers')"></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('numOfFiles') }}</label><input class="form-control" [placeholder]="t('enterNumOfFiles')"></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('numOfBranches') }}</label><input class="form-control" [placeholder]="t('enterNumOfBranches')"></div>
+      </div>
+
+      <div *ngIf="currentStep === 5">
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('facilityLink') }} <span class="text-muted x-small">{{ t('optional') }}</span></label><input class="form-control" [placeholder]="t('enterFacilityLink')"></div>
+        <div class="mb-3">
+            <label class="form-label text-muted small">{{ t('factoryLogo') }} <span class="text-muted x-small">{{ t('optional') }}</span></label>
+            <div class="input-group">
+              <input type="text" class="form-control" [placeholder]="t('uploadFactoryLogo')" readonly>
+              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
+            </div>
+        </div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('language') }} <span class="text-muted x-small">{{ t('optional') }}</span></label><select class="form-select"><option>{{ t('selectLanguage') }}</option></select></div>
+        <div class="mb-3"><label class="form-label text-muted small">{{ t('currencySettings') }}</label><input class="form-control" value="SAR" readonly></div>
+      </div>
+
+    </div>
+
+    <div class="d-flex justify-content-end align-items-center gap-3 mt-5">
+      <button class="btn border px-4" *ngIf="currentStep > 1" (click)="prevStep()">{{ t('back') }}</button>
+
+      <button class="btn btn-success px-4" *ngIf="currentStep < totalSteps" (click)="nextStep()">{{ t('next') }}</button>
+
+      <button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="submitNewUser()">{{ t('submit') }}</button>
+    </div>
+
+  </div>
+</div>
+<div class="filter-overlay" *ngIf="submissionStatus === 'success'">
+  <div class="filter-modal" style="max-width: 600px;" (click)="$event.stopPropagation()">
+
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div>
+        <h4 class="fw-bold mb-1">{{ t('subscriberCreated') }}</h4>
+        <p class="text-muted small">{{ t('subscriberCreatedDesc') }}</p>
+      </div>
+      <i class="fas fa-times text-muted fs-5" style="cursor: pointer;" (click)="closeSuccessModal()"></i>
+    </div>
+
+    <hr class="text-muted opacity-25 mb-4">
+
+    <div class="mb-4">
+      <label class="form-label text-muted small">{{ t('subscriberLink') }}</label>
+      <div class="input-group link-group">
+        <span class="input-group-text border-0 fw-bold small">{{ t('url') }}</span>
+        <input type="text" class="form-control border-0 bg-transparent" [value]="generatedLink" readonly>
+        <button class="btn btn-success copy-btn" (click)="copyLink()">
+          <i class="far fa-copy"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="d-flex gap-3 mt-5">
+      <button class="btn btn-outline-secondary w-50 py-2" (click)="resetAndAddAnother()">{{ t('addAnotherSubscriber') }}</button>
+      <button class="btn btn-success w-50 py-2" (click)="closeSuccessModal()">{{ t('goToSubscribersList') }}</button>
+    </div>
+
+  </div>
+</div>
+<div class="filter-overlay" *ngIf="showReminderModal">
+  <div class="filter-modal" style="max-width: 400px;" (click)="$event.stopPropagation()">
+
+    <div class="d-flex justify-content-center mb-3">
+      <div class="icon-circle-bg">
+        <i class="fas fa-sync-alt text-success fs-4"></i>
+      </div>
+    </div>
+
+    <div class="text-start mb-3">
+      <h5 class="fw-bold mb-2">{{ t('sendReminder') }}</h5>
+      <p class="text-muted small mb-0">{{ t('reminderDesc') }}</p>
+    </div>
+
+    <div class="d-flex flex-column gap-3 mb-4">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="remEmail" [(ngModel)]="reminderOptions.email">
+        <label class="form-check-label small" for="remEmail">{{ t('sendViaEmail') }}</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="remPhone" [(ngModel)]="reminderOptions.phone">
+        <label class="form-check-label small" for="remPhone">{{ t('sendViaPhone') }}</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="remSystem" [(ngModel)]="reminderOptions.system">
+        <label class="form-check-label small" for="remSystem">{{ t('sendViaSystem') }}</label>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary w-50" (click)="closeReminderModal()">{{ t('cancel') }}</button>
+      <button class="btn btn-success w-50" (click)="confirmReminder()">{{ t('confirm') }}</button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,243 @@
+<div class="container-fluid" [class.rtl]="isRtl" >
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 fw-semibold">{{ t('goodMorning') }}, {{ userName }} 👋</h2>
+      <p class="small mb-0">{{ t('overviewToday') }}</p>
+    </div>
+    <div class="d-flex align-items-center mt-3 mt-md-0">
+
+      <!-- فلتر Select + أيقونة -->
+      <div class="filter-select position-relative me-2">
+        <select class="form-select ps-5">
+          <option selected disabled>15 Oct 2024</option>
+          <option value="today">{{ t('today') }}</option>
+          <option value="yesterday">{{ t('yesterday') }}</option>
+          <option value="week">{{ t('last7Days') }}</option>
+          <option value="month">{{ t('last30Days') }}</option>
+        </select>
+        <i class="fas fa-calendar-alt filter-icon"></i>
+      </div>
+
+      <!-- زرار Export -->
+      <button class="btn btn-export text-white">
+        <i class="fas fa-arrow-up-from-bracket me-2"></i>
+        {{ t('export') }}
+      </button>
+
+    </div>
+  </div>
+
+  <div class="row">
+
+    <!-- Card 1 -->
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h6 class="card-title mb-3">{{ t('totalUsers') }}</h6>
+              <h3 class="fm-0">15,342</h3>
+            </div>
+            <div class="icon-box bg-light-purple">
+              <i class="fas fa-users text-purple"></i>
+            </div>
+          </div>
+
+          <div class="stat-footer small text-danger">
+            <i class="fas fa-arrow-down"></i>
+            <span>{{ t('downFromYesterday', { value: '3.7%' }) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h6 class="text-muted card-title mb-3">{{ t('filesCreated') }}</h6>
+              <h3 class="m-0">1,342,454</h3>
+            </div>
+            <div class="icon-box bg-light-green">
+              <i class="fas fa-file-lines text-green"></i>
+            </div>
+          </div>
+
+          <div class="stat-footer small text-success mt-4">
+            <i class="fas fa-arrow-up"></i>
+            <span>{{ t('upFromYesterday', { value: '10.2%' }) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h6 class="card-title mb-3">{{ t('totalFileSize') }}</h6>
+              <h3 class="m-0">320 GB</h3>
+            </div>
+            <div class="icon-box bg-light-yellow">
+              <i class="fas fa-box-archive text-yellow"></i>
+            </div>
+          </div>
+
+          <div class="stat-footer small text-success mt-4">
+            <i class="fas fa-arrow-up"></i>
+            <span>{{ t('upFromYesterday', { value: '8.5%' }) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="container-fluid" [class.rtl]="isRtl" >
+  <div class="row mt-4">
+
+    <div class="col-lg-8 mb-4">
+      <div class="card shadow-sm border-0 p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <p class="text-muted mb-1">{{ t('totalIncome') }}</p>
+            <h3 class="fw-bold">$1,342,454</h3>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-dark btn-sm d-flex align-items-center px-3" style="background-color: #007d58; border: none; border-radius: 16px;">
+              2024 <i class="fas fa-chevron-down ms-2" style="font-size: 0.7rem;"></i>
+            </button>
+            <button class="btn btn-light btn-sm px-3 text-muted fw-medium" style="border-radius: 16px;">
+              {{ t('yearly') }}
+            </button>
+          </div>
+        </div>
+
+        <div style="height: 300px;">
+          <canvas baseChart
+            [data]="barChartData"
+            [options]="barChartOptions"
+            [type]="barChartType">
+          </canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm border-0 p-4 h-100">
+        <h5 class="card-title fw-semibold mb-4" style="font-size: 1rem;">{{ t('supportTickets') }}</h5>
+
+        <div class="d-flex justify-content-center align-items-center mb-4 mt-4" style="height: 220px; position: relative;">
+           <canvas baseChart
+             [data]="doughnutChartData"
+             [options]="doughnutChartOptions"
+             [type]="doughnutChartType">
+           </canvas>
+        </div>
+
+        <div class="d-flex justify-content-around px-2 mt-4">
+          <div class="d-flex align-items-center">
+            <span class="legend-dot" style="background-color: #007d58;"></span>
+            <span class="text-dark fw-medium small ms-2">{{ t('open') }}</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <span class="legend-dot" style="background-color: #10b981;"></span>
+            <span class="text-dark fw-medium small ms-2">{{ t('closed') }}</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <span class="legend-dot" style="background-color: #34d399;"></span>
+            <span class="text-dark fw-medium small ms-2">{{ t('pending') }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card shadow-sm border-0 px-4">
+      <div class="d-flex align-items-center flex-wrap py-4">
+
+        <!-- العنوان وأزرار Edit/Delete -->
+        <div class="d-flex align-items-center gap-4 flex-nowrap mx-4">
+          <h5 class="mb-0 table-title">{{ t('subscribersTable') }}</h5>
+          <div class="d-flex gap-3 text-muted small">
+            <span role="button" class="d-flex align-items-center gap-1 hover-primary">
+              <i class="fas fa-pen"></i> {{ t('edit') }}
+            </span>
+            <span role="button" class="d-flex align-items-center gap-1 hover-danger">
+              <i class="fas fa-trash"></i> {{ t('delete') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- البحث والأزرار -->
+        <div class="d-flex align-items-center gap-2 flex-nowrap">
+          <div class="search-container">
+            <input type="text" [placeholder]="t('search')">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+
+          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+            <i class="fas fa-filter"></i> {{ t('filter') }}
+          </button>
+
+          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+            <i class="fas fa-cloud-arrow-down"></i> {{ t('export') }}
+          </button>
+
+          <button class="btn btn-success btn-sm d-flex align-items-center gap-2">
+            <i class="fas fa-plus"></i> {{ t('addNewUser') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="bg-light">
+            <tr class="text-muted small text-uppercase">
+              <th scope="col" style="width: 50px;">
+                <i class="far fa-square-minus text-success fs-5" role="button"></i>
+              </th>
+              <th scope="col">{{ t('name') }}</th>
+              <th scope="col">{{ t('email') }}</th>
+              <th scope="col">{{ t('mobile') }}</th>
+              <th scope="col">{{ t('country') }}</th>
+              <th scope="col">{{ t('city') }}</th>
+              <th scope="col">{{ t('region') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of subscribers" class="border-bottom">
+              <td>
+                <div class="custom-checkbox bg-success rounded d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
+                  <i class="fas fa-check text-white" style="font-size: 0.7rem;"></i>
+                </div>
+              </td>
+              <td class="fw-bold text-dark">{{ user.name }}</td>
+              <td class="text-muted">{{ user.email }}</td>
+              <td class="text-muted">{{ user.mobile }}</td>
+              <td class="text-muted">{{ user.country }}</td>
+              <td class="text-muted">{{ user.city }}</td>
+              <td class="text-muted">{{ user.region }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="text-center" style="margin-bottom: 15px;">
+          <a routerLink="/dashboard/subscribers" class="fs-5 text-decoration-none text-success">{{ t('viewAll') }}</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

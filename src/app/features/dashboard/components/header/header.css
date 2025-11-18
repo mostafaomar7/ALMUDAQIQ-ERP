@@ -1,0 +1,263 @@
+/* :host بيخلي الـ component ياخد العرض الكامل */
+:host {
+  display: block;
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ebeef2; /* خط خفيف تحت الهيدر */
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  height: 65px;
+  box-sizing: border-box;
+}
+
+/* ---------------- */
+/* الجزء الشمال */
+/* ---------------- */
+.header-title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* ---------------- */
+/* الجزء اليمين */
+/* ---------------- */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+/* تنسيق أزرار الأيقونات الدائرية */
+.icon-btn {
+  background-color: #f8f9fa;
+  color: #5a6a85;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;               /* سنتر الأيقونة */
+  align-items: center;         /* عمودي */
+  justify-content: center;     /* أفقي */
+
+  padding: 0;                  /* إزالة الحشو الافتراضي */
+  border-radius: 50%;          /* شكل دائرة */
+  border: none;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f1f3f5;
+  }
+
+  i {
+    font-size: 18px;           /* حجم الأيقونة */
+    line-height: 1;            /* منع النزول */
+  }
+}
+
+/* إزالة padding الافتراضي للـ mat-icon-button */
+.icon-btn.mat-icon-button {
+  padding: 0 !important;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #343a40;
+  font-size: 14px;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #6c757d;
+}
+/* ... (الستايلات القديمة الخاصة بالهيدر تظل كما هي) ... */
+
+/* نقطة حمراء فوق الجرس */
+.badge-dot {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  border: 2px solid #fff; /* حدود بيضاء عشان تفصل عن الأيقونة */
+}
+
+/* -------------------------------------------------- */
+/* تخصيص Mat-Menu (يحتاج ViewEncapsulation.None) */
+/* -------------------------------------------------- */
+
+/* الكلاس ده احنا ضفناه في الـ HTML على الـ mat-menu */
+.notification-menu-panel {
+  min-width: 380px !important;
+  max-width: 380px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  padding: 0 !important; /* إزالة البادينج الافتراضي */
+}
+
+.notification-menu-panel .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+/* حاوية القائمة */
+.notif-container {
+  background: #fff;
+}
+
+/* --- الهيدر والتابات --- */
+.notif-header {
+  display: flex;
+  gap: 20px;
+  padding: 15px 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tab-item {
+  font-size: 14px;
+  color: #6c757d;
+  padding-bottom: 12px;
+  cursor: pointer;
+  position: relative;
+  font-weight: 500;
+}
+
+.tab-item.active {
+  color: #212529;
+  font-weight: 600;
+}
+
+/* الخط الأسود تحت التاب النشط */
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #212529;
+}
+
+.badge-count {
+  background-color: #dc3545;
+  color: white;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* --- قائمة الإشعارات --- */
+.notif-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  align-items: start;
+  gap: 15px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f8f9fa;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notif-item:hover {
+  background-color: #fbfbfb;
+}
+
+/* أيقونات الإشعارات */
+.notif-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+/* ألوان الخلفيات للأيقونات حسب النوع */
+.notif-icon-box.info { background-color: #eef2ff; color: #4f46e5; }       /* أزرق */
+.notif-icon-box.warning { background-color: #fff7ed; color: #ea580c; }    /* برتقالي */
+.notif-icon-box.success { background-color: #f0fdf4; color: #16a34a; }    /* أخضر */
+.notif-icon-box.danger { background-color: #fef2f2; color: #dc2626; }     /* أحمر */
+.notif-icon-box.default { background-color: #f3f4f6; color: #4b5563; }    /* رمادي */
+
+/* المحتوى النصي */
+.notif-content {
+  flex-grow: 1;
+}
+
+.notif-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.notif-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+
+.notif-time {
+  font-size: 11px;
+  color: #9ca3af;
+  display: block;
+}
+
+/* النقطة الحمراء للإشعار غير المقروء */
+.unread-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  margin-top: 6px;
+}

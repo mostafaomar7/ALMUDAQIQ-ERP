@@ -1,0 +1,251 @@
+/* الألوان الأساسية باستخدام متغيرات CSS الأصلية */
+:root {
+  --primary-color: #00705f; /* الأخضر الداكن */
+  --light-bg: #ffffff;
+  --dark-bg: #212121; /* لون الخلفية الداكن للصورة (غير مستخدم هنا) */
+  --border-color: #e0e0e0;
+  --input-bg: #f5f5ffa3; /* خلفية حقل الإدخال الفاتحة */
+  --text-color: #333333;
+  --primary-hover-color: #005a4a; /* تم حسابها يدوياً بدلاً من دالة darken() */
+}
+
+/* ------------------ التنسيق العام والصفحة ------------------ */
+
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--light-bg);
+  font-family: Arial, sans-serif;
+}
+
+/* ------------------ القسم الأيسر (النموذج) ------------------ */
+
+.login-form-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  max-width: 50%;
+}
+
+/* الشعار ومحدد اللغة */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+}
+
+.logo-text {
+  font-weight: bold;
+  color: #1A1A1A;
+  font-size: 1.2em;
+}
+i{
+  margin: 0px 5px;
+}
+.language-selector {
+  display: flex;
+  align-items: center;
+  padding: 10px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-color);
+  background-color: #F7F7F7;
+}
+
+/* بطاقة تسجيل الدخول */
+.auth-card {
+  max-width: 380px;
+  margin: auto;
+  padding: 0;
+  width: 100%;
+}
+
+.title {
+  font-size: 2em;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: var(--text-color);
+}
+
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.9em;
+  color: var(--text-color);
+  margin-bottom: 5px;
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid #D4D7E3;  border-radius: 12px;
+  background-color: var(--input-bg);
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+  background-color: #F7FBFF;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background-color: var(--light-bg);
+}
+
+input::placeholder {
+  color: #a0a0a0;
+}
+
+/* تغليف كلمة المرور لرمز العين */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #a0a0a0;
+}
+
+/* رابط نسيت كلمة المرور */
+.forgot-password-link {
+  text-align: right;
+  margin-bottom: 30px;
+}
+
+.forgot-password-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: opacity 0.3s;
+}
+
+.forgot-password-link a:hover {
+  opacity: 0.8;
+}
+
+/* زر تسجيل الدخول */
+.login-button {
+  width: 100%;
+  padding: 15px;
+  color: var(--light-bg);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, opacity 0.3s;
+  background-color: #047857;
+  color: #ffffff;
+}
+
+.login-button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+.text-end{
+font-weight: 400;
+font-style: Regular;
+font-size: 14px;
+line-height: 100%;
+letter-spacing: 0%;
+text-align: right;
+opacity: 53%;
+}
+/* رسائل الخطأ */
+.error-messages {
+  margin-top: -10px;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.error-messages small {
+  color: #ff3333;
+  font-size: 0.8em;
+  display: block;
+}
+
+/* ------------------ القسم الأيمن (الصورة) ------------------ */
+
+.login-image-side {
+  flex: 1;
+  /* تم تصحيح 'assests' إلى 'assets' */
+  /* المسار الافتراضي للصورة - عدّله حسب موقع الملف الفعلي في مشروعك */
+  background-image: url('/assets/login.png');
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin: 40px 30px 40px;
+}
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 1rem; /* يبقى دائمًا على جهة الإدخال مهما كانت اللغة */
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* إذا الصفحة RTL */
+:host-context([dir="rtl"]) .toggle-password {
+  right: auto;
+  left: 1rem;
+}
+
+/* ------------------ استجابة الوسائط (اختياري: للأجهزة الأصغر) ------------------ */
+
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-image-side {
+    display: none;
+  }
+
+  .login-form-side {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .auth-card {
+    margin: 40px auto;
+  }
+
+  .header {
+    margin-bottom: 40px;
+  }
+}

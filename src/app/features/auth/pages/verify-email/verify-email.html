@@ -1,0 +1,57 @@
+<div class="d-flex min-vh-100 login-container text-center">
+
+  <div class="flex-fill p-4 p-md-5 login-form-side">
+
+    <!-- الهيدر مع تغيير اللغة -->
+    <header class="header d-flex justify-content-between align-items-center mb-4">
+      <div class="logo d-flex align-items-center">
+        <img src="Logo.png" alt="ALMUDAQIQ Logo" width="30" height="30" class="me-2">
+        <span class="fw-bold logo-text">ALMUDAQIQ</span>
+      </div>
+
+      <div class="language-selector d-flex align-items-center px-2 py-1 rounded border bg-light text-dark"
+           (click)="changeLang(currentLang === 'en' ? 'ar' : 'en')">
+        <i class="fas fa-globe me-1"></i>
+        <span class="language-text me-1">{{ currentLang.toUpperCase() }}</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </header>
+
+    <div class="auth-card mx-auto" style="max-width: 380px;">
+      <h2 class="title">{{ t('verifyEmailTitle') }}</h2>
+      <p class="subtitle">
+        {{ t('verifyEmailSentTo') }} <strong>{{ email }}</strong>
+      </p>
+
+      <form>
+        <div class="otp-inputs">
+          <input #otp1 type="text" class="otp-input" maxlength="1" inputmode="numeric"
+                 (input)="onInput($event, otp2)" (keydown)="onKeyDown($event, null)">
+          <input #otp2 type="text" class="otp-input" maxlength="1" inputmode="numeric"
+                 (input)="onInput($event, otp3)" (keydown)="onKeyDown($event, otp1)">
+          <input #otp3 type="text" class="otp-input" maxlength="1" inputmode="numeric"
+                 (input)="onInput($event, otp4)" (keydown)="onKeyDown($event, otp2)">
+          <input #otp4 type="text" class="otp-input" maxlength="1" inputmode="numeric"
+                 (input)="onInput($event, otp5)" (keydown)="onKeyDown($event, otp3)">
+          <input #otp5 type="text" class="otp-input" maxlength="1" inputmode="numeric"
+                 (input)="onInput($event, otp6)" (keydown)="onKeyDown($event, otp4)">
+          <input #otp6 type="text" class="otp-input" maxlength="1" inputmode="numeric"
+                 (input)="onInput($event, null)" (keydown)="onKeyDown($event, otp5)">
+        </div>
+
+        <p class="subtitle mt-3">{{ t('verifyEmailInstructions') }}</p>
+
+        <button type="button" class="verify-button" [routerLink]="'/auth/reset-password'">
+          {{ t('verifyBtn') }}
+        </button>
+
+        <div class="resend-link mt-2">
+          {{ t('didntReceiveCode') }}
+          <a href="#" class="resend-otp">{{ t('resend') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="flex-fill login-image-side d-none d-md-block"></div>
+</div>

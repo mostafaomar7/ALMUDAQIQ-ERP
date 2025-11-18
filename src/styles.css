@@ -1,1 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+body.dark-mode .app-header {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode .card {
+  background-color: #1f1f1f;
+  color: #fff;
+}
+
+body.dark-mode .mat-menu-panel {
+  background-color: #1f1f1f;
+  color: #fff;
+}
+
+/* مثال لأزرار وأيقونات */
+body.dark-mode .icon-btn i {
+  color: #fff;
+}
+body.dark-mode .sidebar{
+  background-color: #1A1A1A;
+}
+body.dark-mode a{
+  color: #9CA3AF;
+}
+body.dark-mode .content{
+  background-color: #242424;
+}
+body.dark-mode .border-end{
+ border-right: var(--bs-border-width) var(--bs-border-style) #242424 !important
+}
+/* بدلاً من استهداف كل العناصر، نحدد thead فقط */
+body.dark-mode .table > thead > tr > * {
+  background-color: #242424;
+  color: #F9FAFB;
+  border-color: #373b3e; /* لون حدود مناسب للوضع الليلي */
+}
+
+body.dark-mode .bg-light {
+  background-color: #242424 !important;
+  color: #F9FAFB !important;
+}
+/* 1. تلوين خلفية صفوف وخلايا الـ tbody */
+body.dark-mode .table > tbody > tr > td {
+  background-color: #242424;
+  color: #F9FAFB;
+  border-color: #373b3e;
+}
+
+/* 2. مشكلة مهمة: الاسم لديك يحمل كلاس text-dark */
+/* هذا الكلاس يفرض اللون الأسود حتى لو الخلفية سوداء، لذا يجب قلبه للأبيض */
+body.dark-mode .table > tbody .text-dark {
+  color: #F9FAFB !important;
+}
+
+/* 3. تعديل لون النصوص الفرعية (الإيميل والموبايل) لتكون أفتح قليلاً */
+body.dark-mode .table > tbody .text-muted {
+  color: #b0b3b8 !important;
+}
+
+/* 4. تلوين أيقونات الـ Checkbox إذا لزم الأمر */
+body.dark-mode .custom-checkbox {
+    border-color: #F9FAFB; /* إطار فاتح إذا كان الجدول غامق */
+}

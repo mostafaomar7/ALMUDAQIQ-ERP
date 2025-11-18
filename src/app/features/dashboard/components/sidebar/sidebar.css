@@ -1,0 +1,68 @@
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  overflow-y: auto;
+  background: #fff;
+  padding-top: 20px;
+  border-radius: 8px 0 8px 0;
+  z-index: 100;
+  transition: all 0.3s;
+
+  /* الوضع الافتراضي LTR على اليسار */
+  left: 0;
+  right: auto;
+}
+
+/* إذا كانت الصفحة RTL، ضع sidebar على اليمين */
+.sidebar.rtl {
+  left: auto;
+  right: 0;
+  border-radius: 0 8px 0 8px;
+}
+
+.menu li a span {
+  transition: opacity 0.3s;
+}
+
+.menu li a span.d-none {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.logo{
+   font-size: 24px;
+   font-weight: 600;
+}
+
+.sidebar-header button {
+  z-index: 10;
+}
+
+/* القائمة */
+ul li {
+  padding-right: 16px;
+  padding-bottom: 4px;
+}
+
+ul li a {
+  opacity: 1;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4B5563;
+  text-decoration: none;
+  padding: 16px;
+}
+
+.menu li a.active-route {
+  background-color: #EEFFF1 !important;
+  color: #047857 !important;
+  border-radius: 99px;
+}
+
+.menu li a.active-route i {
+  color: #047857 !important;
+}
