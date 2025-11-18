@@ -5,5 +5,11 @@ export const AR = {
   activityLog: 'سجل النشاط',
   plansManagement: 'إدارة الخطط',
   settings: 'الإعدادات',
-  logout: 'تسجيل الخروج'
+  logout: 'تسجيل الخروج',
+  domainSettings: 'إعدادات النطاق',
+  accountsGuide: 'دليل الحسابات',
+  reviewGuide: 'دليل المراجعة',
+  fileStagesGuide: 'دليل مراحل الملف',
+  reviewObjectivesGuide: 'دليل أهداف المراجعة',
+  reviewMarksIndex: 'مؤشر علامات المراجعة',
 };

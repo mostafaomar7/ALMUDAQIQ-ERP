@@ -5,5 +5,11 @@ export const EN = {
   activityLog: 'Activity Log',
   plansManagement: 'Plans Managements',
   settings: 'Settings',
-  logout: 'Logout'
+  logout: 'Logout',
+  domainSettings: 'Domain Settings',
+  accountsGuide: 'Accounts Guide',
+  reviewGuide: 'Review Guide',
+  fileStagesGuide: 'File Stages Guide',
+  reviewObjectivesGuide: 'Review Objectives Guide',
+  reviewMarksIndex: 'Review Marks Index',
 };

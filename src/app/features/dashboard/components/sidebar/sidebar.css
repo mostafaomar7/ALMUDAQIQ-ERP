@@ -66,3 +66,74 @@ ul li a {
 .menu li a.active-route i {
   color: #047857 !important;
 }
+/* ... (الـ CSS الحالي لم يتغير) ... */
+/* إضافة أيقونات السهم في الروابط المنسدلة */
+.dropdown-toggle {
+    cursor: pointer; /* للإشارة إلى أنه يمكن النقر عليه */
+    justify-content: space-between; /* دفع السهم إلى اليمين */
+}
+
+/* القائمة الفرعية */
+.submenu {
+    padding-right: 0; /* لإزالة padding-right من الـ ul الأب */
+    margin-top: 4px;
+    padding-left: 20px; /* لإعطاء مسافة بادئة للقائمة الفرعية */
+}
+
+/* عناصر القائمة الفرعية */
+.submenu li {
+    padding-right: 0; /* لإزالة padding-right من الـ li الأب */
+    padding-bottom: 2px;
+    position: relative; /* لوضع المؤشر (sub-indicator) */
+}
+
+.sub-link {
+    padding: 8px 16px !important; /* تقليل حجم التبطين ليناسب عنصر فرعي */
+    font-size: 13px !important; /* خط أصغر قليلاً */
+    color: #4B5563 !important;
+}
+
+/* مؤشر القائمة الفرعية (الخط العمودي والنقطة) */
+.sub-indicator {
+    position: absolute;
+    left: 2px; /* لتوسيطه أفقياً مع الروابط الفرعية */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #D1D5DB; /* لون نقطة المؤشر */
+}
+
+/* تفعيل المؤشر عندما يكون رابط فرعي نشط */
+.submenu .active-route .sub-indicator {
+    background-color: #047857 !important; /* لون نشط */
+}
+
+/* لمحاكاة الخطوط الجانبية في الصورة */
+.submenu li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 1px;
+    height: 100%;
+    background-color: #D1D5DB; /* لون الخط */
+}
+
+/* إزالة الخط العلوي من أول عنصر فرعي */
+.submenu li:first-child::before {
+    top: 50%;
+    height: 50%;
+}
+
+/* إزالة الخط السفلي من آخر عنصر فرعي */
+.submenu li:last-child::before {
+    height: 50%;
+}
+
+/* تصميم خاص لـ "Domain Settings" كما في الصورة (يمكن أن يكون باللون الأخضر) */
+.submenu li:first-child .sub-link {
+    color: #047857 !important;
+    font-weight: 500;
+}
