@@ -5,6 +5,7 @@ import { AuthService } from '../../../../core/services/auth';
 import { RouterModule } from '@angular/router';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { Router } from '@angular/router'; // تأكد من الاستيراد
 
 // استيراد ملفات الترجمة العامة للـ auth
 import { AR } from '../i18n/ar';
@@ -28,7 +29,7 @@ export class ForgotRequest implements OnInit {
   currentLang: 'en' | 'ar' = (localStorage.getItem('lang') as 'en' | 'ar') || 'en';
   translations: typeof EN = EN; // ← تعيين افتراضي لتجنب TS2564
 
-  constructor(private fb: FormBuilder, private auth: AuthService) {}
+constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -57,24 +58,30 @@ export class ForgotRequest implements OnInit {
   }
 
   submit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    this.loading = true;
-    this.error = null;
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+  }
+  this.loading = true;
+  this.error = null;
 
-    this.auth.requestPasswordReset(this.form.value.email!)
-      .pipe(catchError(err => {
+  this.auth.requestPasswordReset(this.form.value.email!)
+    .pipe(
+      catchError(err => {
         this.error = err?.error?.message || this.t('serverError');
         this.loading = false;
         return of(null);
-      }))
-      .subscribe(res => {
-        this.loading = false;
-        if (res) {
-          this.successMsg = this.t('forgotSuccess');
-        }
-      });
-  }
+      })
+    )
+    .subscribe(res => {
+      this.loading = false;
+      console.log('OTP response:', res); // <--- هنا يتم طباعة الرد في الكونsole
+      if (res) {
+        this.successMsg = this.t('forgotSuccess');
+        // التوجيه بعد النجاح
+        this.router.navigate(['auth/verify-email']);
+      }
+    });
+}
+
 }

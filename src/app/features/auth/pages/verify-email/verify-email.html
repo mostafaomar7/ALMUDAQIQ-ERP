@@ -41,9 +41,9 @@
 
         <p class="subtitle mt-3">{{ t('verifyEmailInstructions') }}</p>
 
-        <button type="button" class="verify-button" [routerLink]="'/auth/reset-password'">
-          {{ t('verifyBtn') }}
-        </button>
+        <button type="button" class="verify-button" (click)="verify()">
+  {{ t('verifyBtn') }}
+</button>
 
         <div class="resend-link mt-2">
           {{ t('didntReceiveCode') }}

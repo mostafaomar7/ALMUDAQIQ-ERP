@@ -1,0 +1,357 @@
+/* --- General Layout --- */
+.domain-container {
+  padding: 20px 40px;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #fff;
+  color: #333;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
+}
+
+.header-text h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+}
+
+.header-text p {
+  color: #7f8c8d;
+  margin: 0;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: #008555;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #006e45;
+}
+
+/* --- Layout (Sidebar + Main) --- */
+.layout-content {
+  display: flex;
+  gap: 40px;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 15px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #555;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.sidebar li:hover {
+  background-color: #f9f9f9;
+}
+
+.sidebar li.active {
+  background-color: #e6f4ea;
+  color: #008555;
+  font-weight: 600;
+}
+
+.more-options {
+  color: #aaa;
+  font-weight: bold;
+}
+
+/* --- Main Details --- */
+.main-details {
+  flex-grow: 1;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* --- Form Grid --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  outline: none;
+  box-sizing: border-box; /* Important for input width */
+}
+
+.form-control:focus {
+  border-color: #008555;
+}
+
+/* --- Tables & Cards --- */
+.table-section {
+  margin-bottom: 40px;
+}
+
+.table-section h4 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+.custom-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 15px;
+  background-color: #fafafa;
+  font-size: 12px;
+  color: #777;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.fw-bold {
+  font-weight: 600;
+  color: #333;
+}
+
+.text-blue {
+  color: #555;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-icon:hover {
+  color: #333;
+}
+
+.card-footer-action {
+  padding: 15px;
+  text-align: center;
+  color: #008555;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #fff;
+  transition: background 0.2s;
+}
+
+.card-footer-action:hover {
+  background-color: #f4fbf8;
+}
+
+.sort-arrow {
+  font-size: 10px;
+  margin-left: 5px;
+  color: #aaa;
+}
+
+/* ==========================
+   MODAL STYLES
+   ========================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* تعتيم الخلفية */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: #fff;
+  width: 550px; /* عرض النافذة */
+  max-width: 90%;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  padding: 30px;
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+}
+
+.modal-titles h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  color: #222;
+}
+
+.modal-titles p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+/* Body inputs */
+.modal-body .form-group {
+  margin-bottom: 15px;
+}
+
+.modal-body .full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Customizing inputs inside modal */
+.modal-body .form-control {
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.modal-body .form-control::placeholder {
+  color: #9ca3af;
+}
+
+/* Select Dropdown Styling */
+.select-wrapper {
+  position: relative;
+}
+
+.modal-body select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: white;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Footer & Save Button */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.save-modal-btn {
+  background-color: #008555;
+  width: auto; /* Allow button to size based on content */
+  padding: 12px 24px;
+}

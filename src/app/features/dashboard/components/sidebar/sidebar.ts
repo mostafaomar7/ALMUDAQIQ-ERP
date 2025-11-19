@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';
-
+import { AuthService } from '../../../../core/services/auth';
 type TranslationKey = keyof typeof EN;
 
 // تعريف هيكل لعنصر القائمة الفرعية
@@ -39,9 +39,9 @@ export class Sidebar implements OnInit {
   menuItems: MenuItem[] = [
     { key: 'dashboard', icon: 'fa-brands fa-gg', route: '/dashboard/home' },
     { key: 'subscribers', icon: 'fa-solid fa-users', route: '/dashboard/subscribers' },
-    { key: 'complaints', icon: 'fa-solid fa-person-circle-exclamation', route: '/dashboard/profile' },
-    { key: 'activityLog', icon: 'fa-solid fa-history', route: '/dashboard/profile' },
-    { key: 'plansManagement', icon: 'fa-solid fa-file-contract', route: '/dashboard/profile' },
+    { key: 'complaints', icon: 'fa-solid fa-person-circle-exclamation', route: '/dashboard/complaints' },
+    { key: 'activityLog', icon: 'fa-solid fa-history', route: '/dashboard/activity' },
+    { key: 'plansManagement', icon: 'fa-solid fa-file-contract', route: '/dashboard/plansmanagements' },
     {
       key: 'settings',
       icon: 'fa-solid fa-cog',
@@ -61,7 +61,8 @@ export class Sidebar implements OnInit {
 
   constructor(
     public themeService: ThemeService,
-    private languageService: TranslateService
+    private languageService: TranslateService,
+    private auth : AuthService
   ) {}
 
   ngOnInit(): void {
@@ -84,15 +85,18 @@ export class Sidebar implements OnInit {
 
   t(key: TranslationKey): string {
     // تضمن أن المفتاح موجود قبل محاولة الوصول إليه
-    return this.translations[key] || String(key); 
+    return this.translations[key] || String(key);
   }
 
   toggleCollapse() {
     this.collapsed = !this.collapsed;
   }
-  
+
   // دالة للتبديل بين حالة الفتح والإغلاق لقائمة Settings المنسدلة
   toggleSettingsDropdown() {
     this.isSettingsOpen = !this.isSettingsOpen;
+  }
+  logout(){
+    this.auth.logout();
   }
 }

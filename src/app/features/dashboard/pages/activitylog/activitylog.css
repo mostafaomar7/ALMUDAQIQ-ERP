@@ -1,0 +1,171 @@
+/* --- Container --- */
+.activity-log-container {
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f9fbfc; /* لون خلفية فاتح جدًا مثل الصورة */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.timeline-wrapper {
+  position: relative;
+  padding-left: 20px;
+}
+
+/* --- Date Badge (The "Today", "Apr 24" Pill) --- */
+.date-badge-container {
+  position: relative;
+  margin-bottom: 20px;
+  z-index: 2; /* ليظهر فوق الخط */
+}
+
+.date-badge {
+  background-color: #fff;
+  padding: 6px 20px;
+  border-radius: 50px; /* شكل الكبسولة */
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  display: inline-block;
+}
+
+/* --- Group & Item Layout --- */
+.timeline-group {
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center; /* محاذاة الخط الأفقي مع منتصف الكارت */
+  margin-bottom: 15px;
+  position: relative;
+}
+
+/* --- The Graphics (Lines & Dots) --- */
+.timeline-graphic {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 20px; /* ضبط مكان بداية الخطوط بالنسبة للصفحة */
+  top: 0;
+  bottom: 0;
+  width: 60px; /* المسافة بين الخط الرأسي والكارت */
+}
+
+/* الخط الرأسي الطويل */
+.vertical-line {
+  position: absolute;
+  left: 0; /* مكان الخط الرأسي */
+  top: -20px; /* يمتد للأعلى ليتصل بالعنصر السابق */
+  bottom: -20px; /* يمتد للأسفل */
+  width: 0;
+  border-left: 2px dotted #ccc; /* الخط المنقط */
+  z-index: 0;
+}
+
+/* إخفاء الخط الزائد في آخر عنصر في القائمة كلها */
+.vertical-line.last-line {
+  bottom: 50%; /* يتوقف عند منتصف آخر عنصر */
+}
+
+/* العقدة (الدائرة الصغيرة) على الخط الرأسي */
+.timeline-node {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  position: absolute;
+  left: -5px; /* لضبط الدائرة في منتصف الخط الرأسي (سُمك الخط 2px) */
+  z-index: 1;
+}
+
+/* الخط الأفقي المنقط (Connector) */
+.horizontal-connector {
+  display: flex;
+  gap: 4px;
+  margin-left: 10px; /* مسافة بعد الخط الرأسي */
+  align-items: center;
+}
+
+.connector-dot {
+  width: 3px;
+  height: 3px;
+  background-color: #ccc;
+  border-radius: 50%;
+}
+
+/* --- The Card --- */
+.activity-card {
+  margin-left: 80px; /* إزاحة الكارت لليمين لترك مساحة للخطوط */
+  flex-grow: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.card-content {
+  display: flex;
+  align-items: flex-start; /* محاذاة الصورة مع النص في الأعلى */
+}
+
+.user-image {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.text-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  margin-right: 6px;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #7f8c8d;
+  background: #f4f6f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.action-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-action {
+  font-size: 0.9rem;
+  color: #34495e;
+  margin: 0 0 4px 0;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: #95a5a6;
+}

@@ -1,0 +1,47 @@
+<div class="activity-log-container">
+  <div class="timeline-wrapper">
+
+    <div *ngFor="let group of activityTimeline; let isLastGroup = last" class="timeline-group">
+
+      <div class="date-badge-container">
+        <span class="date-badge">{{ t(group.dateHeader) }}</span>
+      </div>
+
+      <div *ngFor="let item of group.items; let isLastItem = last" class="timeline-item">
+
+        <div class="timeline-graphic">
+          <div class="vertical-line" [class.last-line]="isLastGroup && isLastItem"></div>
+          <div class="horizontal-connector">
+            <span class="connector-dot"></span>
+            <span class="connector-dot"></span>
+            <span class="connector-dot"></span>
+            <span class="connector-dot"></span>
+          </div>
+          <div class="timeline-node"></div>
+        </div>
+
+        <div class="activity-card">
+          <div class="card-content">
+            <img [src]="item.imageUrl" alt="User" class="user-image">
+
+            <div class="text-content">
+              <div class="header-row">
+                <span class="user-name">{{ item.user }}</span>
+                <span class="user-role">{{ t(item.role) }}</span>
+              </div>
+
+              <div class="action-row">
+                <p class="activity-action">{{ t(item.action) }}</p>
+                <span class="activity-time">{{ t(item.timeAgo) }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

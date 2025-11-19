@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   // عدّل الـ baseApiUrl حسب الـ backend عندك
-  private baseUrl = 'https://api.example.com/auth';
+    private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<{ accessToken: string, user: any }> {
-    return this.http.post<{ accessToken: string, user: any }>(`${this.baseUrl}/login`, { email, password })
+    return this.http.post<{ accessToken: string, user: any }>(`${this.baseUrl}/auth/login`, { email, password })
       .pipe(
         tap(res => {
           if (res?.accessToken) {
@@ -29,16 +30,22 @@ export class AuthService {
   }
 
   requestPasswordReset(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/request-password-reset`, { email });
+    return this.http.post(`${this.baseUrl}/auth/send-otp`, { email });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/reset-password`, { token, password: newPassword });
-  }
+  resetPassword(email: string, otp: string, newPassword: string): Observable<any> {
+  return this.http.post(`${this.baseUrl}/auth/reset-password`, {
+    email,
+    otp,
+    newPassword
+  });
+}
 
-  verifyEmail(token: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/verify-email`, { token });
-  }
+verifyEmailWithEmail(email: string, otp: string): Observable<any> {
+  return this.http.post(`${this.baseUrl}/auth/verify-otp`, { email, otp }, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
   getToken(): string | null {
     return localStorage.getItem('accessToken');
@@ -48,4 +55,5 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+ 
 }

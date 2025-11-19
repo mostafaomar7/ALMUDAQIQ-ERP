@@ -25,7 +25,8 @@ export class ResetPassword implements OnInit {
   currentLang: 'en' | 'ar' = (localStorage.getItem('lang') as 'en' | 'ar') || 'en';
   translations: typeof EN = EN;
 
-  token: string | null = null;
+  email = 'admin@erp.com'; // الايميل ثابت
+  otp: string | null = null; // ممكن تجي من query param
 
   constructor(
     private fb: FormBuilder,
@@ -35,8 +36,8 @@ export class ResetPassword implements OnInit {
   ) {}
 
   ngOnInit() {
-    // قراءة token من query param
-    this.token = this.route.snapshot.queryParamMap.get('token');
+    // قراءة OTP من query param
+    this.otp = this.route.snapshot.queryParamMap.get('otp');
 
     this.form = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -62,8 +63,8 @@ export class ResetPassword implements OnInit {
   }
 
   submit() {
-    if (!this.token) {
-      this.error = 'Token not found!';
+    if (!this.otp) {
+      this.error = 'OTP not found!';
       return;
     }
 
@@ -80,10 +81,10 @@ export class ResetPassword implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const password = this.form.value.password;
+    const newPassword = this.form.value.password;
 
     // استدعاء API إعادة تعيين كلمة المرور
-    this.auth.resetPassword(this.token, password)
+    this.auth.resetPassword(this.email, this.otp, newPassword)
       .pipe(
         catchError(err => {
           this.error = err?.error?.message || this.t('serverError');

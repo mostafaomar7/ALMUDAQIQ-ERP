@@ -1,0 +1,102 @@
+<!-- استدعاء مكتبة FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="guide-container">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 class="page-title">Accounts Guide</h2>
+    <div class="actions-group">
+      <div class="edit-actions">
+        <button class="btn-text"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+        <button class="btn-text"><i class="fa-regular fa-trash-can"></i> Delete</button>
+      </div>
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" placeholder="Search" class="search-input">
+      </div>
+      <div class="file-actions">
+        <button class="btn-outline"><i class="fa-solid fa-file-import"></i> Import</button>
+        <button class="btn-outline"><i class="fa-solid fa-file-export"></i> Export</button>
+        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add new Guide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="accounts-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <div class="custom-checkbox indeterminate" (click)="toggleAll()">
+              <i class="fa-solid fa-minus"></i>
+            </div>
+          </th>
+          <th>Account Name <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>Level <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>Account Number <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>Rules & Regulations <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>Disclosure Notes <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>Code <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- التعديل هنا: القراءة من displayedAccounts -->
+        <tr *ngFor="let account of displayedAccounts" [class.selected-row]="account.selected">
+          <td class="checkbox-col">
+            <div class="custom-checkbox" [class.checked]="account.selected" (click)="toggleSelection(account)">
+              <i *ngIf="account.selected" class="fa-solid fa-check"></i>
+            </div>
+          </td>
+          <td class="fw-bold">{{ account.name }}</td>
+          <td class="text-muted">{{ account.level }}</td>
+          <td class="text-muted">{{ account.number }}</td>
+          <td class="text-muted">{{ account.rules }}</td>
+          <td class="text-muted">{{ account.notes }}</td>
+          <td class="text-muted">{{ account.code }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Dynamic Pagination Footer -->
+  <div class="pagination-footer">
+    <div class="pagination-controls">
+      <!-- زر السابق -->
+      <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-chevron-left"></i> Back
+      </button>
+
+      <!-- توليد أزرار الصفحات ديناميكياً -->
+      <ng-container *ngFor="let page of pagesArray">
+        <span *ngIf="page === '...'" class="dots">...</span>
+        <button *ngIf="page !== '...'"
+                class="page-btn"
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <!-- زر التالي -->
+      <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- التنقل المباشر -->
+    <div class="pagination-info">
+      <span>Page</span>
+      <!-- ربط مربع الإدخال بالصفحة الحالية -->
+      <input type="number" [value]="currentPage" (change)="goToPageInput($event)" class="page-input">
+      <span class="go-btn" (click)="updateDisplayedData()">Go</span>
+    </div>
+
+    <!-- النص الديناميكي -->
+    <div class="items-count">
+      {{ showingRangeText }}
+    </div>
+  </div>
+
+</div>

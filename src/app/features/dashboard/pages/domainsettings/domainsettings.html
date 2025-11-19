@@ -1,0 +1,230 @@
+<div class="domain-container">
+
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-text">
+      <h2>Domain Settings</h2>
+      <p>Manage Countries, Cities, Regions & Authority Websites</p>
+    </div>
+    <button class="btn-primary" (click)="openModal()">
+      <span class="plus-icon">+</span> Add country
+    </button>
+  </div>
+
+  <div class="layout-content">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul>
+        <li *ngFor="let country of countries"
+            [class.active]="selectedCountry === country"
+            (click)="selectCountry(country)">
+          <span class="country-name">{{ country }}</span>
+          <span class="more-options">⋮</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-details">
+      <h3 class="section-title">{{ selectedCountry }}</h3>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>CPA</label>
+          <input type="text" [(ngModel)]="cpaUrl" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Zakat</label>
+          <input type="text" [(ngModel)]="zakatUrl" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Ministry of Commerce</label>
+          <input type="text" [(ngModel)]="commerceUrl" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>taxis</label>
+          <input type="text" [(ngModel)]="taxisUrl" class="form-control">
+        </div>
+      </div>
+
+      <!-- Cities Table -->
+      <div class="table-section">
+        <h4>Cities</h4>
+        <div class="custom-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>City Name <span class="sort-arrow">↓</span></th>
+                <th>Regions Count <span class="sort-arrow">↓</span></th>
+                <th class="actions-col">Actions <span class="sort-arrow">↓</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let city of cities">
+                <td class="fw-bold">{{ city.name }}</td>
+                <td class="text-blue">{{ city.regionsCount }}</td>
+                <td class="actions-cell">
+                  <button class="btn-icon edit">✎ Edit</button>
+                  <button class="btn-icon delete">🗑 Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="card-footer-action" (click)="openCityModal()">Add City</div>
+        </div>
+      </div>
+
+      <!-- Regions Table -->
+      <div class="table-section">
+        <h4>Regions</h4>
+        <div class="custom-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Region Name <span class="sort-arrow">↓</span></th>
+                <th>City <span class="sort-arrow">↓</span></th>
+                <th class="actions-col">Actions <span class="sort-arrow">↓</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let region of regions">
+                <td class="fw-bold">{{ region.name }}</td>
+                <td class="fw-bold">{{ region.cityName }}</td>
+                <td class="actions-cell">
+                  <button class="btn-icon edit">✎ Edit</button>
+                  <button class="btn-icon delete">🗑 Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- تم تفعيل زر إضافة المنطقة هنا -->
+          <div class="card-footer-action" (click)="openRegionModal()">Add Region</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === ADD COUNTRY MODAL === -->
+  <div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-titles">
+          <h3>Add Country</h3>
+          <p>Enter the country details and associate official authority websites</p>
+        </div>
+        <button class="close-btn" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group full-width">
+          <label>Add Country</label>
+          <div class="select-wrapper">
+            <select class="form-control">
+              <option>Select Country</option>
+              <option>Saudi Arabia</option>
+              <option>Egypt</option>
+            </select>
+            <span class="select-arrow">⌄</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Add City</label>
+            <div class="select-wrapper">
+              <select class="form-control">
+                <option>Select City</option>
+              </select>
+              <span class="select-arrow">⌄</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Add Region</label>
+            <div class="select-wrapper">
+              <select class="form-control">
+                <option>Select Region</option>
+              </select>
+              <span class="select-arrow">⌄</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label>Certified Public Accountants Association Website</label>
+          <input type="text" class="form-control" placeholder="Enter CPA website URL">
+        </div>
+        <div class="form-group full-width">
+          <label>Ministry of Commerce Website</label>
+          <input type="text" class="form-control" placeholder="Enter Ministry of commerce website URL">
+        </div>
+        <div class="form-group full-width">
+          <label>Tax / Zakat Authority Website</label>
+          <input type="text" class="form-control" placeholder="Enter tax / zakat website URL">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary save-modal-btn" (click)="closeModal()">Save Country</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === ADD CITY MODAL === -->
+  <div class="modal-overlay" *ngIf="isCityModalOpen">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-titles">
+          <h3>Add City</h3>
+        </div>
+        <button class="close-btn" (click)="closeCityModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group full-width">
+          <label>Add City</label>
+          <div class="select-wrapper">
+            <select class="form-control">
+              <option>Select City</option>
+              <option>Riyadh</option>
+              <option>Jeddah</option>
+              <option>Dammam</option>
+            </select>
+            <span class="select-arrow">⌄</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary save-modal-btn" (click)="closeCityModal()">Save City</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === ADD REGION MODAL (NEW) === -->
+  <div class="modal-overlay" *ngIf="isRegionModalOpen">
+    <div class="modal-container">
+
+      <div class="modal-header">
+        <div class="modal-titles">
+          <h3>Add Region</h3>
+        </div>
+        <button class="close-btn" (click)="closeRegionModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group full-width">
+          <label>Add Region</label>
+          <div class="select-wrapper">
+            <select class="form-control">
+              <option>Select Region</option>
+              <option>Al Olaya</option>
+              <option>Al Malqa</option>
+              <option>Al Yasmin</option>
+            </select>
+            <span class="select-arrow">⌄</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary save-modal-btn" (click)="closeRegionModal()">Save Region</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

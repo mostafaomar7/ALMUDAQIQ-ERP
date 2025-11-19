@@ -2,7 +2,6 @@
   background-color: #F7F7F7;
   margin-left: 230px;   /* عرض السايدبار */
   transition: all 0.3s;
-  height: 100vh;
 }
 
 .content.rtl{

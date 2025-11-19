@@ -13,7 +13,7 @@ import { AR } from '../i18n/ar';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule ],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -24,7 +24,6 @@ export class Login implements OnInit {
 
   currentLang: 'en' | 'ar' = (localStorage.getItem('lang') as 'en' | 'ar') || 'en';
   translations: any = {}; // سيتم تخزين الترجمة هنا
-
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],

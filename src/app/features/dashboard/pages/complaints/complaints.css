@@ -1,0 +1,247 @@
+/* --- الألوان المشتركة والخطوط --- */
+h3 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* الأزرار الخضراء */
+.btn-success {
+    background-color: #007d58; /* اللون الأخضر الأساسي */
+    border-color: #007d58;
+}
+.btn-success:hover {
+    background-color: #006644;
+}
+
+/* أزرار الـ Outline */
+.btn-outline-secondary {
+    color: #6c757d;
+    border-color: #dee2e6;
+}
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    color: #000;
+    border-color: #c4c8cb;
+}
+.table-title{
+    font-weight: 500;
+    font-size: 18px;
+}
+
+/* --- تنسيقات الجدول --- */
+.table thead th {
+    font-weight: 500;
+    border-bottom: 1px solid #f0f0f0;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    font-size: 0.95rem;
+}
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa; /* لون بسيط عند المرور */
+}
+
+/* --- تنسيقات البحث والتحكم --- */
+.search-container {
+    position: relative;
+    width: 213px;
+    margin: 0;
+}
+
+.search-container input[type="text"] {
+    width: 100%;
+    padding: 8px 35px 8px 15px;
+    font-size: 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s;
+    background-color: #fff;
+}
+
+.search-container .search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #adb5bd;
+}
+
+/* تنسيق الـ Dropdown Filter ليتناسب مع أزرار Outline */
+.dropdown-filter .form-select {
+    padding-right: 25px !important; /* لترك مساحة لـ caret */
+    width: auto;
+    /* تأكد من إزالة Arrow الافتراضي إذا لزم الأمر */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+
+/* --- تنسيقات الـ Pagination (مطابقة للكود المرفق) --- */
+.pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    color: #212529;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(.active):not(:disabled) {
+    background-color: #f8f9fa;
+    border-color: #c4c8cb;
+}
+
+.pagination-btn.active {
+    background-color: #007d58; /* اللون الأخضر */
+    color: #fff;
+    border-color: #007d58;
+}
+
+.pagination-btn:disabled {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+}
+
+.pagination-input {
+    width: 50px;
+    height: 36px;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+/* لإزالة الأسهم من الـ Input Number */
+.pagination-input::-webkit-outer-spin-button,
+.pagination-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* --- Modal Styling --- */
+
+/* الخلفية الداكنة */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* شفافية داكنة خفيفة */
+    z-index: 1040; /* ليكون أعلى من باقي العناصر */
+}
+
+/* حاوية النافذة */
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    display: none; /* إخفاء افتراضيًا */
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-modal.show {
+    display: flex; /* إظهار عند تفعيل الكلاس show */
+}
+
+/* محتوى النافذة الفعلي */
+.modal-content {
+    background-color: #ffffff; /* لون أبيض أو فاتح */
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px; /* حجم متوسط */
+    overflow: hidden;
+    position: relative;
+    z-index: 1051;
+}
+
+/* تنسيق رأس النافذة */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+    padding: 0;
+}
+.close-btn:hover {
+    color: #333;
+}
+
+/* تنسيق جسم النافذة */
+.modal-body {
+    padding: 24px;
+}
+
+.detail-item {
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+.message-text {
+    background-color: #f7f7f7; /* خلفية فاتحة للرسالة */
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    white-space: pre-wrap; /* للحفاظ على تنسيق النص إذا كان طويلاً */
+    font-style: italic;
+    color: #555;
+    font-weight: 400;
+}
+
+/* تنسيق الصف لجعله قابلاً للضغط */
+.complaint-row {
+    cursor: pointer;
+}
