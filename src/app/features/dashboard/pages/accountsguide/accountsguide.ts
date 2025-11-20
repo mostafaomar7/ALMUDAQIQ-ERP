@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
+type TranslationKey = keyof typeof EN;
 
 interface Account {
   id: number;
@@ -21,64 +26,69 @@ interface Account {
   styleUrls: ['./accountsguide.css'],
 })
 export class Accountsguide implements OnInit {
-  // البيانات الكاملة (سنقوم بتوليدها لمحاكاة عدد كبير)
-  allAccounts: Account[] = [];
 
-  // البيانات المعروضة في الصفحة الحالية فقط
-  displayedAccounts: Account[] = [];
+  translations: typeof EN = EN;
 
-  // إعدادات الترقيم
-  currentPage: number = 101; // البدء من صفحة 101 كما في الصورة
-  itemsPerPage: number = 10;
-  totalItems: number = 1250;
-  totalPages: number = 0;
-
-  // لتخزين أرقام الصفحات التي ستظهر في الشريط السفلي
-  pagesArray: (number | string)[] = [];
-
-  // بيانات نموذجية للتكرار
-  private sampleData = [
-    { name: 'Accounts Receivable', level: 'Level 1', number: '1001', rules: 'IAS 38 – Intangibles', notes: 'Costs not yet billed', code: 'A01' },
-    { name: 'Bank Accounts', level: 'Level 2', number: '3001', rules: 'IAS 16 – PPE', notes: 'Recognized monthly', code: 'A02' },
-    { name: 'Advances to Suppliers', level: 'Level 3', number: '4002', rules: 'IFRS 16 – Leases', notes: 'Costs not yet billed', code: 'A04' },
-    { name: 'Property Equipment', level: 'Level 5', number: '5005', rules: 'IAS 16 – PPE', notes: 'Annual provision', code: 'A11' },
-    { name: 'Zakat Provision', level: 'Level 12', number: '4002', rules: 'IAS 38 – Intangibles', notes: 'Annual provision', code: 'A18' }
-  ];
+  constructor(private lang: TranslateService) {}
 
   ngOnInit() {
+    this.lang.lang$.subscribe(l => this.loadTranslations(l));
     this.generateDummyData();
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.updateDisplayedData();
     this.calculatePagination();
   }
 
-  // دالة لتوليد 1250 عنصر وهمي
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
+
+  // البيانات الكاملة
+  allAccounts: Account[] = [];
+  displayedAccounts: Account[] = [];
+
+  currentPage: number = 101;
+  itemsPerPage: number = 10;
+  totalItems: number = 1250;
+  totalPages: number = 0;
+  pagesArray: (number | string)[] = [];
+
+  // البيانات المترجمة
+  private sampleData = [
+    { name: this.t('accountsReceivable'), level: this.t('levelWord'), rules: this.t('IAS38'), notes: this.t('costNotBilled'), code: 'A01' },
+    { name: this.t('bankAccounts'), level: this.t('levelWord'), rules: this.t('IAS16'), notes: this.t('recognizedMonthly'), code: 'A02' },
+    { name: this.t('advancesToSuppliers'), level: this.t('levelWord'), rules: this.t('IFRS16'), notes: this.t('costNotBilled'), code: 'A04' },
+    { name: this.t('propertyEquipment'), level: this.t('levelWord'), rules: this.t('IAS16'), notes: this.t('annualProvision'), code: 'A11' },
+    { name: this.t('zakatProvision'), level: this.t('levelWord'), rules: this.t('IAS38'), notes: this.t('annualProvision'), code: 'A18' }
+  ];
+
   generateDummyData() {
     for (let i = 1; i <= this.totalItems; i++) {
-      const randomSample = this.sampleData[i % this.sampleData.length];
+      const s = this.sampleData[i % this.sampleData.length];
       this.allAccounts.push({
         id: i,
-        name: randomSample.name,
-        level: `Level ${Math.floor(Math.random() * 15) + 1}`, // مستويات عشوائية
+        name: s.name,
+        level: `${this.t('levelWord')} ${Math.floor(Math.random() * 15) + 1}`,
         number: (1000 + i).toString(),
-        rules: randomSample.rules,
-        notes: randomSample.notes,
+        rules: s.rules,
+        notes: s.notes,
         code: `A${i}`,
         selected: false
       });
     }
   }
 
-  // تحديث البيانات المعروضة بناءً على الصفحة الحالية
   updateDisplayedData() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayedAccounts = this.allAccounts.slice(startIndex, endIndex);
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    this.displayedAccounts = this.allAccounts.slice(start, start + this.itemsPerPage);
   }
 
-  // الانتقال إلى صفحة محددة
   goToPage(page: number | string) {
-    if (typeof page === 'string') return; // في حالة الضغط على النقاط "..."
+    if (typeof page === 'string') return;
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updateDisplayedData();
@@ -86,7 +96,6 @@ export class Accountsguide implements OnInit {
     }
   }
 
-  // الصفحة التالية
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -95,7 +104,6 @@ export class Accountsguide implements OnInit {
     }
   }
 
-  // الصفحة السابقة
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
@@ -104,65 +112,51 @@ export class Accountsguide implements OnInit {
     }
   }
 
-  // الذهاب للصفحة عبر مربع الإدخال
-  goToPageInput(event: any) {
-    const page = parseInt(event.target.value);
-    if (!isNaN(page)) {
-      this.goToPage(page);
-    }
+  goToPageInput(e: any) {
+    const p = parseInt(e.target.value);
+    if (!isNaN(p)) this.goToPage(p);
   }
 
-  // حساب أرقام الصفحات التي ستظهر (الخوارزمية لمحاكاة الشكل: 1 ... 99 100 101 ... 125)
   calculatePagination() {
-    const total = this.totalPages;
-    const current = this.currentPage;
-    const delta = 2; // عدد الصفحات حول الصفحة الحالية
+    const t = this.totalPages;
+    const c = this.currentPage;
+    const delta = 2;
     const range: number[] = [];
-    const rangeWithDots: (number | string)[] = [];
-    let l: number | undefined;
+    const withDots: (number | string)[] = [];
+    let prev: number | undefined;
 
-    // نضع الصفحة الأولى، الأخيرة، والصفحات حول الصفحة الحالية
     range.push(1);
-    for (let i = current - delta; i <= current + delta; i++) {
-      if (i < total && i > 1) {
-        range.push(i);
-      }
+    for (let i = c - delta; i <= c + delta; i++) {
+      if (i < t && i > 1) range.push(i);
     }
-    range.push(total);
+    range.push(t);
 
-    // إزالة التكرار وترتيب العناصر
-    const uniqueRange = [...new Set(range)].sort((a, b) => a - b);
+    const unique = [...new Set(range)].sort((a, b) => a - b);
 
-    // إضافة النقاط "..."
-    uniqueRange.forEach(i => {
-      if (l) {
-        if (i - l === 2) {
-          rangeWithDots.push(l + 1);
-        } else if (i - l !== 1) {
-          rangeWithDots.push('...');
-        }
+    unique.forEach(i => {
+      if (prev) {
+        if (i - prev === 2) withDots.push(prev + 1);
+        else if (i - prev !== 1) withDots.push('...');
       }
-      rangeWithDots.push(i);
-      l = i;
+      withDots.push(i);
+      prev = i;
     });
 
-    this.pagesArray = rangeWithDots;
+    this.pagesArray = withDots;
   }
 
-  // دوال التحديد Checkbox
-  toggleSelection(account: Account) {
-    account.selected = !account.selected;
+  toggleSelection(acc: Account) {
+    acc.selected = !acc.selected;
   }
 
   toggleAll() {
-    const allSelected = this.displayedAccounts.every(a => a.selected);
-    this.displayedAccounts.forEach(a => a.selected = !allSelected);
+    const all = this.displayedAccounts.every(a => a.selected);
+    this.displayedAccounts.forEach(a => a.selected = !all);
   }
 
-  // معلومات النص السفلي (مثال: 110-120 of 1,250)
   get showingRangeText(): string {
     const start = (this.currentPage - 1) * this.itemsPerPage + 1;
     const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} of ${this.totalItems.toLocaleString()}`;
+    return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
   }
 }

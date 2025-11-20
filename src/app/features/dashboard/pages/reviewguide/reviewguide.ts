@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
+type TranslationKey = keyof typeof EN;
 
 interface ReviewItem {
   id: number;
@@ -9,7 +14,7 @@ interface ReviewItem {
   number: string;
   statement: string;
   purpose: string;
-  responsibility: string; // العمود الأخير الظاهر جزئياً
+  responsibility: string;
   selected: boolean;
 }
 
@@ -22,13 +27,17 @@ interface ReviewItem {
 })
 export class Reviewguide implements OnInit {
 
+  translations: typeof EN = EN;
+
+  constructor(private lang: TranslateService) {}
+
   // البيانات الكاملة
   allReviews: ReviewItem[] = [];
   displayedReviews: ReviewItem[] = [];
 
   // إعدادات الترقيم
   currentPage: number = 101;
-  itemsPerPage: number = 4; // عدد العناصر قليل في الصورة
+  itemsPerPage: number = 4;
   totalItems: number = 1250;
   totalPages: number = 0;
   pagesArray: (number | string)[] = [];
@@ -70,10 +79,19 @@ export class Reviewguide implements OnInit {
   ];
 
   ngOnInit() {
+    this.lang.lang$.subscribe(l => this.loadTranslations(l));
     this.generateDummyData();
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.updateDisplayedData();
     this.calculatePagination();
+  }
+
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
   }
 
   generateDummyData() {
@@ -83,11 +101,11 @@ export class Reviewguide implements OnInit {
         id: i,
         level: sample.level,
         separator: sample.separator,
-        number: (parseInt(sample.number) + i).toString().padStart(3, '0'), // لجعله فريداً
+        number: (parseInt(sample.number) + i).toString().padStart(3, '0'),
         statement: sample.statement,
         purpose: sample.purpose,
         responsibility: sample.responsibility,
-        selected: i <= 4 // تحديد أول 4 عناصر افتراضياً كما في الصورة
+        selected: i <= 4
       });
     }
   }
@@ -98,7 +116,7 @@ export class Reviewguide implements OnInit {
     this.displayedReviews = this.allReviews.slice(startIndex, endIndex);
   }
 
-  // --- Pagination Logic ---
+  // Pagination
   goToPage(page: number | string) {
     if (typeof page === 'string') return;
     if (page >= 1 && page <= this.totalPages) {
@@ -155,7 +173,7 @@ export class Reviewguide implements OnInit {
     this.pagesArray = rangeWithDots;
   }
 
-  // --- Selection Logic ---
+  // Selection
   toggleSelection(item: ReviewItem) {
     item.selected = !item.selected;
   }
@@ -168,6 +186,6 @@ export class Reviewguide implements OnInit {
   get showingRangeText(): string {
     const start = (this.currentPage - 1) * this.itemsPerPage + 1;
     const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} of ${this.totalItems.toLocaleString()}`;
+    return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
   }
 }

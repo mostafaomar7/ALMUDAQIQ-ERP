@@ -1,0 +1,54 @@
+export const AR = {
+  dashboard: 'لوحة التحكم',
+  subscribers: 'المشتركين',
+  complaints: 'الشكاوى',
+  activityLog: 'سجل النشاط',
+  plansManagement: 'إدارة الخطط',
+  settings: 'الإعدادات',
+  logout: 'تسجيل الخروج',
+  domainSettings: 'إعدادات النطاق',
+  accountsGuide: 'دليل الحسابات',
+  reviewGuide: 'دليل المراجعة',
+  fileStagesGuide: 'دليل مراحل الملف',
+  reviewObjectivesGuide: 'دليل أهداف المراجعة',
+  reviewMarksIndex: 'مؤشر علامات المراجعة',
+
+  // --- Accounts Guide Page ---
+  accountsGuideTitle: 'دليل الحسابات',
+  edit: 'تعديل',
+  delete: 'حذف',
+  search: 'بحث',
+  import: 'استيراد',
+  export: 'تصدير',
+  addNewGuide: 'إضافة دليل جديد',
+
+  accountName: 'اسم الحساب',
+  level: 'المستوى',
+  accountNumber: 'رقم الحساب',
+  rules: 'القواعد والأنظمة',
+  notes: 'ملاحظات الإفصاح',
+  code: 'الرمز',
+
+  back: 'السابق',
+  next: 'التالي',
+  page: 'صفحة',
+  go: 'اذهب',
+
+  showingRangeOf: 'من',
+
+  // Sample Data Translations
+  accountsReceivable: 'الذمم المدينة',
+  bankAccounts: 'الحسابات البنكية',
+  advancesToSuppliers: 'سلف الموردين',
+  propertyEquipment: 'الأصول والمعدات',
+  zakatProvision: 'مخصص الزكاة',
+
+  levelWord: 'المستوى',
+  IAS38: 'المعيار IAS 38 – الأصول غير الملموسة',
+  IAS16: 'المعيار IAS 16 – الممتلكات والمعدات',
+  IFRS16: 'المعيار IFRS 16 – عقود الإيجار',
+
+  costNotBilled: 'تكاليف لم تتم فوترتها بعد',
+  recognizedMonthly: 'يتم إثباته شهرياً',
+  annualProvision: 'مخصص سنوي'
+};

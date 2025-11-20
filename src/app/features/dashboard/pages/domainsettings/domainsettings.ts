@@ -1,18 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+import { Country, State, City } from 'country-state-city';
 
-interface City {
-  id: number;
-  name: string;
-  regionsCount: number;
-}
-
-interface Region {
-  id: number;
-  name: string;
-  cityName: string;
-}
+type TranslationKey = keyof typeof EN;
 
 @Component({
   selector: 'app-domainsettings',
@@ -21,67 +15,102 @@ interface Region {
   templateUrl: './domainsettings.html',
   styleUrls: ['./domainsettings.css'],
 })
-export class Domainsettings {
-  // التحكم في النوافذ المنبثقة
-  isModalOpen: boolean = false;       // Add Country Modal
-  isCityModalOpen: boolean = false;   // Add City Modal
-  isRegionModalOpen: boolean = false; // Add Region Modal (جديد)
+export class Domainsettings implements OnInit {
 
-  // الدولة المختارة حالياً
-  selectedCountry: string = 'Saudi Arabia';
+  translations: typeof EN = EN;
 
-  // قائمة الدول
-  countries: string[] = [
-    'Saudi Arabia',
-    'United Arab Emirates',
-    'Egypt',
-    'kuwait'
-  ];
+  // التحكم في النوافذ
+  isModalOpen = false;
+  isCityModalOpen = false;
+  isRegionModalOpen = false;
 
-  // بيانات الحقول (URLs)
-  cpaUrl: string = 'CPA: https://socpa.org.sa';
-  zakatUrl: string = 'https://zatca.gov.sa';
-  commerceUrl: string = 'https://mc.gov.sa';
-  taxisUrl: string = 'https://taxis.gov.sa';
+  // Dropdowns
+  countries: any[] = [];
+  states: any[] = [];
+  cities: any[] = [];
+  regions: any[] = []; // Regions هنا تمثل المناطق داخل المدن إذا أردت لاحقًا
 
-  cities: City[] = [
-    { id: 1, name: 'Riyadh', regionsCount: 2 },
-    { id: 2, name: 'Riyadh', regionsCount: 3 },
-  ];
+  selectedCountry: any = null;
+  selectedState: any = null;
+  selectedCity: any = null;
 
-  regions: Region[] = [
-    { id: 1, name: 'Al Olaya', cityName: 'Riyadh' },
-    { id: 2, name: 'Dammam', cityName: 'Riyadh' },
-  ];
+  // روابط مواقع مهمة
+  cpaUrl = 'https://socpa.org.sa';
+  zakatUrl = 'https://zatca.gov.sa';
+  commerceUrl = 'https://mc.gov.sa';
+  taxisUrl = 'https://taxis.gov.sa';
 
-  selectCountry(country: string) {
-    this.selectedCountry = country;
+  constructor(private langService: TranslateService) {}
+selectCountry(country: any) {
+  this.selectedCountry = country;
+  this.states = State.getStatesOfCountry(country.isoCode);
+  this.selectedState = null;
+  this.cities = [];
+  this.selectedCity = null;
+}
+
+  ngOnInit(): void {
+    this.langService.lang$.subscribe(lang => this.loadTranslations(lang));
+    this.loadCountries();
   }
 
-  // --- Add Country Modal Actions ---
-  openModal() {
-    this.isModalOpen = true;
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+    document.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }
 
-  closeModal() {
-    this.isModalOpen = false;
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
   }
 
-  // --- Add City Modal Actions ---
-  openCityModal() {
-    this.isCityModalOpen = true;
+  // Modal controls
+  openModal() { this.isModalOpen = true; }
+  closeModal() { this.isModalOpen = false; }
+  openCityModal() { this.isCityModalOpen = true; }
+  closeCityModal() { this.isCityModalOpen = false; }
+  openRegionModal() { this.isRegionModalOpen = true; }
+  closeRegionModal() { this.isRegionModalOpen = false; }
+
+  // Load all countries from the library
+  loadCountries() {
+    this.countries = Country.getAllCountries();
   }
 
-  closeCityModal() {
-    this.isCityModalOpen = false;
+  // When user selects a country
+  onCountryChange(event: any) {
+    this.selectedCountry = JSON.parse(event.target.value);
+    this.states = State.getStatesOfCountry(this.selectedCountry.isoCode);
+    this.selectedState = null;
+    this.cities = [];
+    this.selectedCity = null;
   }
 
-  // --- Add Region Modal Actions (جديد) ---
-  openRegionModal() {
-    this.isRegionModalOpen = true;
+  // When user selects a state
+  onStateChange(event: any) {
+    this.selectedState = JSON.parse(event.target.value);
+    this.cities = City.getCitiesOfState(this.selectedCountry.isoCode, this.selectedState.isoCode);
+    this.selectedCity = null;
   }
 
-  closeRegionModal() {
-    this.isRegionModalOpen = false;
+  // When user selects a city
+  onCityChange(event: any) {
+    this.selectedCity = JSON.parse(event.target.value);
   }
+
+  clear(type: string) {
+    switch(type) {
+      case 'country':
+        this.selectedCountry = this.selectedState = this.selectedCity = null;
+        this.states = this.cities = [];
+        break;
+      case 'state':
+        this.selectedState = this.selectedCity = null;
+        this.cities = [];
+        break;
+      case 'city':
+        this.selectedCity = null;
+        break;
+    }
+  }
+
 }

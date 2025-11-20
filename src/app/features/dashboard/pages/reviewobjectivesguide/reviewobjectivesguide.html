@@ -1,39 +1,24 @@
-<!-- استدعاء مكتبة FontAwesome -->
-
 <div class="objectives-container">
 
   <!-- Toolbar -->
   <div class="toolbar">
-    <h2 class="page-title">Review Objectives Guide</h2>
+    <h2 class="page-title">{{ t('reviewObjectivesGuideTitle') }}</h2>
 
     <div class="actions-group">
-      <!-- Left Actions: Edit/Delete -->
       <div class="edit-actions">
-        <button class="btn-text">
-          <i class="fa-regular fa-pen-to-square"></i> Edit
-        </button>
-        <button class="btn-text">
-          <i class="fa-regular fa-trash-can"></i> Delete
-        </button>
+        <button class="btn-text"><i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}</button>
+        <button class="btn-text"><i class="fa-regular fa-trash-can"></i> {{ t('delete') }}</button>
       </div>
 
-      <!-- Search -->
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" placeholder="Search" class="search-input">
+        <input type="text" [placeholder]="t('search')" class="search-input">
       </div>
 
-      <!-- Right Actions: Import/Export/Add -->
       <div class="file-actions">
-        <button class="btn-outline">
-          <i class="fa-solid fa-file-import"></i> Import
-        </button>
-        <button class="btn-outline">
-          <i class="fa-solid fa-cloud-arrow-down"></i> Export
-        </button>
-        <button class="btn-primary">
-          <i class="fa-solid fa-plus"></i> Add new Guide
-        </button>
+        <button class="btn-outline"><i class="fa-solid fa-file-import"></i> {{ t('import') }}</button>
+        <button class="btn-outline"><i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}</button>
+        <button class="btn-primary"><i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}</button>
       </div>
     </div>
   </div>
@@ -48,12 +33,12 @@
               <i class="fa-solid fa-minus"></i>
             </div>
           </th>
-          <th>Codes Collected <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Number of Collected Objectives <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Ethical Compliance % <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Professional Planning % <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Performance Effectiveness % <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Internal Assessment % <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('codesCollected') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('collectedObjectives') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('ethicalCompliance') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('professionalPlanning') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('performanceEffectiveness') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('internalAssessment') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
         </tr>
       </thead>
       <tbody>
@@ -78,28 +63,25 @@
   <div class="pagination-footer">
     <div class="pagination-controls">
       <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
-        <i class="fa-solid fa-chevron-left"></i> Back
+        <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
       </button>
 
       <ng-container *ngFor="let page of pagesArray">
         <span *ngIf="page === '...'" class="dots">...</span>
-        <button *ngIf="page !== '...'"
-                class="page-btn"
-                [class.active]="page === currentPage"
-                (click)="goToPage(page)">
+        <button *ngIf="page !== '...'" class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
           {{ page }}
         </button>
       </ng-container>
 
       <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
-        Next <i class="fa-solid fa-chevron-right"></i>
+        {{ t('next') }} <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
 
     <div class="pagination-info">
-      <span>Page</span>
+      <span>{{ t('page') }}</span>
       <input type="number" [value]="currentPage" (change)="goToPageInput($event)" class="page-input">
-      <span class="go-btn" (click)="updateDisplayedData()">Go</span>
+      <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span>
     </div>
 
     <div class="items-count">

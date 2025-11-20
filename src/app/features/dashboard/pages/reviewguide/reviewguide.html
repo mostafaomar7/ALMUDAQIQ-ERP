@@ -1,39 +1,33 @@
-<!-- استدعاء مكتبة FontAwesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="review-container">
 
   <!-- Toolbar -->
   <div class="toolbar">
-    <h2 class="page-title">Review Guide</h2>
+    <h2 class="page-title">{{ t('reviewGuideTitle') }}</h2>
 
     <div class="actions-group">
-      <!-- Left Actions: Edit/Delete -->
       <div class="edit-actions">
         <button class="btn-text">
-          <i class="fa-regular fa-pen-to-square"></i> Edit
+          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
         </button>
         <button class="btn-text">
-          <i class="fa-regular fa-trash-can"></i> Delete
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
         </button>
       </div>
 
-      <!-- Search -->
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" placeholder="Search" class="search-input">
+        <input type="text" [placeholder]="t('search')" class="search-input">
       </div>
 
-      <!-- Right Actions: Import/Export/Add -->
       <div class="file-actions">
         <button class="btn-outline">
-          <i class="fa-solid fa-file-import"></i> Import
+          <i class="fa-solid fa-file-import"></i> {{ t('import') }}
         </button>
         <button class="btn-outline">
-          <i class="fa-solid fa-cloud-arrow-down"></i> Export
+          <i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}
         </button>
         <button class="btn-primary">
-          <i class="fa-solid fa-plus"></i> Add new Guide
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
         </button>
       </div>
     </div>
@@ -49,12 +43,12 @@
               <i class="fa-solid fa-minus"></i>
             </div>
           </th>
-          <th>Level <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Separator <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Number <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="wide-col">Statement <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="wide-col">Purpose <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>Responsibility <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('level') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('separator') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('number') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th class="wide-col">{{ t('statement') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th class="wide-col">{{ t('purpose') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('responsibility') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
         </tr>
       </thead>
       <tbody>
@@ -79,7 +73,7 @@
   <div class="pagination-footer">
     <div class="pagination-controls">
       <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
-        <i class="fa-solid fa-chevron-left"></i> Back
+        <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
       </button>
 
       <ng-container *ngFor="let page of pagesArray">
@@ -93,14 +87,14 @@
       </ng-container>
 
       <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
-        Next <i class="fa-solid fa-chevron-right"></i>
+        {{ t('next') }} <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
 
     <div class="pagination-info">
-      <span>Page</span>
+      <span>{{ t('page') }}</span>
       <input type="number" [value]="currentPage" (change)="goToPageInput($event)" class="page-input">
-      <span class="go-btn" (click)="updateDisplayedData()">Go</span>
+      <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span>
     </div>
 
     <div class="items-count">

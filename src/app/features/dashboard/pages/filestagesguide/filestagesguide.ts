@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
+type TranslationKey = keyof typeof EN;
 
 interface FileStage {
   id: number;
@@ -22,68 +27,46 @@ interface FileStage {
 })
 export class Filestagesguide implements OnInit {
 
-  // البيانات الكاملة والمعروضة
+  translations: typeof EN = EN;
+
+  constructor(private lang: TranslateService) {}
+
   allStages: FileStage[] = [];
   displayedStages: FileStage[] = [];
 
-  // إعدادات الترقيم
   currentPage: number = 101;
-  itemsPerPage: number = 4; // عدد العناصر قليل في الصورة للتوضيح
+  itemsPerPage: number = 4;
   totalItems: number = 1250;
   totalPages: number = 0;
   pagesArray: (number | string)[] = [];
 
-  // بيانات نموذجية للتكرار
   private sampleData = [
-    {
-      code: 'STG-001',
-      name: 'Draft',
-      description: 'Initial version created by user',
-      order: 1,
-      role: 'User',
-      duration: 5
-    },
-    {
-      code: 'STG-002',
-      name: 'Under Review',
-      description: 'File currently under reviewer assessment',
-      order: 2,
-      role: 'Reviewer',
-      duration: 10
-    },
-    {
-      code: 'STG-003',
-      name: 'Reviewed',
-      description: 'Review completed, awaiting approval',
-      order: 3,
-      role: 'Reviewer',
-      duration: 3
-    },
-    {
-      code: 'STG-004',
-      name: 'Approved',
-      description: 'File approved by authorized person',
-      order: 4,
-      role: 'Approver',
-      duration: 7
-    }
+    { code: 'STG-001', name: 'Draft', description: 'Initial version created by user', order: 1, role: 'User', duration: 5 },
+    { code: 'STG-002', name: 'Under Review', description: 'File currently under reviewer assessment', order: 2, role: 'Reviewer', duration: 10 },
+    { code: 'STG-003', name: 'Reviewed', description: 'Review completed, awaiting approval', order: 3, role: 'Reviewer', duration: 3 },
+    { code: 'STG-004', name: 'Approved', description: 'File approved by authorized person', order: 4, role: 'Approver', duration: 7 }
   ];
 
   ngOnInit() {
+    this.lang.lang$.subscribe(l => this.loadTranslations(l));
     this.generateDummyData();
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.updateDisplayedData();
     this.calculatePagination();
   }
 
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
+
   generateDummyData() {
     for (let i = 1; i <= this.totalItems; i++) {
-      // استخدام باقي القسمة لتكرار البيانات النموذجية
       const sample = this.sampleData[(i - 1) % this.sampleData.length];
-
-      // تعديل الكود ليكون فريداً
       const uniqueCode = `STG-${i.toString().padStart(3, '0')}`;
-
       this.allStages.push({
         id: i,
         code: uniqueCode,
@@ -92,18 +75,17 @@ export class Filestagesguide implements OnInit {
         order: sample.order,
         role: sample.role,
         duration: sample.duration,
-        selected: i === 1 // تحديد العنصر الأول فقط كما في الصورة
+        selected: i === 1
       });
     }
   }
 
   updateDisplayedData() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayedStages = this.allStages.slice(startIndex, endIndex);
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    this.displayedStages = this.allStages.slice(start, start + this.itemsPerPage);
   }
 
-  // --- Pagination Logic ---
+  // Pagination
   goToPage(page: number | string) {
     if (typeof page === 'string') return;
     if (page >= 1 && page <= this.totalPages) {
@@ -139,7 +121,7 @@ export class Filestagesguide implements OnInit {
     const current = this.currentPage;
     const delta = 2;
     const range: number[] = [];
-    const rangeWithDots: (number | string)[] = [];
+    const withDots: (number | string)[] = [];
     let l: number | undefined;
 
     range.push(1);
@@ -150,29 +132,29 @@ export class Filestagesguide implements OnInit {
 
     [...new Set(range)].sort((a, b) => a - b).forEach(i => {
       if (l) {
-        if (i - l === 2) rangeWithDots.push(l + 1);
-        else if (i - l !== 1) rangeWithDots.push('...');
+        if (i - l === 2) withDots.push(l + 1);
+        else if (i - l !== 1) withDots.push('...');
       }
-      rangeWithDots.push(i);
+      withDots.push(i);
       l = i;
     });
 
-    this.pagesArray = rangeWithDots;
+    this.pagesArray = withDots;
   }
 
-  // --- Selection Logic ---
-  toggleSelection(item: FileStage) {
-    item.selected = !item.selected;
+  // Selection
+  toggleSelection(stage: FileStage) {
+    stage.selected = !stage.selected;
   }
 
   toggleAll() {
-    const allSelected = this.displayedStages.every(i => i.selected);
-    this.displayedStages.forEach(i => i.selected = !allSelected);
+    const allSelected = this.displayedStages.every(s => s.selected);
+    this.displayedStages.forEach(s => s.selected = !allSelected);
   }
 
   get showingRangeText(): string {
     const start = (this.currentPage - 1) * this.itemsPerPage + 1;
     const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} of ${this.totalItems.toLocaleString()}`;
+    return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
   }
 }
