@@ -1,13 +1,20 @@
 import { importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
+import { AuthInterceptor } from './core/services/auth.interceptor';
 
 export const appConfig = {
   providers: [
-    provideRouter(routes),         // ← هنا الـ Router
-    provideHttpClient(),           // لو عندك HttpClient
-    importProvidersFrom(BrowserModule)
+    provideRouter(routes),
+    importProvidersFrom(BrowserModule),
+
+    provideHttpClient(
+      withInterceptors([
+        AuthInterceptor 
+      ])
+    )
+
   ]
 };

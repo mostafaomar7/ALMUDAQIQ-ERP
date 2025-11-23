@@ -10,7 +10,7 @@ export const EN = {
   selectRegion: 'Select Region',
 
   cpa: 'CPA',
-  zakat: 'Zakat',
+  zakat: 'Tax / Zakat',
   ministryCommerce: 'Ministry of Commerce',
   taxis: 'Taxis',
 

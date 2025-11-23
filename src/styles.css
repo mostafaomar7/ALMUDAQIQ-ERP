@@ -66,3 +66,21 @@ body.dark-mode .table > tbody .text-muted {
 body.dark-mode .custom-checkbox {
     border-color: #F9FAFB; /* إطار فاتح إذا كان الجدول غامق */
 }
+body.dark-mode .user-profile span{
+   color: #b7bcc2;
+}
+body.dark-mode .activity-log-container{
+  background-color: #242424;
+
+}
+body.dark-mode .activity-card{
+    background-color: #242424;
+    border: 1px solid #aaa0a0;
+}
+body.dark-mode .user-name {
+  color: #afafaf;
+}
+
+body.dark-mode .activity-action {
+  color: #afafaf;
+}

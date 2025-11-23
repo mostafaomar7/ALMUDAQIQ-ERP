@@ -63,7 +63,7 @@ export class Reviewmarksindex implements OnInit {
 
   ngOnInit() {
     this.lang.lang$.subscribe(l => this.loadTranslations(l));
-    this.loadTranslations('en'); // default
+
     this.generateDummyData();
     this.initializeFilterOptions();
     this.applyFilter();

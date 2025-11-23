@@ -12,17 +12,17 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<{ accessToken: string, user: any }> {
-    return this.http.post<{ accessToken: string, user: any }>(`${this.baseUrl}/auth/login`, { email, password })
-      .pipe(
-        tap(res => {
-          if (res?.accessToken) {
-            localStorage.setItem('accessToken', res.accessToken);
-            localStorage.setItem('user', JSON.stringify(res.user || {}));
-          }
-        })
-      );
-  }
+  login(email: string, password: string): Observable<any> {
+  return this.http.post<any>(`${this.baseUrl}/auth/login`, { email, password })
+    .pipe(
+      tap(res => {
+        if (res?.token) {
+          localStorage.setItem('accessToken', res.token);
+        }
+      })
+    );
+}
+
 
   logout() {
     localStorage.removeItem('accessToken');
@@ -55,5 +55,5 @@ verifyEmailWithEmail(email: string, otp: string): Observable<any> {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
- 
+
 }
