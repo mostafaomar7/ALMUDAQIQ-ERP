@@ -92,14 +92,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let region of regions">
-                <td class="fw-bold">{{ region.name }}</td>
-                <td class="fw-bold">{{ region.cityName }}</td>
-                <td class="actions-cell">
-                  <button class="btn-icon edit">✎ {{ t('edit') }}</button>
-                  <button class="btn-icon delete">🗑 {{ t('delete') }}</button>
-                </td>
-              </tr>
+            <tr *ngFor="let region of regions">
+  <td class="fw-bold">{{ region.name }}</td>
+  <td class="fw-bold">{{ region.cityName }}</td>
+  <td class="actions-cell">
+    <button class="btn-icon edit">✎ {{ t('edit') }}</button>
+    <button class="btn-icon delete">🗑 {{ t('delete') }}</button>
+  </td>
+</tr>
+
+
             </tbody>
           </table>
 
@@ -114,86 +116,91 @@
 
   <!-- === ADD COUNTRY MODAL === -->
   <div class="modal-overlay" *ngIf="isModalOpen">
-    <div class="modal-container">
+  <div class="modal-container">
 
-      <div class="modal-header">
-        <div class="modal-titles">
-          <h3>{{ t('modalAddCountry') }}</h3>
-          <p>{{ t('modalAddCountryDesc') }}</p>
+    <div class="modal-header">
+      <div class="modal-titles">
+        <h3>{{ t('modalAddCountry') }}</h3>
+        <p>{{ t('modalAddCountryDesc') }}</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Country Select -->
+      <div class="form-group full-width">
+        <label>{{ t('addCountry') }}</label>
+        <div class="select-wrapper">
+          <select (change)="onCountryChange($event)" class="form-control">
+            <option [value]="null">-- Select Country --</option>
+            <option *ngFor="let country of countries" [value]="country | json">
+              {{ country.flag }} {{ country.name }}
+            </option>
+          </select>
+          <span class="select-arrow">⌄</span>
         </div>
-        <button class="close-btn" (click)="closeModal()">×</button>
       </div>
 
-      <div class="modal-body">
+      <div class="form-row">
 
-        <div class="form-group full-width">
-          <label>{{ t('addCountry') }}</label>
+        <!-- city Select -->
+        <div class="form-group">
+          <label>{{ t('addCity') }}</label>
           <div class="select-wrapper">
-            <select (change)="onCountryChange($event)" class="form-control">
-  <option [value]="null">-- Select Country --</option>
-  <option *ngFor="let country of countries" [value]="country | json">
-    {{ country.flag }} {{ country.name }}
-  </option>
-</select>
+            <select [disabled]="!states.length" (change)="onStateChange($event)" class="form-control">
+              <option [value]="null">-- Select City --</option>
+              <option *ngFor="let state of states" [value]="state | json">
+                {{ state.name }}
+              </option>
+            </select>
             <span class="select-arrow">⌄</span>
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>{{ t('addCity') }}</label>
-            <div class="select-wrapper">
-              <select *ngIf="states.length" (change)="onStateChange($event)" class="form-control">
-  <option [value]="null">-- Select State --</option>
-  <option *ngFor="let state of states" [value]="state | json">
-    {{ state.name }}
-  </option>
-</select>
-              <span class="select-arrow">⌄</span>
-            </div>
+        <!-- Region Select -->
+        <div class="form-group">
+          <label>{{ t('addRegion') }}</label>
+          <div class="select-wrapper">
+            <select [disabled]="!cities.length" (change)="onCityChange($event)" class="form-control">
+              <option [value]="null">-- Select Region --</option>
+              <option *ngFor="let city of cities" [value]="city | json">
+                {{ city.name }}
+              </option>
+            </select>
+            <span class="select-arrow">⌄</span>
           </div>
-          <div class="form-group">
-            <label>{{ t('addRegion') }}</label>
-            <div class="select-wrapper">
-              <select *ngIf="cities.length" (change)="onCityChange($event)" class="form-control">
-  <option [value]="null">-- Select City --</option>
-  <option *ngFor="let city of cities" [value]="city | json">
-    {{ city.name }}
-  </option>
-</select>
-              <span class="select-arrow">⌄</span>
-            </div>
-          </div>
-
-
-
-        </div>
-
-        <div class="form-group full-width">
-          <label>{{ t('cpaWebsite') }}</label>
-          <input type="text" class="form-control" placeholder="{{ t('cpaWebsite') }}" [(ngModel)]="cpaUrl">
-        </div>
-
-        <div class="form-group full-width">
-          <label>{{ t('commerceWebsite') }}</label>
-          <input type="text" class="form-control" placeholder="{{ t('commerceWebsite') }}" [(ngModel)]="commerceUrl">
-        </div>
-
-        <div class="form-group full-width">
-          <label>{{ t('taxWebsite') }}</label>
-          <input type="text" class="form-control" placeholder="{{ t('taxWebsite') }}" [(ngModel)]="zakatUrl">
         </div>
 
       </div>
 
-      <div class="modal-footer">
-<button class="btn-primary save-modal-btn" (click)="saveAll()">
-  {{ t('saveCountry') }}
-</button>
+      <!-- Websites -->
+      <div class="form-group full-width">
+        <label>{{ t('cpaWebsite') }}</label>
+        <input type="text" class="form-control" placeholder="{{ t('cpaWebsite') }}" [(ngModel)]="cpaUrl">
+      </div>
+
+      <div class="form-group full-width">
+        <label>{{ t('commerceWebsite') }}</label>
+        <input type="text" class="form-control" placeholder="{{ t('commerceWebsite') }}" [(ngModel)]="commerceUrl">
+      </div>
+
+      <div class="form-group full-width">
+        <label>{{ t('taxWebsite') }}</label>
+        <input type="text" class="form-control" placeholder="{{ t('taxWebsite') }}" [(ngModel)]="zakatUrl">
       </div>
 
     </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary save-modal-btn" (click)="saveAll()">
+        {{ t('saveCountry') }}
+      </button>
+    </div>
+
   </div>
+</div>
+
 
   <!-- === ADD CITY MODAL === -->
   <div class="modal-overlay" *ngIf="isCityModalOpen">
@@ -210,12 +217,13 @@
         <div class="form-group full-width">
           <label>{{ t('addCity') }}</label>
           <div class="select-wrapper">
-            <select class="form-control" [(ngModel)]="selectedCity">
+            <select class="form-control" [(ngModel)]="selectedState">
   <option [ngValue]="null">{{ t('selectCity') }}</option>
-  <option *ngFor="let city of cities" [ngValue]="city">
-    {{ city.name }}
+  <option *ngFor="let state of states" [ngValue]="state">
+    {{ state.name }}
   </option>
 </select>
+
 
             <span class="select-arrow">⌄</span>
           </div>
@@ -223,43 +231,47 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn-primary save-modal-btn" (click)="closeCityModal()">{{ t('saveCity') }}</button>
-      </div>
+<button class="btn-primary save-modal-btn" (click)="saveCity()">{{ t('saveCity') }}</button>
+</div>
+
 
     </div>
   </div>
 
   <!-- === ADD REGION MODAL === -->
-  <div class="modal-overlay" *ngIf="isRegionModalOpen">
-    <div class="modal-container">
+<div class="modal-overlay" *ngIf="isRegionModalOpen">
+  <div class="modal-container">
 
-      <div class="modal-header">
-        <div class="modal-titles">
-          <h3>{{ t('addRegion') }}</h3>
-        </div>
-        <button class="close-btn" (click)="closeRegionModal()">×</button>
+    <div class="modal-header">
+      <div class="modal-titles">
+        <h3>{{ t('addRegion') }}</h3>
       </div>
-
-      <div class="modal-body">
-        <div class="form-group full-width">
-          <label>{{ t('addRegion') }}</label>
-          <div class="select-wrapper">
-            <select class="form-control">
-              <option>{{ t('selectRegion') }}</option>
-              <option>Al Olaya</option>
-              <option>Al Malqa</option>
-              <option>Al Yasmin</option>
-            </select>
-            <span class="select-arrow">⌄</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-primary save-modal-btn" (click)="closeRegionModal()">{{ t('saveRegion') }}</button>
-      </div>
-
+      <button class="close-btn" (click)="closeRegionModal()">×</button>
     </div>
+
+    <div class="modal-body">
+      <div class="form-group full-width">
+        <label>{{ t('selectCityForRegion') }}</label>
+        <div class="select-wrapper">
+          <select class="form-control" [(ngModel)]="selectedCity">
+            <option [ngValue]="null">{{ t('selectRegion') }}</option>
+            <option *ngFor="let city of cities" [ngValue]="city">
+              {{ city.name }}
+            </option>
+          </select>
+          <span class="select-arrow">⌄</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary save-modal-btn" (click)="saveRegion()">
+        {{ t('saveRegion') }}
+      </button>
+    </div>
+
   </div>
+</div>
+
 
 </div>

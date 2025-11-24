@@ -9,7 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { DomainService } from './domain.service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 
 type TranslationKey = keyof typeof EN;
 
@@ -40,6 +40,8 @@ export class Domainsettings implements OnInit {
   selectedCountry: any = null;
   selectedState: any = null;
   selectedCity: any = null;
+selectedRegion: any = null;
+regionName: string = "";
 
   // روابط مواقع مهمة
   cpaUrl = '';
@@ -51,71 +53,46 @@ export class Domainsettings implements OnInit {
 selectCountry(country: any) {
   this.selectedCountry = country;
 
-  // حفظ isoCode لاستخدامه في المودال فقط
+  // جلب isoCode من مكتبة country-state-city
   const countryObj = Country.getAllCountries().find((c: any) => c.name === country.name);
-  this.selectedCountry.isoCode = countryObj?.isoCode || null;
+  this.selectedCountry.isoCode = countryObj?.isoCode;
 
-  // روابط المواقع
+  // تعيين روابط الدولة
   this.cpaUrl = country.cpaWebsite || '';
-  this.commerceUrl = country.commerceWebsite || '';
   this.zakatUrl = country.taxWebsite || '';
+  this.commerceUrl = country.commerceWebsite || '';
 
-  // إعادة تعيين القوائم القديمة
-  this.addedCities = [];
-  this.regions = [];
-  this.selectedCity = null;
+  // المدن مع تعداد المناطق
+  this.addedCities = country.cities?.map((city: any) => ({
+    id: city.id,
+    name: city.name,
+    regionsCount: city.regions?.length || 0,
+    regions: city.regions || []
+  })) || [];
 
-  // جلب المدن الخاصة بالدولة من API فقط للجدول
-  if (this.selectedCountry.id) {
-    this.domainService.getCitiesByCountry(this.selectedCountry.id).subscribe(citiesRes => {
-      // تحديث addedCities فقط بالمدن الخاصة بالدولة
-      this.addedCities = citiesRes.map(city => ({
-        ...city,
-        regionsCount: 0
-      }));
-
-      // مسح المناطق القديمة قبل إضافة أي بيانات جديدة
-      this.regions = [];
-
-      // جلب المناطق لكل مدينة
-      const regionRequests = this.addedCities.map(city =>
-        this.domainService.getRegionsByCity(city.id).pipe(
-          // عند الاستلام، أضف فقط المناطق التي تنتمي لهذه المدينة
-          // استخدم map أو subscribe لاحقًا
-        )
-      );
-
-      // اشتغل على كل المناطق لكل مدينة
-      this.addedCities.forEach(city => {
-        this.domainService.getRegionsByCity(city.id).subscribe(regionsRes => {
-          const cityRegions = regionsRes.map(r => ({ ...r, cityName: city.name }));
-          this.regions.push(...cityRegions);
-          city.regionsCount = cityRegions.length;
-        });
-      });
-    });
-  }
-
-  // الـ select في المودال سيعبأ عند فتح المودال
-  this.cities = [];
+  // المناطق للدولة كلها، مع ربط كل منطقة بالمدينة الخاصة بها
+  this.regions = this.addedCities
+    .map(city => city.regions.map((region:any) => ({
+      ...region,
+      cityName: city.name
+    })))
+    .flat();
 }
-
 
 // عند فتح مودال إضافة مدينة
 openCityModal(): void {
-  if (!this.selectedCountry?.isoCode) {
+  if (!this.selectedCountry || !this.selectedCountry.isoCode) {
     Swal.fire('Error', 'Please select a country first', 'error');
     return;
   }
 
-  // هذا للـ select في المودال فقط
-  this.cities = City.getCitiesOfCountry(this.selectedCountry.isoCode);
+  // جلب الولايات/المقاطعات من المكتبة
+  this.states = State.getStatesOfCountry(this.selectedCountry.isoCode);
 
+  this.selectedState = null;
   this.selectedCity = null;
   this.isCityModalOpen = true;
 }
-
-
 
   ngOnInit(): void {
     this.langService.lang$.subscribe(lang => this.loadTranslations(lang));
@@ -137,34 +114,96 @@ openCityModal(): void {
   closeModal() { this.isModalOpen = false; }
 
   closeCityModal() { this.isCityModalOpen = false; }
-  openRegionModal() { this.isRegionModalOpen = true; }
-  closeRegionModal() { this.isRegionModalOpen = false; }
+openRegionModal(): void {
+  if (!this.selectedCountry || !this.selectedCountry.isoCode) {
+    Swal.fire('Error', 'Please select a country first', 'error');
+    return;
+  }
+
+  // جلب المدن للدولة المختارة
+  this.cities = City.getCitiesOfCountry(this.selectedCountry.isoCode);
+  this.selectedCity = null;
+
+  this.isRegionModalOpen = true;
+}
+onCitySelectForRegion(event: any) {
+  this.selectedCity = event;
+}
+// حفظ المنطقة
+saveRegion() {
+  if (!this.selectedCity) {
+    Swal.fire('Error', 'Please select a city first', 'error');
+    return;
+  }
+
+  if (!this.regionName || this.regionName.trim() === "") {
+    Swal.fire('Error', 'Please enter a region name', 'error');
+    return;
+  }
+
+  const regionBody = {
+  name: this.selectedCity.name,
+  cityId: this.selectedCity.id
+};
+
+
+  this.domainService.addRegion(regionBody).subscribe({
+    next: (res: any) => {
+      const newRegion = res.region;
+
+      /** 1️⃣ أضف المنطقة داخل المدينة نفسها */
+      const cityInUI = this.countriessidebar
+        .find(c => c.id === this.selectedCountry.id)
+        ?.cities?.find((ct:any) => ct.id === this.selectedCity.id);
+
+      if (cityInUI) {
+        cityInUI.regions = cityInUI.regions || [];
+        cityInUI.regions.push(newRegion);
+      }
+
+      /** 2️⃣ أضفها لقائمة المناطق اللي بتظهر تحت الدولة */
+      this.regions.push({
+        ...newRegion,
+        cityName: this.selectedCity.name
+      });
+
+      Swal.fire('Success', 'Region added successfully!', 'success');
+      this.regionName = "";
+      this.closeRegionModal();
+    },
+    error: (err) => console.error(err)
+  });
+}
+
+closeRegionModal() { this.isRegionModalOpen = false; }
 
   // Load all countries from the library
   loadCountries() {
     this.countries = Country.getAllCountries();
   }
 
-  // When user selects a country
-  onCountryChange(event: any) {
-    this.selectedCountry = JSON.parse(event.target.value);
-    this.states = State.getStatesOfCountry(this.selectedCountry.isoCode);
-    this.selectedState = null;
-    this.cities = [];
-    this.selectedCity = null;
-  }
+onCountryChange(event: any) {
+  this.selectedCountry = JSON.parse(event.target.value);
+  this.states = State.getStatesOfCountry(this.selectedCountry.isoCode) || [];
+  this.selectedState = null;
+  this.cities = [];
+  this.selectedCity = null;
+  this.regions = [];
+}
 
-  // When user selects a state
-  onStateChange(event: any) {
-    this.selectedState = JSON.parse(event.target.value);
-    this.cities = City.getCitiesOfState(this.selectedCountry.isoCode, this.selectedState.isoCode);
-    this.selectedCity = null;
-  }
+onStateChange(event: any) {
+  this.selectedState = JSON.parse(event.target.value);
+  this.cities = City.getCitiesOfState(this.selectedCountry.isoCode, this.selectedState.isoCode) || [];
+  this.selectedCity = null;
+  this.regions = [];
+}
 
-  // When user selects a city
-  onCityChange(event: any) {
-    this.selectedCity = JSON.parse(event.target.value);
-  }
+onCityChange(event: any) {
+  this.selectedCity = JSON.parse(event.target.value);
+  this.selectedRegion = null;
+  // إذا عندك بيانات المناطق من API أو من addedCities
+  this.regions = this.selectedCity.regions || [];
+}
 
   clear(type: string) {
     switch(type) {
@@ -206,21 +245,20 @@ this.domainService.addCountry(countryBody).subscribe({
     // ← أضف الدولة مباشرة للـ sidebar
     this.countriessidebar.push(countryRes.country);
 
-    const cityBody = {
-      name: this.selectedCity.name,
-      countryId: countryId
-    };
-
+   const cityBody = {
+  name: this.selectedState?.name, // state → city
+  countryId: countryId
+};
     this.domainService.addCity(cityBody).subscribe({
-      next: (cityRes: any) => {
-        const cityId = Number(cityRes.city?.id);
-        if (!cityId) return console.error('City ID missing');
+        next: (cityRes: any) => {
+    const cityId = Number(cityRes.city?.id);
+    if (!cityId) return;
 
-        if (this.selectedState?.name) {
-          const regionBody = {
-            name: this.selectedState.name,
-            cityId: cityId
-          };
+    if (this.selectedCity?.name) {
+      const regionBody = {
+        name: this.selectedCity.name, // city → region
+        cityId: cityId
+      };
           this.domainService.addRegion(regionBody).subscribe({
             next: () => {
               Swal.fire({
@@ -261,26 +299,32 @@ loadCountriesFromAPI() {
   });
 }
 saveCity(): void {
-  if (!this.selectedCity || !this.selectedCountry?.id) {
-    Swal.fire('Error', 'Please select a country and city', 'error');
+  if (!this.selectedState || !this.selectedCountry?.id) {
+    Swal.fire('Error', 'Please select a country and state', 'error');
     return;
   }
 
   const cityBody = {
-    name: this.selectedCity.name,
+    name: this.selectedState.name,
     countryId: this.selectedCountry.id
   };
 
   this.domainService.addCity(cityBody).subscribe({
     next: (res: any) => {
+      const newCity = res.city;
+
+      // ⬅️ إضافة المدينة فوراً في الـ array بدون Refresh
+      this.cities.push({
+        ...newCity,
+        regions: []
+      });
+
       Swal.fire('Success', 'City added successfully!', 'success');
-      // إعادة تحميل المدن المضافة للجدول بعد الحفظ
-      this.selectCountry(this.selectedCountry);
+
       this.closeCityModal();
     },
     error: (err) => console.error(err)
   });
 }
-
 
 }

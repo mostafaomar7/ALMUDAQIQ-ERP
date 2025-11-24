@@ -39,4 +39,6 @@ export const AR = {
   saveCountry: 'حفظ الدولة',
   saveCity: 'حفظ المدينة',
   saveRegion: 'حفظ المنطقة',
+    selectCityForRegion: 'Select City for Region',
+
 };
