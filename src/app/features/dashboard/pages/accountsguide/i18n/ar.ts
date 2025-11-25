@@ -50,5 +50,21 @@ export const AR = {
 
   costNotBilled: 'تكاليف لم تتم فوترتها بعد',
   recognizedMonthly: 'يتم إثباته شهرياً',
-  annualProvision: 'مخصص سنوي'
+  annualProvision: 'مخصص سنوي',
+  relatedObjectives : 'الأهداف ذات الصلة',
+  objectiveCode : 'كود الهدف',
+    enterCode: 'ادخال الكود',
+  submit: 'اضافة',
+  enterAccountName: 'Enter account name',
+  enterLevel: 'Enter level',
+  enterAccountNumber: 'Enter account number',
+  enterObjectiveCode: 'Enter objective code',
+  enterRelatedObjectives: 'Enter related objectives',
+  rulesAndRegulations: 'القواعد واللوائح',
+  enterDisclosureNotes: 'Enter disclosure notes',
+    basicInfo: 'المعلومات الأساسية',
+  regulations: 'القوانين واللوائح',
+  step: 'الخطوة',
+  of: 'من',
+  disclosureNotes: 'ملاحظات الإفصاح',
 };

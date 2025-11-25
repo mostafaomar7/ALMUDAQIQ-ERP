@@ -251,17 +251,13 @@
 
     <div class="modal-body">
       <div class="form-group full-width">
-        <label>{{ t('selectCityForRegion') }}</label>
-        <div class="select-wrapper">
-          <select class="form-control" [(ngModel)]="selectedCity">
-            <option [ngValue]="null">{{ t('selectRegion') }}</option>
-            <option *ngFor="let city of cities" [ngValue]="city">
-              {{ city.name }}
-            </option>
-          </select>
-          <span class="select-arrow">⌄</span>
-        </div>
-      </div>
+  <label>Select Region</label>
+  <select class="form-control" [(ngModel)]="selectedRegionFromLibrary" (ngModelChange)="onRegionSelect($event)">
+    <option [ngValue]="null">Select Region</option>
+    <option *ngFor="let city of cities" [ngValue]="city">{{ city.name }}</option>
+  </select>
+</div>
+
     </div>
 
     <div class="modal-footer">

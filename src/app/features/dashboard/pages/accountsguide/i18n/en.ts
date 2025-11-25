@@ -50,5 +50,21 @@ export const EN = {
 
   costNotBilled: 'Costs not yet billed',
   recognizedMonthly: 'Recognized monthly',
-  annualProvision: 'Annual provision'
+  annualProvision: 'Annual provision',
+  relatedObjectives : 'related Objectives',
+  objectiveCode : 'objective Code',
+    enterCode: 'Enter Code',
+  submit: 'Submit',
+  enterAccountName: 'Enter account name',
+  enterLevel: 'Enter level',
+  enterAccountNumber: 'Enter account number',
+  enterObjectiveCode: 'Enter objective code',
+  enterRelatedObjectives: 'Enter related objectives',
+  rulesAndRegulations: 'Rules and Regulations',
+  enterDisclosureNotes: 'Enter disclosure notes',
+    basicInfo: 'Basic Information',
+  regulations: 'Regulations',
+  step: 'Step',
+  of: 'of',
+  disclosureNotes: 'Disclosure Notes',
 };

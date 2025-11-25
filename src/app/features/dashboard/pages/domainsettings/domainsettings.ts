@@ -42,6 +42,7 @@ export class Domainsettings implements OnInit {
   selectedCity: any = null;
 selectedRegion: any = null;
 regionName: string = "";
+selectedApiCity: any = null;
 
   // روابط مواقع مهمة
   cpaUrl = '';
@@ -115,66 +116,72 @@ openCityModal(): void {
 
   closeCityModal() { this.isCityModalOpen = false; }
 openRegionModal(): void {
-  if (!this.selectedCountry || !this.selectedCountry.isoCode) {
+  if (!this.selectedCountry || !this.selectedCountry.id) {
     Swal.fire('Error', 'Please select a country first', 'error');
     return;
   }
 
-  // جلب المدن للدولة المختارة
+  // مدن API الحقيقية
+  this.addedCities = this.selectedCountry.cities || [];
+
+  // مدن المكتبة
   this.cities = City.getCitiesOfCountry(this.selectedCountry.isoCode);
+
   this.selectedCity = null;
+  this.selectedApiCity = null;
 
   this.isRegionModalOpen = true;
 }
-onCitySelectForRegion(event: any) {
-  this.selectedCity = event;
+
+onCitySelectForRegion(cityFromLibrary: any) {
+  if (!cityFromLibrary) {
+    this.selectedCity = null;
+    return;
+  }
+  this.selectedCity = cityFromLibrary;
+  // لا تفعل أي شيء مع الـ API هنا
 }
-// حفظ المنطقة
 saveRegion() {
-  if (!this.selectedCity) {
-    Swal.fire('Error', 'Please select a city first', 'error');
+  if (!this.selectedCountry || !this.selectedState || !this.selectedRegionFromLibrary) {
+    Swal.fire('Missing data', 'Please select country, city, and region.', 'warning');
     return;
   }
 
   if (!this.regionName || this.regionName.trim() === "") {
-    Swal.fire('Error', 'Please enter a region name', 'error');
+    Swal.fire('Missing name', 'Please enter a region name', 'warning');
     return;
   }
 
   const regionBody = {
-  name: this.selectedCity.name,
-  cityId: this.selectedCity.id
-};
-
+    name: this.regionName, // اسم المنطقة اللي المستخدم كتبه
+    cityId: this.selectedRegionFromLibrary.apiId // ID من الـ API للـ city
+  };
 
   this.domainService.addRegion(regionBody).subscribe({
-    next: (res: any) => {
-      const newRegion = res.region;
-
-      /** 1️⃣ أضف المنطقة داخل المدينة نفسها */
-      const cityInUI = this.countriessidebar
-        .find(c => c.id === this.selectedCountry.id)
-        ?.cities?.find((ct:any) => ct.id === this.selectedCity.id);
-
-      if (cityInUI) {
-        cityInUI.regions = cityInUI.regions || [];
-        cityInUI.regions.push(newRegion);
-      }
-
-      /** 2️⃣ أضفها لقائمة المناطق اللي بتظهر تحت الدولة */
-      this.regions.push({
-        ...newRegion,
-        cityName: this.selectedCity.name
-      });
-
-      Swal.fire('Success', 'Region added successfully!', 'success');
-      this.regionName = "";
-      this.closeRegionModal();
-    },
-    error: (err) => console.error(err)
+    next: () => Swal.fire('Success', 'Region saved successfully', 'success'),
+    error: err => console.error(err)
   });
 }
 
+selectedRegionFromLibrary: any = null; // هذا يمثل الـ City من المكتبة → Region عندك
+
+
+onRegionSelect(regionFromLibrary: any) {
+  this.selectedRegionFromLibrary = regionFromLibrary;
+
+  // هنا ممكن تتحقق إذا هذا Region موجود في الـ API City
+  if (!regionFromLibrary) return;
+
+  this.domainService.getCitiesByCountry(this.selectedCountry.id).subscribe(apiCities => {
+    const matched = apiCities.find(c => c.name.toLowerCase() === regionFromLibrary.name.toLowerCase());
+
+    if (matched) {
+      this.selectedRegionFromLibrary.apiId = matched.id; // استخدم ID من الـ API لاحقًا عند الحفظ
+    } else {
+      this.selectedRegionFromLibrary.apiId = null;
+    }
+  });
+}
 closeRegionModal() { this.isRegionModalOpen = false; }
 
   // Load all countries from the library

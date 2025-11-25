@@ -37,7 +37,7 @@ export class Reviewmarksindex implements OnInit {
   allMarks: ReviewMark[] = [];
   displayedMarks: ReviewMark[] = [];
   filteredMarks: ReviewMark[] = [];
-
+  
   currentPage: number = 1;
   itemsPerPage: number = 20;
   totalItems: number = 0;

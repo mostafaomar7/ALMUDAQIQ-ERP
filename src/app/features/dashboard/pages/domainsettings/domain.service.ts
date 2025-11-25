@@ -31,5 +31,12 @@ getCitiesByCountry(countryId: number) {
 getRegionsByCity(cityId: number) {
   return this.http.get<any[]>(`${this.api_url}/regions?cityId=${cityId}`);
 }
+getStatesByCountry(countryId: number) {
+  return this.http.get<any[]>(`${this.api_url}/states?countryId=${countryId}`);
+}
+
+getCitiesByState(stateId: number) {
+  return this.http.get<any[]>(`${this.api_url}/cities?stateId=${stateId}`);
+}
 
 }
