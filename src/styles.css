@@ -84,3 +84,383 @@ body.dark-mode .user-name {
 body.dark-mode .activity-action {
   color: #afafaf;
 }
+/* 🆕 Modal Overlay and Container */
+/* ----------------------------------- */
+.modal-overlay {
+  /* حافظ على الأساسيات */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  /* تعديل للحصول على شكل الكارد (البطاقة) الناعمة التي بالصورة */
+  background-color: white;
+  padding: 0; /* تم إزالة الـ Padding الأساسي لضبطه بالهيدر والفوتر */
+  border-radius: 12px; /* حواف أكثر دائرية */
+  width: 90%;
+  max-width: 500px; /* تحديد عرض مشابه للصور */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* ظل أنعم وأبرز */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ----------------------------------- */
+/* 🆕 Modal Header */
+/* ----------------------------------- */
+.modal-header {
+  /* فصل الهيدر بـ Padding داخلي */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: none; /* إزالة الخط الفاصل من الأسفل */
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem; /* حجم أصغر قليلاً للعنوان */
+  font-weight: 600;
+  color: #333;
+}
+
+.step-indicator {
+    /* تنسيق مؤشر الخطوة (Step 1 of 3) */
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #666;
+    margin-right: auto; /* لجعله بجوار العنوان مباشرة */
+    margin-left: 15px;
+}
+
+.close-btn {
+  /* زر الإغلاق (X) */
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #aaa;
+  line-height: 1;
+  padding: 0;
+}
+
+/* ----------------------------------- */
+/* 🆕 Modal Body - Form Fields */
+/* ----------------------------------- */
+.modal-body {
+    padding: 0 24px 24px 24px; /* Padding جانبي وسفلي */
+    flex-grow: 1; /* لتمديد المحتوى */
+}
+
+.modal-body label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 8px; /* تباعد أكبر بين العنوان والمدخل */
+    font-weight: 500; /* وزن خط متوسط */
+    color: #444;
+    font-size: 0.9rem;
+}
+
+.modal-body h3 { /* For Rules & Regulations / Disclosure Notes */
+    font-size: 1.1rem;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.form-control {
+    /* جعل المدخلات تشبه تصميم الصور: حواف ناعمة وارتفاع مناسب */
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px; /* حواف ناعمة */
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #00796b; /* لون التظليل عند التركيز (مثل اللون الأخضر للأزرار) */
+    outline: none;
+    box-shadow: 0 0 0 1px rgba(0, 121, 107, 0.2);
+}
+
+.large-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* ----------------------------------- */
+/* 🆕 Code Grid Styling for Step 3 */
+/* ----------------------------------- */
+.code-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 10px;
+}
+
+/* ----------------------------------- */
+/* 🆕 Modal Footer - Navigation */
+/* ----------------------------------- */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 24px;
+  border-top: 1px solid #eee; /* خط فاصل خفيف */
+  background-color: #fcfcfc; /* خلفية خفيفة للفوتر */
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* 🆕 Buttons Styling (لتتناسب مع التصميم الأخضر) */
+.btn-primary {
+    /* اللون الأخضر الذي يظهر في زر Next/Submit */
+    background-color: #00796b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-width: 80px; /* لتحديد عرض ثابت للأزرار */
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #006056;
+}
+
+.btn-secondary {
+    /* زر Back */
+    background: none;
+    color: #666;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-width: 80px;
+}
+/* --- GENERAL MODAL OVERLAY --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* أعلى رقم علشان يظهر فوق كله */
+}
+
+/* --- IMPORT MODAL STYLES --- */
+.import-modal-container {
+  background-color: #ffffff;
+  width: 420px;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  animation: fadeIn 0.25s ease-out;
+  color: #222; /* ضمان وضوح النص */
+}
+
+/* Body */
+.import-body {
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+.upload-area {
+  border: 1px dashed #c7c7c7;
+  border-radius: 10px;
+  padding: 25px;
+  text-align: center;
+  background-color: #f8f8f8;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.upload-area:hover {
+  background-color: #efefef;
+}
+
+.upload-icon {
+  color: #555;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.upload-text {
+  font-size: 15px;
+  color: #222;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #666;
+}
+
+/* File Progress Item */
+.file-progress-item {
+  background-color: #efefef;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.file-icon-wrapper {
+  font-size: 26px;
+  color: #e74c3c;
+  display: flex;
+  align-items: center;
+}
+
+.file-info-wrapper { flex: 1; }
+
+.file-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.remove-file-btn {
+  background: none;
+  border: none;
+  color: #777;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.file-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.progress-bar-container {
+  height: 4px;
+  background-color: #ddd;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #007a5c;
+  border-radius: 3px;
+}
+
+/* --- EXPORT MODAL --- */
+.export-modal-container {
+  background-color: #ffffff;
+  width: 400px;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  animation: fadeIn 0.25s ease-out;
+  color: #222; /* مهم جدًا */
+}
+
+.export-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.export-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #222;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #777;
+  cursor: pointer;
+}
+
+.export-subtitle {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.export-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.export-option-card {
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  padding: 15px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  background-color: #fafafa;
+  transition: all 0.2s;
+}
+
+.export-option-card:hover {
+  background-color: #f3f3f3;
+}
+
+.export-option-card.selected {
+  border-color: #4a90e2;
+  background-color: #e8f2ff;
+}
+
+.file-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.file-icon.green { color: #27ae60; }
+.file-icon.red { color: #e74c3c; }
+
+.export-option-card span {
+  font-size: 12px;
+  color: #444;
+  font-weight: 600;
+}
+
+.export-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.download-btn {
+  padding: 10px 22px;
+  border-radius: 6px;
+}
+

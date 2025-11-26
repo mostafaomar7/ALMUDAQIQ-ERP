@@ -1,76 +1,94 @@
 <div class="stages-container">
 
-  <!-- Toolbar -->
   <div class="toolbar">
     <h2 class="page-title">{{ t('fileStagesGuideTitle') }}</h2>
 
     <div class="actions-group">
       <div class="edit-actions">
-        <button class="btn-text"><i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}</button>
-        <button class="btn-text"><i class="fa-regular fa-trash-can"></i> {{ t('delete') }}</button>
+        <button class="btn-text" [disabled]="!selectedStage" (click)="openAddModal(selectedStage || undefined)">
+          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+        </button>
+        <button class="btn-text" (click)="deleteSelected()">
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
+        </button>
       </div>
 
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" [placeholder]="t('search')" class="search-input">
+        <input type="text" class="search-input" [(ngModel)]="searchText" (input)="onSearchInput()" [placeholder]="t('search')">
       </div>
 
       <div class="file-actions">
-        <button class="btn-outline"><i class="fa-solid fa-file-import"></i> {{ t('import') }}</button>
-        <button class="btn-outline"><i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}</button>
-        <button class="btn-primary"><i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}</button>
+        <button class="btn-outline" (click)="openImportModal()">
+          <i class="fa-solid fa-file-import"></i> {{ t('import') }}
+        </button>
+        <button class="btn-outline" (click)="openExportModal()">
+          <i class="fa-solid fa-file-export"></i> {{ t('export') }}
+        </button>
+        <button class="btn-primary" (click)="openAddModal()">
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Table -->
   <div class="table-container">
     <table class="stages-table">
       <thead>
-        <tr>
-          <th class="checkbox-col">
-            <div class="custom-checkbox indeterminate" (click)="toggleAll()">
-              <i class="fa-solid fa-minus"></i>
-            </div>
-          </th>
-          <th>{{ t('stageCode') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('stageName') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="wide-col">{{ t('description') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('order') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('responsibleRole') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('stageDuration') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-        </tr>
+        <tr> <th class="checkbox-col"> <div class="custom-checkbox indeterminate" (click)="toggleAll()"> <i class="fa-solid fa-minus"></i> </div> </th> <th>{{ t('stageCode') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('stage') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('entityType') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('economicSector') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th class="wide-col">{{ t('procedure') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('scopeOfProcedure') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('selectionMethod') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('examplesOfUse') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('ias') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('ifrs') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th class="wide-col">{{ t('isa') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('relevantPolicies') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('detailedStageExplanation') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('formsToBeCompleted') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('practicalReviewProcedures') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('associatedRisks') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th class="wide-col">{{ t('riskLevel') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('responsibleAuthority') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('outputs') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('implementationPeriod') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('strengths') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th>{{ t('potentialWeaknesses') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> <th class="wide-col">{{ t('performanceIndicators') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th> </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let stage of displayedStages" [class.selected-row]="stage.selected">
-          <td class="checkbox-col">
-            <div class="custom-checkbox" [class.checked]="stage.selected" (click)="toggleSelection(stage)">
-              <i *ngIf="stage.selected" class="fa-solid fa-check"></i>
-            </div>
-          </td>
-          <td class="fw-bold">{{ stage.code }}</td>
-          <td class="text-muted">{{ stage.name }}</td>
-          <td class="text-muted desc-text">{{ stage.description }}</td>
-          <td class="text-muted">{{ stage.order }}</td>
-          <td class="text-muted">{{ stage.role }}</td>
-          <td class="text-muted">{{ stage.duration }}</td>
-        </tr>
+      <tr *ngFor="let stage of displayedStages"
+    [class.selected-row]="stage?.selected"
+    (click)="selectForEdit(stage)">
+
+  <td class="checkbox-col">
+    <div class="custom-checkbox" [class.checked]="stage?.selected"
+         (click)="$event.stopPropagation(); toggleSelection(stage)">
+      <i *ngIf="stage?.selected" class="fa-solid fa-check"></i>
+    </div>
+  </td>
+
+  <td>{{ stage.stageCode }}</td>
+  <td>{{ stage.stage }}</td>
+  <td>{{ stage.entityType }}</td>
+  <td>{{ stage.economicSector }}</td>
+  <td>{{ stage.procedure }}</td>
+  <td>{{ stage.scopeOfProcedure }}</td>
+  <td>{{ stage.selectionMethod }}</td>
+  <td>{{ stage.examplesOfUse }}</td>
+  <td>{{ stage.IAS }}</td>
+  <td>{{ stage.IFRS }}</td>
+  <td>{{ stage.ISA }}</td>
+  <td>{{ stage.relevantPolicies }}</td>
+  <td>{{ stage.detailedExplanation }}</td>
+  <td>{{ stage.formsToBeCompleted }}</td>
+  <td>{{ stage.practicalProcedures }}</td>
+  <td>{{ stage.associatedRisks }}</td>
+  <td>{{ stage.riskLevel }}</td>
+  <td>{{ stage.responsibleAuthority }}</td>
+  <td>{{ stage.outputs }}</td>
+  <td>{{ stage.implementationPeriod }}</td>
+  <td>{{ stage.strengths }}</td>
+  <td>{{ stage.potentialWeaknesses }}</td>
+  <td>{{ stage.performanceIndicators }}</td>
+
+</tr>
+
       </tbody>
     </table>
   </div>
 
-  <!-- Pagination Footer -->
+  <!-- Pagination -->
   <div class="pagination-footer">
     <div class="pagination-controls">
       <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
         <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
       </button>
 
-      <ng-container *ngFor="let page of pagesArray">
-        <span *ngIf="page === '...'" class="dots">...</span>
-        <button *ngIf="page !== '...'" class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
-          {{ page }}
-        </button>
+      <ng-container *ngFor="let p of pagesArray">
+        <span *ngIf="p === '...'" class="dots">...</span>
+        <button *ngIf="p !== '...'" class="page-btn" [class.active]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
       </ng-container>
 
       <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
@@ -88,5 +106,204 @@
       {{ showingRangeText }}
     </div>
   </div>
+</div>
 
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content bg-white p-3 rounded shadow-lg w-600 mx-auto">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? t('editStage') : t('addStage') }}</h3>
+      <button class="close-btn" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- ============================= -->
+      <!-- STEP 1 -->
+      <!-- ============================= -->
+      <div *ngIf="currentStep === 1">
+
+        <label>{{ t('stageCode') }}</label>
+        <input [(ngModel)]="newStage.stageCode" class="form-control">
+
+        <label>{{ t('stage') }}</label>
+        <input [(ngModel)]="newStage.stage" class="form-control">
+
+        <label>{{ t('entityType') }}</label>
+        <input [(ngModel)]="newStage.entityType" class="form-control">
+
+        <label>{{ t('economicSector') }}</label>
+        <input [(ngModel)]="newStage.economicSector" class="form-control">
+
+        <label>{{ t('procedure') }}</label>
+        <textarea [(ngModel)]="newStage.procedure" class="form-control"></textarea>
+
+        <label>{{ t('responsibleAuthority') }}</label>
+        <input [(ngModel)]="newStage.responsibleAuthority" class="form-control">
+
+        <label>{{ t('implementationPeriod') }}</label>
+        <input [(ngModel)]="newStage.implementationPeriod" class="form-control">
+
+        <label>{{ t('scopeOfProcedure') }}</label>
+        <input [(ngModel)]="newStage.scopeOfProcedure" class="form-control">
+      </div>
+
+      <!-- ============================= -->
+      <!-- STEP 2 -->
+      <!-- ============================= -->
+      <div *ngIf="currentStep === 2">
+
+        <label>{{ t('selectionMethod') }}</label>
+        <input [(ngModel)]="newStage.selectionMethod" class="form-control">
+
+        <label>{{ t('examplesOfUse') }}</label>
+        <textarea [(ngModel)]="newStage.examplesOfUse" class="form-control"></textarea>
+
+        <label>{{ t('ias') }}</label>
+        <input [(ngModel)]="newStage.IAS" class="form-control">
+
+        <label>{{ t('ifrs') }}</label>
+        <input [(ngModel)]="newStage.IFRS" class="form-control">
+
+        <label>{{ t('isa') }}</label>
+        <input [(ngModel)]="newStage.ISA" class="form-control">
+
+        <label>{{ t('relevantPolicies') }}</label>
+        <textarea [(ngModel)]="newStage.relevantPolicies" class="form-control"></textarea>
+        <label>{{ t('detailedStageExplanation') }}</label>
+        <textarea [(ngModel)]="newStage.detailedExplanation" class="form-control"></textarea>
+
+        <label>{{ t('formsToBeCompleted') }}</label>
+        <textarea [(ngModel)]="newStage.formsToBeCompleted" class="form-control"></textarea>
+      </div>
+
+      <!-- ============================= -->
+      <!-- STEP 3 -->
+      <!-- ============================= -->
+      <div *ngIf="currentStep === 3">
+
+        <label>{{ t('practicalReviewProcedures') }}</label>
+        <textarea [(ngModel)]="newStage.practicalProcedures" class="form-control"></textarea>
+
+        <label>{{ t('associatedRisks') }}</label>
+        <textarea [(ngModel)]="newStage.associatedRisks" class="form-control"></textarea>
+
+        <label>{{ t('riskLevel') }}</label>
+        <input [(ngModel)]="newStage.riskLevel" class="form-control">
+
+        <label>{{ t('outputs') }}</label>
+        <textarea [(ngModel)]="newStage.outputs" class="form-control"></textarea>
+
+        <label>{{ t('strengths') }}</label>
+        <textarea [(ngModel)]="newStage.strengths" class="form-control"></textarea>
+
+        <label>{{ t('potentialWeaknesses') }}</label>
+        <textarea [(ngModel)]="newStage.potentialWeaknesses" class="form-control"></textarea>
+
+        <label>{{ t('performanceIndicators') }}</label>
+        <textarea [(ngModel)]="newStage.performanceIndicators" class="form-control"></textarea>
+      </div>
+
+    </div>
+
+    <!-- ============================= -->
+    <!-- FOOTER BUTTONS -->
+    <!-- ============================= -->
+    <div class="modal-footer">
+
+      <button class="btn-secondary" (click)="closeModal()">
+        {{ t('cancel') }}
+      </button>
+
+      <!-- BACK BUTTON -->
+      <button
+        *ngIf="currentStep > 1"
+        class="btn-secondary"
+        (click)="prevStep()">
+        {{ t('back') }}
+      </button>
+
+      <!-- NEXT BUTTON -->
+      <button
+        *ngIf="currentStep < 3"
+        class="btn-primary"
+        (click)="nextStep()">
+        {{ t('next') }}
+      </button>
+
+      <!-- SUBMIT BUTTON -->
+      <button
+        *ngIf="currentStep === 3"
+        class="btn-primary"
+        (click)="submitStage()">
+        {{ t('submit') }}
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- IMPORT Modal -->
+<div class="modal-overlay" *ngIf="isImportModalOpen">
+  <div class="import-modal-container">
+    <div class="export-header">
+      <h3>{{ t('importTitle') }}</h3>
+      <button class="close-btn" (click)="closeImportModal()">×</button>
+    </div>
+
+    <div class="import-body">
+      <div class="upload-area" (drop)="onFileDropped($event)" (dragover)="onDragOver($event)">
+        <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+        <p class="upload-text">{{ t('dropFileHere') }}</p>
+        <p class="upload-hint">{{ t('fileTypesHint') }}</p>
+        <input type="file" (change)="onFileSelected($event)" hidden #fileInput>
+        <button class="btn-outline" (click)="fileInput.click()">{{ t('browse') }}</button>
+      </div>
+
+      <div *ngIf="selectedFile" class="file-progress-item">
+        <div class="file-info-wrapper">
+          <div class="file-header">
+            <span class="file-name">{{ selectedFile.name }}</span>
+            <button class="remove-file-btn" (click)="removeFile()">×</button>
+          </div>
+
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+
+          <span *ngIf="isUploading">{{ uploadProgress }}%</span>
+        </div>
+      </div>
+
+      <div class="export-footer">
+        <button class="btn-primary download-btn" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">{{ t('import') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT Modal -->
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+  <div class="export-modal-container">
+    <div class="export-header">
+      <h3>{{ t('exportTitle') }}</h3>
+      <button class="close-btn" (click)="closeExportModal()">×</button>
+    </div>
+
+    <p class="export-subtitle">{{ t('selectFileType') }}</p>
+    <div class="export-options-grid">
+      <div class="export-option-card" [class.selected]="selectedExportOption==='excel'" (click)="selectExportOption('excel')">
+        <div class="file-icon green"><i class="fa-solid fa-file-excel"></i></div>
+        <span>Excel file</span>
+      </div>
+      <div class="export-option-card" [class.selected]="selectedExportOption==='pdf'" (click)="selectExportOption('pdf')">
+        <div class="file-icon red"><i class="fa-solid fa-file-pdf"></i></div>
+        <span>PDF file</span>
+      </div>
+    </div>
+
+    <div class="export-footer">
+      <button class="btn-primary download-btn" (click)="handleExport()"><i class="fa-solid fa-download"></i> {{ t('download') }}</button>
+    </div>
+  </div>
 </div>

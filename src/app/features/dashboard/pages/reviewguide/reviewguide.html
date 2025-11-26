@@ -6,27 +6,32 @@
 
     <div class="actions-group">
       <div class="edit-actions">
-        <button class="btn-text">
+        <button class="btn-text" [disabled]="!selectedReview" (click)="openAddModal(selectedReview || undefined)">
           <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
         </button>
-        <button class="btn-text">
+        <button class="btn-text" (click)="deleteSelectedItems()">
           <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
         </button>
       </div>
 
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" [placeholder]="t('search')" class="search-input">
+<input type="text"
+       [(ngModel)]="searchTerm"
+       (input)="applySearch()"
+       [placeholder]="t('search')"
+       class="search-input">
       </div>
 
       <div class="file-actions">
-        <button class="btn-outline">
+        <button class="btn-outline" (click)="openImportModal()">
           <i class="fa-solid fa-file-import"></i> {{ t('import') }}
         </button>
-        <button class="btn-outline">
-          <i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}
+
+        <button class="btn-outline" (click)="openExportModal()">
+          <i class="fa-solid fa-file-export"></i> {{ t('export') }}
         </button>
-        <button class="btn-primary">
+        <button class="btn-primary" (click)="openAddModal()">
           <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
         </button>
       </div>
@@ -43,28 +48,45 @@
               <i class="fa-solid fa-minus"></i>
             </div>
           </th>
-          <th>{{ t('level') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('separator') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('number') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="wide-col">{{ t('statement') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="wide-col">{{ t('purpose') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('responsibility') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('level') }}</th>
+          <th>{{ t('separator') }}</th>
+          <th>{{ t('number') }}</th>
+          <th>{{ t('statement') }}</th>
+          <th>{{ t('purpose') }}</th>
+          <th>{{ t('responsibility') }}</th>
+          <th>{{ t('DatePrepared') }}</th>
+          <th>{{ t('DateReviewed') }}</th>
+          <th>{{ t('Conclusion') }}</th>
+          <th>{{ t('Attachments') }}</th>
+          <th>{{ t('Notes1') }}</th>
+          <th>{{ t('Notes2') }}</th>
+          <th>{{ t('Notes3') }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of displayedReviews" [class.selected-row]="item.selected">
-          <td class="checkbox-col">
-            <div class="custom-checkbox" [class.checked]="item.selected" (click)="toggleSelection(item)">
-              <i *ngIf="item.selected" class="fa-solid fa-check"></i>
-            </div>
-          </td>
-          <td class="fw-bold">{{ item.level }}</td>
-          <td class="text-muted">{{ item.separator }}</td>
-          <td class="text-muted">{{ item.number }}</td>
-          <td class="text-muted content-text">{{ item.statement }}</td>
-          <td class="text-muted content-text">{{ item.purpose }}</td>
-          <td class="text-muted">{{ item.responsibility }}</td>
-        </tr>
+        <tr *ngFor="let item of displayedReviews"
+    [class.selected-row]="item.selected"
+    (click)="selectForEdit(item)">
+  <td class="checkbox-col">
+    <div class="custom-checkbox" [class.checked]="item.selected">
+      <i *ngIf="item.selected" class="fa-solid fa-check"></i>
+    </div>
+  </td>
+  <td>{{ item.level }}</td>
+  <td>{{ item.separator }}</td>
+  <td>{{ item.number }}</td>
+  <td>{{ item.statement }}</td>
+  <td>{{ item.purpose }}</td>
+  <td>{{ item.responsiblePerson }}</td>
+  <td>{{ item.datePrepared | date:'yyyy-MM-dd' }}</td>
+  <td>{{ item.dateReviewed | date:'yyyy-MM-dd' }}</td>
+  <td>{{ item.conclusion }}</td>
+  <td>{{ item.attachments }}</td>
+  <td>{{ item.notes1 }}</td>
+  <td>{{ item.notes2 }}</td>
+  <td>{{ item.notes3 }}</td>
+</tr>
+
       </tbody>
     </table>
   </div>
@@ -101,5 +123,154 @@
       {{ showingRangeText }}
     </div>
   </div>
+</div>
 
+<!-- REVIEW GUIDE MODAL -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content bg-white p-3 rounded shadow-lg w-600 mx-auto">
+    <div class="modal-header">
+      <h2>
+        {{ currentStep === 1 ? t('basicInfo')
+           : currentStep === 2 ? t('details')
+           : t('Attachments') }}
+      </h2>
+
+      <span class="step-indicator">
+        {{ t('step') }} {{ currentStep }} {{ t('of') }} 3
+      </span>
+
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Step 1 -->
+      <div *ngIf="currentStep === 1">
+        <label>{{ t('level') }}</label>
+        <input type="text" [(ngModel)]="newReview.level" [placeholder]="t('enterLevel')" class="form-control">
+
+        <label>{{ t('separator') }}</label>
+        <input type="text" [(ngModel)]="newReview.separator" [placeholder]="t('enterSeparator')" class="form-control">
+
+        <label>{{ t('number') }}</label>
+        <input type="text" [(ngModel)]="newReview.number" [placeholder]="t('enterNumber')" class="form-control">
+
+        <label>{{ t('statement') }}</label>
+        <input type="text" [(ngModel)]="newReview.statement" [placeholder]="t('enterStatement')" class="form-control">
+
+        <label>{{ t('purpose') }}</label>
+        <input type="text" [(ngModel)]="newReview.purpose" [placeholder]="t('enterPurpose')" class="form-control">
+      </div>
+
+      <!-- Step 2 -->
+      <div *ngIf="currentStep === 2">
+        <label>{{ t('responsibility') }}</label>
+        <input type="text" [(ngModel)]="newReview.responsiblePerson" [placeholder]="t('enterResponsiblePerson')" class="form-control">
+
+        <label>{{ t('DatePrepared') }}</label>
+        <input type="date" [(ngModel)]="newReview.datePrepared" class="form-control">
+
+        <label>{{ t('DateReviewed') }}</label>
+        <input type="date" [(ngModel)]="newReview.dateReviewed" class="form-control">
+
+        <label>{{ t('Conclusion') }}</label>
+        <input type="text" [(ngModel)]="newReview.conclusion" [placeholder]="t('enterConclusion')" class="form-control">
+
+        <label>{{ t('Notes1') }}</label>
+        <input type="text" [(ngModel)]="newReview.notes1" [placeholder]="t('enterNotes1')" class="form-control">
+
+        <label>{{ t('Notes2') }}</label>
+        <input type="text" [(ngModel)]="newReview.notes2" [placeholder]="t('enterNotes2')" class="form-control">
+
+        <label>{{ t('Notes3') }}</label>
+        <input type="text" [(ngModel)]="newReview.notes3" [placeholder]="t('enterNotes3')" class="form-control">
+      </div>
+
+      <!-- Step 3 -->
+      <div *ngIf="currentStep === 3">
+        <label>{{ t('Attachments') }}</label>
+        <input type="text" [(ngModel)]="newReview.attachments" [placeholder]="t('enterAttachments')" class="form-control">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="prevStep()" *ngIf="currentStep > 1">
+        {{ t('back') }}
+      </button>
+
+      <button class="btn-primary mt-1" (click)="nextStep()" *ngIf="currentStep < 3">
+        {{ t('next') }}
+      </button>
+
+      <button class="btn-primary" (click)="submitReview()" *ngIf="currentStep === 3">
+        {{ t('submit') }}
+      </button>
+    </div>
+  </div>
+</div>
+<!-- IMPORT Modal -->
+<div class="modal-overlay" *ngIf="isImportModalOpen">
+  <div class="import-modal-container">
+    <div class="export-header">
+      <h3>{{ t('importTitle') }}</h3>
+      <button class="close-btn" (click)="closeImportModal()">×</button>
+    </div>
+
+    <div class="import-body">
+      <div class="upload-area" (drop)="onFileDropped($event)" (dragover)="onDragOver($event)">
+        <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+        <p class="upload-text">{{ t('dropFileHere') }}</p>
+        <p class="upload-hint">{{ t('fileTypesHint') }}</p>
+        <input type="file" (change)="onFileSelected($event)" hidden #fileInput>
+        <button class="btn-outline" (click)="fileInput.click()">Browse</button>
+      </div>
+
+      <div *ngIf="selectedFile" class="file-progress-item">
+        <div class="file-icon-wrapper"><i class="fa-solid fa-file-excel"></i></div>
+        <div class="file-info-wrapper">
+          <div class="file-header">
+            <span class="file-name">{{ selectedFile.name }}</span>
+            <button class="remove-file-btn" (click)="removeFile()">×</button>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+          <span *ngIf="isUploading">{{ uploadProgress }}%</span>
+        </div>
+      </div>
+
+      <div class="export-footer">
+        <button class="btn-primary download-btn" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">
+          {{ t('import') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT Modal -->
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+  <div class="export-modal-container">
+    <div class="export-header">
+      <h3>{{ t('exportTitle') }}</h3>
+      <button class="close-btn" (click)="closeExportModal()">×</button>
+    </div>
+
+    <p class="export-subtitle">{{ t('selectFileType') }}</p>
+    <div class="export-options-grid">
+      <div class="export-option-card" [class.selected]="selectedExportOption==='excel'" (click)="selectExportOption('excel')">
+        <div class="file-icon green"><i class="fa-solid fa-file-excel"></i></div>
+        <span>Excel file</span>
+      </div>
+      <div class="export-option-card" [class.selected]="selectedExportOption==='pdf'" (click)="selectExportOption('pdf')">
+        <div class="file-icon red"><i class="fa-solid fa-file-pdf"></i></div>
+        <span>PDF file</span>
+      </div>
+    </div>
+
+    <div class="export-footer">
+      <button class="btn-primary download-btn" (click)="handleExport()">
+        <i class="fa-solid fa-download"></i> {{ t('download') }}
+      </button>
+    </div>
+  </div>
 </div>
