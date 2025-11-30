@@ -17,5 +17,18 @@ export const EN = {
   next: 'Next',
   page: 'Page',
   go: 'Go',
-  showingRangeOf: 'of'
+  showingRangeOf: 'of',
+  ethicalCompliancePercentage : 'ethical Compliance Percentage' ,
+    professionalPlanningPercentage : 'professional Planning Percentage',
+  internalControlPercentage : 'internal Control Percentage' ,
+  evidencePercentage : 'evidence Percentage' ,
+  evaluationPercentage : 'evaluation Percentage' ,
+  documentationPercentage : 'documentationPercentage' ,
+  implementationStatus : 'implementation Status' ,
+  actualPerformance : 'actual Performance' ,
+  codeOfEthics : 'codeOfEthics' ,
+  policies : 'policies' ,
+  ifrs : 'ifrs' ,
+  ias : 'ias' ,
+  notes : 'notes'
 };

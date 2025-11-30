@@ -29,19 +29,38 @@
             <span role="button" class="d-flex align-items-center gap-1 hover-primary" (click)="updateSelectedUsers()">
               <i class="fas fa-pen"></i> {{ t('edit') }}
             </span>
-            <span role="button" class="d-flex align-items-center gap-1 hover-danger" (click)="deleteSelectedUsers()">
+            <!-- <span role="button" class="d-flex align-items-center gap-1 hover-danger" (click)="deleteSelectedUsers()">
               <i class="fas fa-trash"></i> {{ t('delete') }}
-            </span>
+            </span> -->
+             <!-- Status Select -->
+              <select class="form-select form-select-sm"
+                      [disabled]="selectedUsers.length !== 1"
+                      [(ngModel)]="selectedSubscriberStatus">
+                <option value="">Select Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="PENDING">Pending</option>
+              </select>
+
+              <button class="btn btn-sm btn-primary"
+                      [disabled]="selectedUsers.length !== 1 || !selectedSubscriberStatus"
+                      (click)="updateSubscriberStatus()">
+                Update Status
+              </button>
           </div>
         </div>
 
         <!-- البحث والأزرار -->
         <div class="d-flex align-items-center gap-2 flex-nowrap">
           <div class="search-container">
-            <input type="text" [placeholder]="t('search')">
-            <i class="fas fa-search search-icon"></i>
-          </div>
-
+              <input
+                type="text"
+                [placeholder]="t('search')"
+                [(ngModel)]="searchTerm"
+                (input)="loadSubscribers()"
+              >
+              <i class="fas fa-search search-icon"></i>
+            </div>
           <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
                   (click)="toggleFilter()">
             <i class="fas fa-filter"></i> {{ t('filter') }}
@@ -70,6 +89,11 @@
               <th scope="col">{{ t('country') }}</th>
               <th scope="col">{{ t('city') }}</th>
               <th scope="col">{{ t('region') }}</th>
+              <th scope="col">{{ t('LegalEntity') }}</th>
+              <th scope="col">{{ t('LicenseNo') }}</th>
+              <th scope="col">{{ t('LicenseDate') }}</th>
+              <th scope="col">{{ t('Status') }}</th>
+              <th scope="col">{{ t('SubscriptionEnd') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -82,12 +106,19 @@
         id="chk{{i}}"
       />
     </td>
-    <td class="fw-bold text-dark">{{ user.name }}</td>
-    <td class="text-muted">{{ user.email }}</td>
-    <td class="text-muted">{{ user.mobile }}</td>
-    <td class="text-muted">{{ user.country }}</td>
-    <td class="text-muted">{{ user.city }}</td>
-    <td class="text-muted">{{ user.region }}</td>
+<td class="fw-bold text-dark">{{ user.licenseName }}</td>
+<td class="text-muted">{{ user.subscriberEmail }}</td>
+<td class="text-muted">{{ user.primaryMobile }}</td>
+<td class="text-muted">{{ user.country?.name }}</td>
+<td class="text-muted">{{ user.city?.name }}</td>
+<td class="text-muted">{{ user.region?.name }}</td>
+<td class="text-muted">{{ user.legalEntityType }}</td>
+<td class="text-muted">{{ user.licenseNumber }}</td>
+<td class="text-muted">{{ user.licenseDate }}</td>
+<td class="text-muted">{{ user.status }}</td>
+<td class="text-muted">
+  {{ user.subscriptionEndDate ? (user.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
+</td>
   </tr>
           </tbody>
         </table>
@@ -144,51 +175,76 @@
     </div>
 
     <div class="filter-body">
+
+      <!-- Country -->
       <div class="mb-3">
         <label class="form-label text-muted small">{{ t('country') }}</label>
-        <select class="form-select text-muted">
-          <option selected>{{ t('selectCountry') }}</option>
-          <option value="sa">{{ t('saudiArabia') }}</option>
-          <option value="eg">{{ t('egypt') }}</option>
+        <select class="form-select text-muted"
+                [(ngModel)]="filterData.countryId"
+                (change)="onFilterCountryChange()">
+
+          <option value="">{{ t('selectCountry') }}</option>
+          <option *ngFor="let c of countries" [value]="c.id">{{ c.name }}</option>
+
         </select>
       </div>
 
+      <!-- City + Region -->
       <div class="row mb-3">
+
+        <!-- City -->
         <div class="col-6">
           <label class="form-label text-muted small">{{ t('city') }}</label>
-          <select class="form-select text-muted">
-            <option selected>{{ t('selectCity') }}</option>
-            <option value="jeddah">{{ t('jeddah') }}</option>
-            <option value="riyadh">{{ t('riyadh') }}</option>
+          <select class="form-select text-muted"
+                  [(ngModel)]="filterData.cityId"
+                  (change)="onFilterCityChange()">
+
+            <option value="">{{ t('selectCity') }}</option>
+            <option *ngFor="let c of cities" [value]="c.id">{{ c.name }}</option>
+
           </select>
         </div>
+
+        <!-- Region -->
         <div class="col-6">
           <label class="form-label text-muted small">{{ t('region') }}</label>
-          <select class="form-select text-muted">
-            <option selected>{{ t('selectRegion') }}</option>
-            <option value="makkah">{{ t('makkahRegion') }}</option>
+          <select class="form-select text-muted"
+                  [(ngModel)]="filterData.regionId">
+
+            <option value="">{{ t('selectRegion') }}</option>
+            <option *ngFor="let r of regions" [value]="r.id">{{ r.name }}</option>
+
           </select>
         </div>
+
       </div>
 
+      <!-- Status -->
       <div class="mb-3">
         <label class="form-label text-muted small">{{ t('status') }}</label>
-        <select class="form-select text-muted">
-          <option selected>{{ t('selectStatus') }}</option>
-          <option value="active">{{ t('active') }}</option>
-          <option value="inactive">{{ t('inactive') }}</option>
+        <select class="form-select text-muted" [(ngModel)]="filterData.status">
+          <option value="">{{ t('selectStatus') }}</option>
+          <option value="ACTIVE">{{ t('active') }}</option>
+          <option value="INACTIVE">{{ t('inactive') }}</option>
         </select>
       </div>
 
+      <!-- New Subscribers -->
       <div class="mb-3">
         <label class="form-label text-muted small">{{ t('newSubscribers') }}</label>
-        <input type="text" class="form-control" [placeholder]="t('eg30Days')">
+        <input type="text" class="form-control"
+               [(ngModel)]="filterData.newSubscribersDays"
+               [placeholder]="t('eg30Days')">
       </div>
 
+      <!-- Subscription Ending -->
       <div class="mb-4">
         <label class="form-label text-muted small">{{ t('subscriptionEnding') }}</label>
-        <input type="text" class="form-control" [placeholder]="t('eg15Days')">
+        <input type="text" class="form-control"
+               [(ngModel)]="filterData.endingSubscriptionDays"
+               [placeholder]="t('eg15Days')">
       </div>
+
     </div>
 
     <div class="d-flex justify-content-between align-items-center mt-4">
@@ -198,6 +254,7 @@
 
   </div>
 </div>
+
 </div>
   </div>
 
@@ -229,6 +286,11 @@
               <th scope="col">{{ t('country') }}</th>
               <th scope="col">{{ t('city') }}</th>
               <th scope="col">{{ t('region') }}</th>
+              <th scope="col">{{ t('LegalEntity') }}</th>
+              <th scope="col">{{ t('LicenseNo') }}</th>
+              <th scope="col">{{ t('LicenseDate') }}</th>
+              <th scope="col">{{ t('Status') }}</th>
+              <th scope="col">{{ t('SubscriptionEnd') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -364,6 +426,7 @@
 <div class="filter-overlay" *ngIf="showAddUserModal" [dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
   <div class="filter-modal modal-lg" (click)="$event.stopPropagation()">
 
+    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-start mb-4">
       <div>
         <h4 class="fw-bold mb-1">
@@ -387,24 +450,51 @@
       </div>
     </div>
 
+    <!-- BODY -->
     <div class="wizard-body">
 
+      <!-- STEP 1 -->
       <div *ngIf="currentStep === 1">
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('country') }}</label>
-          <select class="form-select"><option>{{ t('selectCountry') }}</option></select>
+            <select class="form-select" [(ngModel)]="formData.countryId" (change)="onCountryChange()">
+  <option value="">{{ t('selectCountry') }}</option>
+  <option *ngFor="let c of countries" [value]="c.id">{{ c.name }}</option>
+</select>
+
         </div>
+
         <div class="row mb-4">
           <div class="col-6">
             <label class="form-label text-muted small">{{ t('city') }}</label>
-            <select class="form-select"><option>{{ t('selectCity') }}</option></select>
+              <select class="form-select"
+              [(ngModel)]="formData.cityId"
+              (change)="onCityChange()">
+
+        <option value="">{{ t('selectCity') }}</option>
+
+        <option *ngFor="let city of cities" [value]="city.id">
+          {{ city.name }}
+        </option>
+
+      </select>
           </div>
           <div class="col-6">
             <label class="form-label text-muted small">{{ t('region') }}</label>
-            <select class="form-select"><option>{{ t('selectRegion') }}</option></select>
+              <select class="form-select"
+              [(ngModel)]="formData.regionId">
+
+        <option value="">{{ t('selectRegion') }}</option>
+
+        <option *ngFor="let r of regions" [value]="r.id">
+          {{ r.name }}
+        </option>
+
+      </select>
           </div>
         </div>
 
+        <!-- STATIC LINKS (unchanged) -->
         <div class="row g-3">
           <div class="col-6">
             <div class="d-flex align-items-start gap-2">
@@ -424,129 +514,222 @@
               </div>
             </div>
           </div>
-          <div class="col-6">
-            <div class="d-flex align-items-start gap-2">
-              <i class="fas fa-file-invoice-dollar text-muted mt-1"></i>
-              <div>
-                <div class="fw-bold small">{{ t('taxAuthority') }}</div>
-                <a href="#" class="text-muted x-small text-decoration-none">https://Tax.gov.sa</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="d-flex align-items-start gap-2">
-              <i class="fas fa-hand-holding-usd text-muted mt-1"></i>
-              <div>
-                <div class="fw-bold small">{{ t('zakatAuthority') }}</div>
-                <a href="#" class="text-muted x-small text-decoration-none">https://zatca.gov.sa</a>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
+      <!-- STEP 2 -->
       <div *ngIf="currentStep === 2">
+
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('licenseName') }}</label>
-          <input type="text" class="form-control" [placeholder]="t('enterLicenseName')">
+          <input type="text" class="form-control" [(ngModel)]="formData.licenseName">
         </div>
+
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('licenseNumber') }}</label>
-          <input type="text" class="form-control" [placeholder]="t('enterLicenseNumber')">
+          <input type="text" class="form-control" [(ngModel)]="formData.licenseNumber">
         </div>
+
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('licenseDate') }}</label>
-          <input type="date" class="form-control text-muted">
+          <input type="date" class="form-control text-muted" [(ngModel)]="formData.licenseDate">
         </div>
+
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('licenseType') }}</label>
-          <select class="form-select"><option>{{ t('selectLicenseType') }}</option></select>
+          <select class="form-select" [(ngModel)]="formData.licenseType">
+            <option value="">{{ t('selectLicenseType') }}</option>
+            <option value="Company">Company</option>
+            <option value="Office">Office</option>
+          </select>
         </div>
+
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('licenseCertificate') }}</label>
-          <div class="input-group">
-            <input type="text" class="form-control" [placeholder]="t('uploadLicenseCert')" readonly>
-            <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
-          </div>
+          <input type="file" class="form-control" (change)="onFileSelect($event, 'licenseCertificate')">
         </div>
+
       </div>
 
+      <!-- STEP 3 -->
       <div *ngIf="currentStep === 3">
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('ownersName') }}</label><input class="form-control" [placeholder]="t('enterOwnerName')"></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('subscriberEmail') }}</label><input class="form-control" [placeholder]="t('enterSubscriberEmail')"></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('mobile') }}</label><input class="form-control" [placeholder]="t('enterMobile')"></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('subscriberStatus') }}</label><select class="form-select"><option>{{ t('selectSubscriberStatus') }}</option></select></div>
-
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('legalEntityType') }}</label><input class="form-control" [placeholder]="t('enterLegalEntityType')"></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('legalEntityNationality') }}</label><input class="form-control" [placeholder]="t('enterNationality')"></div>
 
         <div class="mb-3">
-            <label class="form-label text-muted small">{{ t('taxNumber') }}</label>
-            <div class="input-group">
-              <input type="text" class="form-control" [placeholder]="t('enterTaxNumber')">
-              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
-            </div>
+          <label class="form-label text-muted small">{{ t('ownersName') }}</label>
+          <input class="form-control" [(ngModel)]="formData.ownersNames">
         </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('subscriberEmail') }}</label>
+          <input class="form-control" [(ngModel)]="formData.subscriberEmail">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('mobile') }}</label>
+          <input class="form-control" [(ngModel)]="formData.primaryMobile">
+        </div>
+
+        <!-- <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('subscriberStatus') }}</label>
+          <select class="form-select" [(ngModel)]="formData.status">
+            <option value="">{{ t('selectSubscriberStatus') }}</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </select>
+        </div> -->
+
+        <!-- entity -->
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('legalEntityType') }}</label>
+          <input class="form-control" [(ngModel)]="formData.legalEntityType">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('legalEntityNationality') }}</label>
+          <input class="form-control" [(ngModel)]="formData.legalEntityNationality">
+        </div>
+
+        <!-- TAX NUMBER + FILE -->
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('taxNumber') }}</label>
+          <input type="text" class="form-control mb-2" [(ngModel)]="formData.taxNumber">
+          <input type="file" class="form-control" (change)="onFileSelect($event,'taxCertificateFile')">
+        </div>
+
+        <!-- DATES -->
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('commRegisterDate') }}</label>
-          <input type="date" class="form-control text-muted">
+          <input type="date" class="form-control text-muted" [(ngModel)]="formData.commercialRegisterDate">
         </div>
+
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('fiscalYear') }}</label>
-          <input type="date" class="form-control text-muted">
+          <input type="date" class="form-control text-muted" [(ngModel)]="formData.fiscalYear">
+        </div>
+
+        <!-- Unified -->
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('unifiedNumber') }}</label>
+          <input type="text" class="form-control mb-2" [(ngModel)]="formData.unifiedNumber">
+          <input type="file" class="form-control" (change)="onFileSelect($event,'unifiedNumberFile')">
+        </div>
+
+        <!-- Activity -->
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('commRegisterActivity') }}</label>
+          <input type="text" class="form-control mb-2" [(ngModel)]="formData.commercialActivity">
+          <input type="file" class="form-control" (change)="onFileSelect($event,'commercialActivityFile')">
         </div>
         <div class="mb-3">
-            <label class="form-label text-muted small">{{ t('unifiedNumber') }}</label>
-            <div class="input-group">
-              <input type="text" class="form-control" [placeholder]="t('enterUnifiedNumber')">
-              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
-            </div>
+          <label class="form-label text-muted small">{{ t('commRegisternumber) }}</label>
+          <input type="text" class="form-control mb-2" [(ngModel)]="formData.commercialRegisterNumber">
         </div>
-        <div class="mb-3">
-            <label class="form-label text-muted small">{{ t('commRegisterActivity') }}</label>
-            <div class="input-group">
-              <input type="text" class="form-control" [placeholder]="t('enterCommActivity')">
-              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
-            </div>
-        </div>
+
       </div>
 
+      <!-- STEP 4 -->
       <div *ngIf="currentStep === 4">
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('subPackage') }}</label><select class="form-select"><option>{{ t('selectSubPackage') }}</option></select></div>
-        <div class="row mb-3">
-           <div class="col-6"><label class="form-label text-muted small">{{ t('startDate') }}</label><select class="form-select"><option>{{ t('selectStartDate') }}</option></select></div>
-           <div class="col-6"><label class="form-label text-muted small">{{ t('endDate') }}</label><select class="form-select"><option>{{ t('selectEndDate') }}</option></select></div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('subPackage') }}</label>
+          <select class="form-select" [(ngModel)]="formData.subscriptionType">
+            <option>{{ t('selectSubPackage') }}</option>
+            <option value="monthly">Monthly</option>
+            <option value="annual">Annual</option>
+          </select>
         </div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('numOfUsers') }}</label><input class="form-control" [placeholder]="t('enterNumOfUsers')"></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('numOfFiles') }}</label><input class="form-control" [placeholder]="t('enterNumOfFiles')"></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('numOfBranches') }}</label><input class="form-control" [placeholder]="t('enterNumOfBranches')"></div>
+
+        <div class="row mb-3">
+          <div class="col-6">
+            <label class="form-label text-muted small">{{ t('startDate') }}</label>
+            <input type="date" class="form-control" [(ngModel)]="formData.subscriptionStartDate">
+          </div>
+          <div class="col-6">
+            <label class="form-label text-muted small">{{ t('endDate') }}</label>
+            <input type="date" class="form-control" [(ngModel)]="formData.subscriptionEndDate">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('numOfUsers') }}</label>
+          <input class="form-control" [(ngModel)]="formData.numberOfUsers">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('numOfFiles') }}</label>
+          <input class="form-control" [(ngModel)]="formData.numberOfClients">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('numOfBranches') }}</label>
+          <input class="form-control" [(ngModel)]="formData.numberOfBranches">
+        </div>
       </div>
 
+      <!-- STEP 5 -->
       <div *ngIf="currentStep === 5">
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('facilityLink') }} <span class="text-muted x-small">{{ t('optional') }}</span></label><input class="form-control" [placeholder]="t('enterFacilityLink')"></div>
+
         <div class="mb-3">
-            <label class="form-label text-muted small">{{ t('factoryLogo') }} <span class="text-muted x-small">{{ t('optional') }}</span></label>
-            <div class="input-group">
-              <input type="text" class="form-control" [placeholder]="t('uploadFactoryLogo')" readonly>
-              <button class="btn btn-light border" type="button">{{ t('chooseFile') }}</button>
-            </div>
+          <label class="form-label text-muted small">{{ t('facilityLink') }}</label>
+          <input class="form-control" [(ngModel)]="formData.facilityLink">
         </div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('language') }} <span class="text-muted x-small">{{ t('optional') }}</span></label><select class="form-select"><option>{{ t('selectLanguage') }}</option></select></div>
-        <div class="mb-3"><label class="form-label text-muted small">{{ t('currencySettings') }}</label><input class="form-control" value="SAR" readonly></div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('factoryLogo') }}</label>
+          <input type="file" class="form-control" (change)="onFileSelect($event,'factoryLogo')">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('language') }}</label>
+          <select class="form-select" [(ngModel)]="formData.language">
+            <option value="">{{ t('selectLanguage') }}</option>
+            <option value="Arabic">Arabic</option>
+            <option value="English">English</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('currencySettings') }}</label>
+          <input class="form-control" value="SAR" [(ngModel)]="formData.currency" readonly>
+        </div>
+
       </div>
 
     </div>
 
+    <!-- FOOTER BUTTONS -->
     <div class="d-flex justify-content-end align-items-center gap-3 mt-5">
       <button class="btn border px-4" *ngIf="currentStep > 1" (click)="prevStep()">{{ t('back') }}</button>
-
       <button class="btn btn-success px-4" *ngIf="currentStep < totalSteps" (click)="nextStep()">{{ t('next') }}</button>
+     <button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="submitNewUser()">
+  {{ isEditMode ? t('update') : t('submit') }}
+</button>
+<button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="updateSubscriber()">
+  {{ t('update') }}
+</button>
 
-      <button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="submitNewUser()">{{ t('submit') }}</button>
     </div>
 
   </div>
 </div>
+
+<!-- SUCCESS MODAL -->
+<div class="filter-overlay" *ngIf="submissionStatus === 'success'">
+  <div class="filter-modal modal-sm text-center p-4">
+
+    <h4 class="fw-bold mb-2">{{ t('subscriberCreated') }}</h4>
+    <p class="text-muted mb-4">{{ t('yourSystemLink') }}</p>
+
+    <div class="input-group mb-4">
+      <input class="form-control text-center fw-bold" [value]="generatedLink" readonly>
+      <button class="btn btn-success" (click)="copyLink()">{{ t('copy') }}</button>
+    </div>
+
+    <button class="btn btn-success w-100 mb-2" (click)="closeSuccessModal()">{{ t('goToSubscribers') }}</button>
+    <button class="btn btn-light w-100" (click)="resetAndAddAnother()">{{ t('addAnother') }}</button>
+
+  </div>
+</div>
+
 <div class="filter-overlay" *ngIf="submissionStatus === 'success'">
   <div class="filter-modal" style="max-width: 600px;" (click)="$event.stopPropagation()">
 

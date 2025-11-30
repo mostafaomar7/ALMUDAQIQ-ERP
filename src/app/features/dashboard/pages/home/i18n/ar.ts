@@ -147,4 +147,16 @@ SubscriptionRenewals : " تجديد الاشتراكات" ,
   url: 'الرابط',
   addAnotherSubscriber: 'إضافة مشترك آخر',
   goToSubscribersList: 'الذهاب إلى قائمة المشتركين',
+    LegalEntity : 'الكيان القانوني' ,
+  LicenseNo : 'رقم الترخيص' ,
+  LicenseDate : 'تاريخ الترخيص' ,
+  Status : 'الحالة',
+  SubscriptionEnd :'نهاية الاشتراك',
+  yourSystemLink: "رابط النظام الخاص بك",
+  copy: "نسخ",
+  goToSubscribers: "الذهاب للمشتركين",
+  addAnother: "إضافة مشترك آخر" ,
+  commRegisternumber : 'commercial Register number'  ,
+  update :'تحديث'
+
 };

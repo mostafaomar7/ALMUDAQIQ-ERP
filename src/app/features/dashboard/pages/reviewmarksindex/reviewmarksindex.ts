@@ -4,24 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';
+import { ReviewmarksindexService, Reviewmarksindex } from './reviewmarksindex.service';
+import Swal from 'sweetalert2';
+import { HttpEventType } from '@angular/common/http';
 
 type TranslationKey = keyof typeof EN;
-
-interface ReviewMark {
-  id: number;
-  name: string;
-  code: string;
-  description: string;
-  suggestedStage: string;
-  whenToUse: string;
-  example: string;
-  selected: boolean;
-}
-
-interface FilterOption {
-  name: string;
-  selected: boolean;
-}
 
 @Component({
   selector: 'app-reviewmarksindex',
@@ -30,95 +17,83 @@ interface FilterOption {
   templateUrl: './reviewmarksindex.html',
   styleUrls: ['./reviewmarksindex.css']
 })
-export class Reviewmarksindex implements OnInit {
+export class ReviewmarksindexComponent implements OnInit {
 
   translations: typeof EN = EN;
+  allMarks: Reviewmarksindex[] = [];
+  displayedMarks: Reviewmarksindex[] = [];
 
-  allMarks: ReviewMark[] = [];
-  displayedMarks: ReviewMark[] = [];
-  filteredMarks: ReviewMark[] = [];
-  
   currentPage: number = 1;
   itemsPerPage: number = 20;
   totalItems: number = 0;
   totalPages: number = 0;
-  pagesArray: (number | string)[] = [];
+  pagesArray: (number|string)[] = [];
 
+  // Filter
   isFilterOpen = false;
-  filterOptions: FilterOption[] = [];
-  filterSearchText = '';
+  filterOptions: string[] = [];
+  selectedFilterOptions: string[] = [];
 
+  // Export / Import
   isExportModalOpen = false;
-  selectedExportOption: string = 'pdf2';
+  selectedExportOption: 'pdf' | 'excel' | null = null;
   isImportModalOpen = false;
+  selectedFile: File | null = null;
+  uploadProgress = 0;
+  isUploading = false;
 
-  private sampleData: Omit<ReviewMark,'id'|'selected'>[] = [
-    { name: 'Cash Balance Review', code: 'IMG-001', description: 'Check accuracy of cash balance in ledger', suggestedStage: 'Under Review', whenToUse: 'When validating monthly statements', example: 'CBR' },
-    { name: 'Vendor Payment Verification', code: 'IMG-002', description: 'Confirm vendor payments match invoice totals', suggestedStage: 'Approved Stage', whenToUse: 'Before closing review file', example: 'VPV' },
-    { name: 'AR Aging Analysis', code: 'IMG-003', description: 'Review overdue receivables', suggestedStage: 'Review Stage', whenToUse: 'During AR balance reconciliation', example: 'ARA' },
-    { name: 'Inventory Count Accuracy', code: 'IMG-004', description: 'Validate stock quantities', suggestedStage: 'Field Stage', whenToUse: 'At physical stocktaking', example: 'ICA' }
-  ];
-
-  constructor(private eRef: ElementRef, private lang: TranslateService) {}
+  constructor(private svc: ReviewmarksindexService, private lang: TranslateService, private eRef: ElementRef) {}
 
   ngOnInit() {
     this.lang.lang$.subscribe(l => this.loadTranslations(l));
-
-    this.generateDummyData();
-    this.initializeFilterOptions();
-    this.applyFilter();
+    this.loadMarks();
   }
 
-  loadTranslations(lang: 'en' | 'ar') {
-    this.translations = lang === 'en' ? EN : AR;
-  }
-
+  loadTranslations(lang: 'en'|'ar') { this.translations = lang==='en'?EN:AR; }
   t(key: TranslationKey): string { return this.translations[key] || key; }
 
-  @HostListener('document:click', ['$event'])
-  clickout(event: any) {
-    if (!this.eRef.nativeElement.contains(event.target) && !event.target.closest('.filter-trigger')) {
-      this.isFilterOpen = false;
-    }
+  // ---- API ----
+  loadMarks() {
+    this.svc.getReviewmarksindex().subscribe({
+      next: res => {
+        this.allMarks = res.map(r => ({ ...r, selected: false }));
+        this.totalItems = this.allMarks.length;
+        this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+        this.currentPage = 1;
+        this.updateDisplayedData();
+        this.initFilterOptions();
+      },
+      error: err => { console.error(err); Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error'); }
+    });
   }
 
-  generateDummyData() {
-    for (let i=1;i<=1250;i++) {
-      const s = this.sampleData[(i-1)%this.sampleData.length];
-      this.allMarks.push({ ...s, id:i, selected:i===1 });
-    }
-    this.totalItems = this.allMarks.length;
-  }
-
-  initializeFilterOptions() {
-    const uniqueStages = [...new Set(this.allMarks.map(m=>m.suggestedStage))];
-    this.filterOptions = uniqueStages.map(stage => ({ name: stage, selected: true }));
+  initFilterOptions() {
+    const stages = Array.from(new Set(this.allMarks.map(m => m.suggestedStage)));
+    this.filterOptions = stages;
+    this.selectedFilterOptions = [...stages];
   }
 
   toggleFilter(event: Event) { event.stopPropagation(); this.isFilterOpen = !this.isFilterOpen; }
   closeFilter() { this.isFilterOpen = false; }
-
   applyFilter() {
-    const selectedStages = this.filterOptions.filter(f=>f.selected).map(f=>f.name);
-    this.filteredMarks = this.allMarks.filter(m=>selectedStages.includes(m.suggestedStage));
-    this.totalItems = this.filteredMarks.length;
-    this.totalPages = Math.ceil(this.totalItems/this.itemsPerPage);
+    this.displayedMarks = this.allMarks.filter(m => this.selectedFilterOptions.includes(m.suggestedStage));
+    this.totalItems = this.displayedMarks.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.currentPage = 1;
     this.updateDisplayedData();
-    this.calculatePagination();
     this.closeFilter();
   }
 
-  get visibleFilterOptions() {
-    return this.filterSearchText ? this.filterOptions.filter(f=>f.name.toLowerCase().includes(this.filterSearchText.toLowerCase())) : this.filterOptions;
-  }
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) { if(!this.eRef.nativeElement.contains(event.target)) this.closeFilter(); }
 
+  // ---- Pagination ----
   updateDisplayedData() {
     const start = (this.currentPage-1)*this.itemsPerPage;
-    this.displayedMarks = this.filteredMarks.slice(start,start+this.itemsPerPage);
+    this.displayedMarks = this.allMarks.slice(start, start+this.itemsPerPage);
   }
 
-  goToPage(page: number|string) { if(typeof page==='number' && page>=1 && page<=this.totalPages){ this.currentPage=page; this.updateDisplayedData(); this.calculatePagination(); } }
+  goToPage(page:number|string) { if(typeof page==='number' && page>=1 && page<=this.totalPages){ this.currentPage=page; this.updateDisplayedData(); this.calculatePagination(); } }
   nextPage() { if(this.currentPage<this.totalPages){ this.currentPage++; this.updateDisplayedData(); this.calculatePagination(); } }
   prevPage() { if(this.currentPage>1){ this.currentPage--; this.updateDisplayedData(); this.calculatePagination(); } }
   goToPageInput(e:any){ const p=parseInt(e.target.value); if(!isNaN(p)) this.goToPage(p); }
@@ -130,14 +105,56 @@ export class Reviewmarksindex implements OnInit {
     } this.pagesArray=rangeWithDots;
   }
 
-  toggleSelection(mark:ReviewMark){ mark.selected=!mark.selected; }
-  toggleAll(){ const allSelected=this.displayedMarks.every(m=>m.selected); this.displayedMarks.forEach(m=>m.selected=!allSelected); }
+  // ---- Selection ----
+  toggleSelection(mark: Reviewmarksindex) { mark.selected = !mark.selected; }
+  toggleAll() {
+    const allSelected = this.displayedMarks.every(m => m.selected);
+    this.displayedMarks.forEach(m => m.selected = !allSelected);
+  }
 
-  get showingRangeText(){ const start=(this.currentPage-1)*this.itemsPerPage+1,end=Math.min(this.currentPage*this.itemsPerPage,this.totalItems); return `${start}-${end} ${this.t('page')} ${this.totalItems.toLocaleString()}`; }
+  get showingRangeText() {
+    const start = (this.currentPage-1)*this.itemsPerPage+1;
+    const end = Math.min(this.currentPage*this.itemsPerPage, this.totalItems);
+    return `${start}-${end} ${this.t('page')} ${this.totalItems.toLocaleString()}`;
+  }
+
+  // ---- Import / Export ----
+  openImportModal(){ this.isImportModalOpen=true; }
+  closeImportModal(){ this.isImportModalOpen=false; this.selectedFile=null; this.uploadProgress=0; }
+  onFileSelected(e:any){ if(e.target.files?.length) this.selectedFile = e.target.files[0]; }
+
+  uploadFile(){
+    if(!this.selectedFile) return;
+    this.isUploading=true; this.uploadProgress=0;
+    this.svc.iimportReviewmarksindex(this.selectedFile).subscribe({
+      next: e=>{
+        if(e.type===HttpEventType.UploadProgress && e.total) this.uploadProgress=Math.round((100*e.loaded)/e.total);
+        else if(e.type===HttpEventType.Response){ this.isUploading=false; Swal.fire(this.t('success'), this.t('success'),'success'); this.closeImportModal(); this.loadMarks(); }
+      },
+      error: err => { this.isUploading=false; console.error(err); Swal.fire(this.t('error'), this.t('somethingWentWrong'),'error'); }
+    });
+  }
 
   openExportModal(){ this.isExportModalOpen=true; }
-  closeExportModal(){ this.isExportModalOpen=false; }
-  selectExportOption(opt:string){ this.selectedExportOption=opt; }
-  openImportModal(){ this.isImportModalOpen=true; }
-  closeImportModal(){ this.isImportModalOpen=false; }
+  closeExportModal(){ this.isExportModalOpen=false; this.selectedExportOption=null; }
+  selectExportOption(opt: 'pdf'|'excel'){ this.selectedExportOption=opt; }
+
+  downloadFile(blob:Blob, filename:string){
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=filename; a.click(); window.URL.revokeObjectURL(url);
+  }
+
+  handleExport(){
+    if(!this.selectedExportOption){ Swal.fire(this.t('warning'), this.t('chooseFileType'),'info'); return; }
+    const selected = this.allMarks.filter(m => m.selected);
+    if(selected.length===1 && selected[0].id){
+      const id = selected[0].id;
+      if(this.selectedExportOption==='pdf') this.svc.exportAllPDF().subscribe(b=>this.downloadFile(b,`reviewmarks_${id}.pdf`));
+      else this.svc.exportAllExcel().subscribe(b=>this.downloadFile(b,`reviewmarks_${id}.xlsx`));
+      this.closeExportModal(); return;
+    }
+    if(this.selectedExportOption==='pdf') this.svc.exportAllPDF().subscribe(b=>this.downloadFile(b,'reviewmarks.pdf'));
+    if(this.selectedExportOption==='excel') this.svc.exportAllExcel().subscribe(b=>this.downloadFile(b,'reviewmarks.xlsx'));
+    this.closeExportModal();
+  }
 }

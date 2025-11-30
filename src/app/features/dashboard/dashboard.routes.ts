@@ -10,7 +10,7 @@ import { Accountsguide } from './pages/accountsguide/accountsguide';
 import { Reviewguide } from './pages/reviewguide/reviewguide';
 import { Filestagesguide } from './pages/filestagesguide/filestagesguide';
 import { Reviewobjectivesguide } from './pages/reviewobjectivesguide/reviewobjectivesguide';
-import { Reviewmarksindex } from './pages/reviewmarksindex/reviewmarksindex';
+import { ReviewmarksindexComponent } from './pages/reviewmarksindex/reviewmarksindex';
 
 export const dashboardRoutes: Routes = [
   {
@@ -28,7 +28,7 @@ export const dashboardRoutes: Routes = [
       { path: 'settings/review-guide', component: Reviewguide },
       { path: 'settings/file-stages-guide', component: Filestagesguide },
       { path: 'settings/review-objectives-guide', component: Reviewobjectivesguide },
-      { path: 'settings/review-marks-index', component: Reviewmarksindex },
+      { path: 'settings/review-marks-index', component: ReviewmarksindexComponent }, 
     ]
   }
 ];

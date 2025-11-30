@@ -35,38 +35,21 @@
       <thead>
         <tr>
           <th class="checkbox-col">
-            <div class="custom-checkbox indeterminate" (click)="toggleAll()">
-              <i class="fa-solid fa-minus"></i>
-            </div>
+            <div class="custom-checkbox indeterminate" (click)="toggleAll()"><i class="fa-solid fa-minus"></i></div>
           </th>
-          <th>{{ t('name') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('code') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="wide-col">{{ t('description') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th class="filter-header-cell">
-            <div class="header-content">
-              {{ t('suggestedStage') }}
-              <i class="fa-solid fa-angle-down sort-arrow filter-trigger" (click)="toggleFilter($event)"></i>
-            </div>
-            <div class="filter-dropdown" *ngIf="isFilterOpen" (click)="$event.stopPropagation()">
-              <div class="filter-title">{{ t('filter') }}</div>
-              <div class="filter-search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" [placeholder]="t('search')" [(ngModel)]="filterSearchText">
-              </div>
-              <div class="filter-options-list">
-                <label class="filter-option" *ngFor="let opt of visibleFilterOptions">
-                  <input type="checkbox" [(ngModel)]="opt.selected">
-                  <span>{{ opt.name }}</span>
-                </label>
-              </div>
-              <div class="filter-actions">
-                <button class="filter-btn cancel" (click)="closeFilter()">{{ t('cancel') }}</button>
-                <button class="filter-btn ok" (click)="applyFilter()">{{ t('ok') }}</button>
-              </div>
-            </div>
-          </th>
-          <th>{{ t('whenToUse') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
-          <th>{{ t('example') }} <i class="fa-solid fa-angle-down sort-arrow"></i></th>
+          <th>{{ t('name') }}</th>
+          <th>{{ t('codeImage') }}</th>
+          <th>{{ t('shortDescription') }}</th>
+          <th>{{ t('suggestedStage') }}</th>
+          <th>{{ t('whenToUse') }}</th>
+          <th>{{ t('exampleShortForm') }}</th>
+          <th>{{ t('sectorTags') }}</th>
+          <th>{{ t('assertion') }}</th>
+          <th>{{ t('benchmark') }}</th>
+          <th>{{ t('scoreWeight') }}</th>
+          <th>{{ t('severityLevel') }}</th>
+          <th>{{ t('severityWeight') }}</th>
+          <th>{{ t('priorityRating') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -76,12 +59,19 @@
               <i *ngIf="mark.selected" class="fa-solid fa-check"></i>
             </div>
           </td>
-          <td class="fw-bold">{{ mark.name }}</td>
-          <td class="text-muted">{{ mark.code }}</td>
-          <td class="text-muted desc-text">{{ mark.description }}</td>
-          <td class="text-muted">{{ mark.suggestedStage }}</td>
-          <td class="text-muted">{{ mark.whenToUse }}</td>
-          <td class="text-muted">{{ mark.example }}</td>
+          <td>{{ mark.name }}</td>
+          <td>{{ mark.codeImage }}</td>
+          <td>{{ mark.shortDescription }}</td>
+          <td>{{ mark.suggestedStage }}</td>
+          <td>{{ mark.whenToUse }}</td>
+          <td>{{ mark.exampleShortForm }}</td>
+          <td>{{ mark.sectorTags }}</td>
+          <td>{{ mark.assertion }}</td>
+          <td>{{ mark.benchmark }}</td>
+          <td>{{ mark.scoreWeight }}</td>
+          <td>{{ mark.severityLevel }}</td>
+          <td>{{ mark.severityWeight }}</td>
+          <td>{{ mark.priorityRating }}</td>
         </tr>
       </tbody>
     </table>
@@ -126,21 +116,17 @@
       </div>
       <p class="export-subtitle">{{ t('selectFileType') }}</p>
       <div class="export-options-grid">
-        <div class="export-option-card" [class.selected]="selectedExportOption==='pdf1'" (click)="selectExportOption('pdf1')">
-          <div class="file-icon green"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="export-option-card" [class.selected]="selectedExportOption==='pdf'" (click)="selectExportOption('pdf')">
+          <div class="file-icon green"><i class="fa-solid fa-file-pdf"></i></div>
           <span>PDF file</span>
         </div>
-        <div class="export-option-card" [class.selected]="selectedExportOption==='pdf2'" (click)="selectExportOption('pdf2')">
-          <div class="file-icon green"><i class="fa-solid fa-file-lines"></i></div>
-          <span>PDF file</span>
-        </div>
-        <div class="export-option-card" [class.selected]="selectedExportOption==='pdf3'" (click)="selectExportOption('pdf3')">
-          <div class="file-icon red"><i class="fa-solid fa-file-pdf"></i></div>
-          <span>PDF file</span>
+        <div class="export-option-card" [class.selected]="selectedExportOption==='excel'" (click)="selectExportOption('excel')">
+          <div class="file-icon green"><i class="fa-solid fa-file-excel"></i></div>
+          <span>Excel file</span>
         </div>
       </div>
       <div class="export-footer">
-        <button class="btn-primary download-btn" (click)="closeExportModal()">
+        <button class="btn-primary download-btn" (click)="handleExport()">
           <i class="fa-solid fa-download"></i> {{ t('download') }}
         </button>
       </div>
@@ -155,30 +141,32 @@
         <button class="close-btn" (click)="closeImportModal()">×</button>
       </div>
       <div class="import-body">
-        <div class="upload-area">
+        <div class="upload-area" (click)="fileInput.click()">
+          <input type="file" hidden #fileInput (change)="onFileSelected($event)">
           <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
           <p class="upload-text">{{ t('dropFileHere') }}</p>
           <p class="upload-hint">{{ t('fileTypesHint') }}</p>
         </div>
-        <div class="file-progress-item">
-          <div class="file-icon-wrapper"><i class="fa-solid fa-file-pdf"></i></div>
+        <div class="file-progress-item" *ngIf="selectedFile">
+          <div class="file-icon-wrapper"><i class="fa-solid fa-file"></i></div>
           <div class="file-info-wrapper">
             <div class="file-header">
-              <span class="file-name">Review_Marks_Index.pdf</span>
-              <button class="remove-file-btn">×</button>
+              <span class="file-name" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+              <button class="remove-file-btn" (click)="selectedFile=null; uploadProgress=0">×</button>
             </div>
             <div class="file-stats">
-              <span>2.5MB • 10 seconds left</span>
-              <span class="percentage">90%</span>
+              <span *ngIf="selectedFile">{{ (selectedFile.size / 1024 / 1024) | number:'1.1-2' }} MB</span>
+
+              <span class="percentage">{{ uploadProgress }}%</span>
             </div>
             <div class="progress-bar-container">
-              <div class="progress-bar-fill" style="width: 90%;"></div>
+              <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
             </div>
           </div>
         </div>
       </div>
       <div class="export-footer">
-        <button class="btn-primary download-btn" (click)="closeImportModal()">{{ t('import') }}</button>
+        <button class="btn-primary download-btn" (click)="uploadFile()">{{ t('import') }}</button>
       </div>
     </div>
   </div>

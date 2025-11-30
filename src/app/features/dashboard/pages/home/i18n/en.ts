@@ -105,6 +105,7 @@ export const EN = {
   enterUnifiedNumber: 'Enter unified number',
   commRegisterActivity: 'Commercial Register Activity',
   enterCommActivity: 'Enter activity',
+  commRegisternumber : 'commercial Register number'  ,
 
   // Step 4
   subPackage: 'Subscription Package',
@@ -146,4 +147,14 @@ export const EN = {
   url: 'URL',
   addAnotherSubscriber: 'Add Another Subscriber',
   goToSubscribersList: 'Go to Subscribers List',
+  LegalEntity : 'Legal Entity' ,
+  LicenseNo : 'License No.' ,
+  LicenseDate : 'License Date' ,
+  Status : 'Status',
+  SubscriptionEnd :'Subscription End',
+  yourSystemLink: "Your system link",
+  copy: "Copy",
+  goToSubscribers: "Go to subscribers",
+  addAnother: "Add another",
+  update :'update'
 };

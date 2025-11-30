@@ -18,5 +18,18 @@ export const AR = {
   next: 'التالي',
   page: 'صفحة',
   go: 'اذهب',
-  showingRangeOf: 'من'
+  showingRangeOf: 'من' ,
+  ethicalCompliancePercentage : 'ethical Compliance Percentage' ,
+  professionalPlanningPercentage : 'professional Planning Percentage',
+  internalControlPercentage : 'internal Control Percentage' ,
+  evidencePercentage : 'evidence Percentage' ,
+  evaluationPercentage : 'evaluation Percentage' ,
+  documentationPercentage : 'documentationPercentage' ,
+  implementationStatus : 'implementation Status' ,
+  actualPerformance : 'actual Performance' ,
+  codeOfEthics : 'codeOfEthics' ,
+  policies : 'policies' ,
+  ifrs : 'ifrs' ,
+  ias : 'ias' ,
+  notes : 'notes'
 };
