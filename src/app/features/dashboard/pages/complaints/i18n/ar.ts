@@ -24,4 +24,10 @@ export const AR = {
     complaintMessage: "تفاصيل الشكوى",
     subscriberName: "اسم المشترك",
     date: "التاريخ",
+        actions : 'حدث',
+    respond : 'رد',
+        send : 'ارسال' ,
+    cancel : 'الغاء',
+    yourResponse : 'ردك' ,
+    respondToComplaint : 'رد علي المشكلة'
 };

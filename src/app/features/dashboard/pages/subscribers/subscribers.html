@@ -125,42 +125,32 @@
 
         <!-- Pagination -->
         <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pb-3 px-2">
-          <div class="text-muted small">
-            {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }}
-          </div>
+  <div class="text-muted small">
+    {{ (subCurrentPage - 1) * subItemsPerPage + 1 }}-{{ Math.min(subCurrentPage * subItemsPerPage, subTotalItems) }} of {{ subTotalItems }}
+  </div>
 
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-light text-dark pagination-btn"
-                    (click)="changePage(currentPage - 1)"
-                    [disabled]="currentPage === 1">
-              <i class="fas fa-chevron-left small"></i> {{ t('back') }}
-            </button>
+  <div class="d-flex align-items-center gap-2">
+      <button (click)="changePage('sub', subCurrentPage - 1)" [disabled]="subCurrentPage === 1" class="btn btn-outline-light text-dark pagination-btn">Prev</button>
+  <button (click)="changePage('sub', subCurrentPage + 1)" [disabled]="subCurrentPage === totalPages" class="btn btn-outline-light text-dark pagination-btn mx-1">Next</button>
+    <div class="d-flex gap-1">
+      <ng-container *ngFor="let page of subPaginationArray">
+  <button *ngIf="page !== '...'"
+          class="btn pagination-btn"
+          [class.active]="page === subCurrentPage"
+          (click)="changePage('sub', +page)">
+    {{ page }}
+  </button>
+  <span *ngIf="page === '...'" class="px-2 text-muted">...</span>
+</ng-container>
+    </div>
 
-            <div class="d-flex gap-1">
-              <ng-container *ngFor="let page of paginationArray">
-                <button *ngIf="page !== '...'"
-                        class="btn pagination-btn"
-                        [class.active]="page === currentPage"
-                        (click)="changePage(page)">
-                  {{ page }}
-                </button>
-                <span *ngIf="page === '...'" class="px-2 text-muted">...</span>
-              </ng-container>
-            </div>
-
-            <button class="btn btn-outline-light text-dark pagination-btn"
-                    (click)="changePage(currentPage + 1)"
-                    [disabled]="currentPage === totalPages">
-              {{ t('next') }} <i class="fas fa-chevron-right small"></i>
-            </button>
-
-            <div class="d-flex align-items-center gap-2 ms-3">
-              <span class="text-muted small">Page</span>
-              <input type="number" class="form-control pagination-input" [(ngModel)]="goToPageInput">
-              <button class="btn fw-bold text-dark" (click)="goToPage()">Go</button>
-            </div>
-          </div>
-        </div>
+    <div class="d-flex align-items-center gap-2 ms-3">
+      <span class="text-muted small">Page</span>
+      <input type="number" class="form-control pagination-input" [(ngModel)]="goToPageInput">
+      <button class="btn fw-bold text-dark" (click)="goToPage('sub')">Go</button>
+    </div>
+  </div>
+</div>
 
       </div>
     </div>
@@ -285,16 +275,15 @@
               <th scope="col">{{ t('mobile') }}</th>
               <th scope="col">{{ t('country') }}</th>
               <th scope="col">{{ t('city') }}</th>
-              <th scope="col">{{ t('region') }}</th>
-              <th scope="col">{{ t('LegalEntity') }}</th>
-              <th scope="col">{{ t('LicenseNo') }}</th>
-              <th scope="col">{{ t('LicenseDate') }}</th>
+              <th scope="col">{{ t('subscriptionstart') }}</th>
+              <th scope="col">{{ t('subscriptionEnd') }}</th>
+              <th scope="col">{{ t('lastrenewal') }}</th>
               <th scope="col">{{ t('Status') }}</th>
-              <th scope="col">{{ t('SubscriptionEnd') }}</th>
+              <th scope="col">{{ t('Actions') }}</th>
             </tr>
           </thead>
           <tbody>
-  <tr *ngFor="let user of subscribers; let i = index" class="border-bottom">
+  <tr *ngFor="let user of renDisplayedItems; let i = index" class="border-bottom">
     <td>
       <input
         type="checkbox"
@@ -305,53 +294,59 @@
     </td>
     <td class="fw-bold text-dark">{{ user.name }}</td>
     <td class="text-muted">{{ user.email }}</td>
-    <td class="text-muted">{{ user.mobile }}</td>
+    <td class="text-muted">{{ user.phone }}</td>
     <td class="text-muted">{{ user.country }}</td>
     <td class="text-muted">{{ user.city }}</td>
-    <td class="text-muted">{{ user.region }}</td>
+    <td class="text-muted">{{ user.startDate }}</td>
+    <td class="text-muted">{{ user.endDate }}</td>
+    <td class="text-muted">{{ user.startDate }}</td>
+    <td class="text-muted">{{ user.renewalStatus }}</td>
+    <td>
+      <button class="btn btn-success btn-sm">
+        {{ t('reminder') }}
+      </button>
   </tr>
           </tbody>
         </table>
 
         <!-- Pagination -->
         <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pb-3 px-2">
-          <div class="text-muted small">
-            {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }}
-          </div>
+  <div class="text-muted small">
+  {{ (renCurrentPage - 1) * renItemsPerPage + 1 }}-
+  {{ Math.min(renCurrentPage * renItemsPerPage, renTotalItems) }}
+  of {{ renTotalItems }}
+</div>
 
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-light text-dark pagination-btn"
-                    (click)="changePage(currentPage - 1)"
-                    [disabled]="currentPage === 1">
-              <i class="fas fa-chevron-left small"></i> {{ t('back') }}
-            </button>
+  <div class="d-flex align-items-center gap-2">
+    <div class="d-flex gap-1">
+      <button (click)="changePage('ren', renCurrentPage - 1)"
+        [disabled]="renCurrentPage === 1"
+        class="btn btn-outline-light text-dark pagination-btn">Prev</button>
 
-            <div class="d-flex gap-1">
-              <ng-container *ngFor="let page of paginationArray">
-                <button *ngIf="page !== '...'"
-                        class="btn pagination-btn"
-                        [class.active]="page === currentPage"
-                        (click)="changePage(page)">
-                  {{ page }}
-                </button>
-                <span *ngIf="page === '...'" class="px-2 text-muted">...</span>
-              </ng-container>
-            </div>
+<button (click)="changePage('ren', renCurrentPage + 1)"
+        [disabled]="renCurrentPage === renTotalPages"
+        class="btn btn-outline-light text-dark pagination-btn mx-2">Next</button>
+  <ng-container *ngFor="let page of renPaginationArray">
 
-            <button class="btn btn-outline-light text-dark pagination-btn"
-                    (click)="changePage(currentPage + 1)"
-                    [disabled]="currentPage === totalPages">
-              {{ t('next') }} <i class="fas fa-chevron-right small"></i>
-            </button>
+    <button *ngIf="page !== '...'"
+            class="btn pagination-btn"
+            [class.active]="page === renCurrentPage"
+            (click)="changePage('ren', +page)">  <!-- تحويل page إلى رقم -->
+      {{ page }}
+    </button>
 
-            <div class="d-flex align-items-center gap-2 ms-3">
-              <span class="text-muted small">Page</span>
-              <input type="number" class="form-control pagination-input" [(ngModel)]="goToPageInput">
-              <button class="btn fw-bold text-dark" (click)="goToPage()">Go</button>
-            </div>
-          </div>
-        </div>
+    <span *ngIf="page === '...'" class="px-2 text-muted">...</span>
 
+  </ng-container>
+</div>
+
+    <div class="d-flex align-items-center gap-2 ms-3">
+      <span class="text-muted small">Page</span>
+      <input type="number" class="form-control pagination-input" [(ngModel)]="goToPageInput">
+      <button class="btn fw-bold text-dark" (click)="goToPage('ren')">Go</button>
+    </div>
+  </div>
+</div>
       </div>
     </div>
   </div>

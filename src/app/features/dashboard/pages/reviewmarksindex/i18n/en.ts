@@ -36,5 +36,16 @@ export const EN = {
   success: 'Success',
   warning: 'Warning',
   chooseFileType: 'Choose file type',
-  fileUploaded : 'fileUploaded'
+  fileUploaded : 'fileUploaded',
+    submit: 'Submit',
+  confirmDelete : ' confirm Delete',
+  yesDelete : 'yes Delete',
+  deleted : 'deleted',
+  nameRequired : 'nameRequired',
+  addMark : 'addMark' ,
+editMark : 'editMark',
+step3 : 'step3',
+step2 : 'step2' ,
+step1 : 'step1',
+
 };

@@ -36,6 +36,16 @@ export const AR = {
   success: 'تم بنجاح',
   warning: 'تحذير',
   chooseFileType: 'اختر نوع الملف',
-  fileUploaded : 'تحميل الملف'
+  fileUploaded : 'تحميل الملف',
+  submit: 'حفظ',
+  confirmDelete : 'تأكيد الحذف',
+    yesDelete : 'yes Delete',
+  deleted : 'deleted' ,
+  nameRequired : 'nameRequired',
+addMark : 'addMark' ,
+editMark : 'editMark',
+step3 : 'step3',
+step2 : 'step2' ,
+step1 : 'step1',
 
 };

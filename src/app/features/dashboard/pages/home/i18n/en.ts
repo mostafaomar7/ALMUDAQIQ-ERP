@@ -156,5 +156,9 @@ export const EN = {
   copy: "Copy",
   goToSubscribers: "Go to subscribers",
   addAnother: "Add another",
-  update :'update'
+  update :'update',
+  subscriptionstart : 'subscription start',
+subscriptionEnd  : 'Subscription End' ,
+lastrenewal : 'last renewal ' ,
+Actions : 'Actions' ,
 };

@@ -1,23 +1,31 @@
-// complaints.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { TranslateService } from '../../../../core/services/translate.service';
+import { ComplaintsService } from './complaints.service';
+
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';
+import Swal from 'sweetalert2';
 
 type TranslationKey = keyof typeof EN;
 
 interface Complaint {
+  id: number;
+  subscriberId: number;
+  subscriberName: string;
+  phone: string;
+  email: string;
+  message: string;
+  type: string;
+  complaintDate: string;
+  respondedAt?: string;
+  response?: string;
+  subscriber?: {
     id: number;
-    name: string;
-    email: string;
-    mobile: string;
-    type: string;
-    message: string;
-    date: string;
-    license: string;
+    subdomain: string;
+  };
 }
 
 @Component({
@@ -31,48 +39,87 @@ export class Complaints implements OnInit {
 
   translations: typeof EN = EN;
 
-  showComplaintModal: boolean = false;
+  showComplaintModal = false;
   selectedComplaint: Complaint | null = null;
 
   Math = Math;
 
-  complaintsData: Complaint[] = [
-    { id: 1, name: 'Ahmed Ali', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', type: 'Technical', message: 'The system stopped working...', date: '15 Aug 2025', license: '12/05/2023' },
-    { id: 2, name: 'Youssef Hassan', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', type: 'Technical', message: 'Slow connection speeds...', date: '16 Aug 2025', license: '12/05/2023' },
-    { id: 3, name: 'Omar Khaled', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', type: 'Technical', message: 'Internet issue...', date: '17 Aug 2025', license: '12/05/2023' },
-    { id: 4, name: 'Mona Ibrahim', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', type: 'Technical', message: 'Internet issue...', date: '18 Aug 2025', license: '12/05/2023' },
-  ];
+  // === API DATA ===
+  complaintsData: Complaint[] = [];
 
-  currentPage: number = 101;
+  // === Pagination ===
+  currentPage: number = 1;
   itemsPerPage: number = 10;
-  totalItems: number = 1250;
-  goToPageInput: number | null = 101;
+  totalItems: number = 0;
+  goToPageInput: number | null = 1;
 
-  constructor(private languageService: TranslateService) {}
+  // === Search & Filters ===
+  searchText = '';
+  filterType = '';
+  fromDate = '';
+  toDate = '';
+
+  // === UI State ===
+  loading = false;
+  errorMessage = '';
+
+  constructor(
+    private languageService: TranslateService,
+    private api: ComplaintsService
+  ) {}
 
   ngOnInit(): void {
     this.languageService.lang$.subscribe(lang => this.loadTranslations(lang));
+    this.fetchComplaints(); // أول تحميل
   }
 
-  loadTranslations(lang: 'en' | 'ar') {
-    this.translations = lang === 'en' ? EN : AR;
-    document.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  // =========================
+  //       GET Complaints
+  // =========================
+  fetchComplaints(page: number = this.currentPage) {
+    this.loading = true;
+    this.errorMessage = '';
+
+    const params = {
+      page,
+      limit: this.itemsPerPage,
+      search: this.searchText || '',
+      type: this.filterType || '',
+      startDate: this.fromDate || '',
+      endDate: this.toDate || ''
+    };
+
+    this.api.getComplaints(params).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+
+        this.complaintsData = res.data || [];
+        this.totalItems = res.total || 0;
+        this.currentPage = res.page || page;
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMessage = 'Failed to load complaints.';
+      }
+    });
   }
 
-  t(key: TranslationKey): string {
-    return this.translations[key] || key;
+  // =========================
+  //   Search & Filters
+  // =========================
+  onSearch() {
+    this.currentPage = 1;
+    this.fetchComplaints();
   }
 
-  openComplaintDetails(complaint: Complaint) {
-    this.selectedComplaint = complaint;
-    this.showComplaintModal = true;
+  applyFilters() {
+    this.currentPage = 1;
+    this.fetchComplaints();
   }
 
-  closeComplaintDetails() {
-    this.showComplaintModal = false;
-    this.selectedComplaint = null;
-  }
-
+  // =========================
+  //       Pagination
+  // =========================
   get totalPages(): number {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
@@ -107,6 +154,7 @@ export class Complaints implements OnInit {
     if (typeof page === 'string') return;
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.fetchComplaints();
     }
   }
 
@@ -116,4 +164,78 @@ export class Complaints implements OnInit {
       this.goToPageInput = null;
     }
   }
+
+  // =========================
+  //       MODAL
+  // =========================
+  openComplaintDetails(complaint: Complaint) {
+    this.selectedComplaint = complaint;
+    this.showComplaintModal = true;
+  }
+
+  closeComplaintDetails() {
+    this.showComplaintModal = false;
+    this.selectedComplaint = null;
+  }
+
+  // =========================
+  //       Translation
+  // =========================
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+    document.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  t(key: TranslationKey) {
+    return this.translations[key] || key;
+  }
+  // إضافة state جديد للرد
+showRespondModal = false;
+responseText: string = '';
+
+// فتح وغلق مودال الرد
+openRespondModal(complaint: Complaint) {
+  this.selectedComplaint = complaint;
+  this.responseText = complaint.response || '';
+  this.showRespondModal = true;
+}
+
+closeRespondModal() {
+  this.showRespondModal = false;
+  this.selectedComplaint = null;
+  this.responseText = '';
+}
+sendResponse() {
+  if (!this.selectedComplaint || !this.responseText.trim()) return;
+
+  this.loading = true;
+
+  this.api.respondComplaint(this.selectedComplaint.id, { response: this.responseText })
+    .subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.fetchComplaints(); // تحديث الجدول
+        this.closeRespondModal();
+
+        // SweetAlert نجاح
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Response sent successfully!',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+
+        // SweetAlert خطأ
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to send response.',
+        });
+      }
+    });
+}
 }

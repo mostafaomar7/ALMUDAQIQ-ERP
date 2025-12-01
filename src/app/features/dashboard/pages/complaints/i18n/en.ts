@@ -13,7 +13,7 @@ export const EN = {
     mobile: "Mobile",
     complaintType: "Complaint Type",
     message: "Message",
-    license: "License",
+    license: "License Date",
 
     of: "of",
     back: "Back",
@@ -24,4 +24,10 @@ export const EN = {
     complaintMessage: "Complaint Message",
     subscriberName: "Subscriber name",
     date: "Date",
+    actions : 'Action',
+    respond : 'Respond',
+    send : 'Send' ,
+    cancel : 'Cancel',
+    yourResponse : 'Your Response' ,
+    respondToComplaint : 'Response To Complaint'
 };

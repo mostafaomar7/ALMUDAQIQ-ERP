@@ -240,3 +240,66 @@
     background-color: #007a5c; /* Green color */
     border-radius: 2px;
 }
+.modal-overlay {
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-container.white-bg {
+  background: #fff;
+  padding: 20px;
+  width: 500px;
+  border-radius: 10px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.steps-indicator {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.steps-indicator span {
+  flex: 1;
+  text-align: center;
+  padding: 5px;
+  border-bottom: 2px solid #ccc;
+}
+
+.steps-indicator span.active {
+  border-bottom: 2px solid #007bff;
+  font-weight: bold;
+}
+
+.form-step label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.form-step input,
+.form-step textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.form-step textarea {
+  resize: vertical;
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

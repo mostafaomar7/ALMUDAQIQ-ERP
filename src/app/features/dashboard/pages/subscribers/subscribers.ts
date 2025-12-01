@@ -56,6 +56,7 @@ formData: any = {
   currentLang: 'en' | 'ar';
 Math = Math; // أضف هذا السطر داخل الكلاس Subscribers
 activeTab: string = 'subscribers';
+  renwalsubscribers: any[] = [];
 setActiveTab(tab: string) {
     this.activeTab = tab;
   }
@@ -67,7 +68,15 @@ regions: any[] = [];
 isEditMode: boolean = false;
 editingSubscriberId: number | null = null;
 selectedSubscriberStatus: string = '';
+// Subscribers Pagination
+subCurrentPage: number = 1;
+subItemsPerPage: number = 10;
+subTotalItems: number = 0;
 
+// Renewal Subscribers Pagination
+renCurrentPage: number = 1;
+renItemsPerPage: number = 10;
+renTotalItems: number = 0;
   // 👇 متغير للتحكم في ظهور المنيو
   showFilterModal: boolean = false;
 searchTerm: string = '';
@@ -350,6 +359,9 @@ showReminderModal: boolean = false;
     });
     this.loadSubscribers();
     this.loadCountries();
+// this.loadRenwalSubscribers();
+this.loadRenewalSubscribers();
+
   }
 
   loadTranslations(lang: 'en' | 'ar') {
@@ -361,16 +373,24 @@ showReminderModal: boolean = false;
   }
 loadSubscribers() {
   this.subscriberService
-    .getSubscribers(this.currentPage, this.itemsPerPage, this.searchTerm, this.filterData)
+    .getSubscribers(this.subCurrentPage, this.subItemsPerPage, this.searchTerm, this.filterData)
     .subscribe({
       next: (res) => {
         this.subscribers = res.data;
-        this.totalItems = res.total;
-      },
-      error: (err) => console.error("Error:", err)
+        this.subTotalItems = res.total;
+      }
     });
 }
-
+loadRenwalSubscribers() {
+  this.subscriberService
+    .getRenwalSubscribers(this.renCurrentPage, this.renItemsPerPage, this.searchTerm)
+    .subscribe({
+      next: (res) => {
+        this.renwalsubscribers = res.data;
+        this.renTotalItems = res.total;
+      }
+    });
+}
   // --- Checkbox Logic ---
   toggleAllSelection(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
@@ -504,45 +524,108 @@ deleteSelectedUsers() {
   }
 
   get paginationArray(): (number | string)[] {
-    const total = this.totalPages;
-    const current = this.currentPage;
-    const delta = 2;
-    const range: number[] = [];
-    const rangeWithDots: (number | string)[] = [];
-    let l: number | undefined;
+  const total = this.totalPages;
+  const current = this.currentPage;
+  const pages: (number | string)[] = [];
 
-    for (let i = 1; i <= total; i++) {
-      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-        range.push(i);
-      }
-    }
+  if (total <= 5) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push('...');
 
-    range.forEach(i => {
-      if (l) {
-        if (i - l === 2) {
-          rangeWithDots.push(l + 1);
-        } else if (i - l !== 1) {
-          rangeWithDots.push('...');
-        }
-      }
-      rangeWithDots.push(i);
-      l = i;
-    });
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
 
-    return rangeWithDots;
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
   }
 
-  changePage(page: number | string) {
-  if (typeof page === 'string') return;
-  if (page >= 1 && page <= this.totalPages) {
-    this.currentPage = page;
-    this.loadSubscribers();   // 👈 إعادة تحميل البيانات
-  }
+  return pages;
+}
+get subTotalPages(): number {
+  return Math.ceil(this.subTotalItems / this.subItemsPerPage);
 }
 
-goToPage() {
+get renTotalPages(): number {
+  return Math.ceil(this.renTotalItems / this.renItemsPerPage) || 1;
+}
+// للمشتركين
+get subPaginationArray(): (number | string)[] {
+  const total = this.subTotalPages; // أو حسب متغيرك الصحيح
+  const current = this.subCurrentPage;
+  return this.buildPaginationArray(total, current);
+}
+
+// للتجديد
+get renPaginationArray(): (number | string)[] {
+  const total = this.renTotalPages;
+  const current = this.renCurrentPage;
+  const pages: (number | string)[] = [];
+
+  if (total <= 5) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push('...');
+
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+  }
+
+  return pages;
+}
+// دالة مساعدة لبناء مصفوفة الصفحات
+private buildPaginationArray(total: number, current: number): (number | string)[] {
+  const pages: (number | string)[] = [];
+  if (total <= 5) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push('...');
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+  }
+  return pages;
+}
+applyRenewalPagination() {
+  const start = (this.renCurrentPage - 1) * this.renItemsPerPage;
+  const end = start + this.renItemsPerPage;
+
+  this.renDisplayedItems = this.renwalsubscribers.slice(start, end);
+}
+
+renDisplayedItems: any[] = []; // البيانات المعروضة فقط في الجدول
+
+// عند تحميل البيانات من API
+loadRenewalSubscribers() {
+  this.subscriberService.getRenwalSubscribers(this.renCurrentPage, this.renItemsPerPage, this.searchTerm).subscribe((res: any) => {
+    this.renwalsubscribers = res.data;
+    this.renTotalItems = this.renwalsubscribers.length;
+
+    this.applyRenewalPagination();
+  });
+}
+changePage(type: 'sub' | 'ren', page: number) {
+  if (type === 'ren') {
+    if (page < 1 || page > this.renTotalPages) return;
+    this.renCurrentPage = page;
+    this.applyRenewalPagination();
+  }
+}
+goToPage(table: 'sub' | 'ren') {
   if (this.goToPageInput) {
-    this.changePage(this.goToPageInput);
+    this.changePage(table, this.goToPageInput);
     this.goToPageInput = null;
   }
 }

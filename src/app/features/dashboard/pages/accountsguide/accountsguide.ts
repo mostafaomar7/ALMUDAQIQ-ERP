@@ -86,16 +86,16 @@ openAddModal(account?: DisplayAccount | null) {
 
   if (account) {
     this.newAccount = {
-      id: account.id,
-      level: account.level || '',
-      accountNumber: Number(account.number) || '',
-      accountName: account.name || '',
-      rulesAndRegulations: account.rules || '',
-      disclosureNotes: account.notes || '',
-      code1: account.code || '',
-      objectiveCode: account.objectiveCode || '',
-      relatedObjectives: account.relatedObjectives || ''
-    };
+  id: account.id || null,
+  level: account.level || '',
+  accountNumber: account.number ? Number(account.number) : '',
+  accountName: account.name || '',
+  rulesAndRegulations: account.rules || '',
+  disclosureNotes: account.notes || '',
+  code1: account.code || '',
+  objectiveCode: account.objectiveCode || '',
+  relatedObjectives: account.relatedObjectives || ''
+};
     this.editingId = account.id;
     this.isEditMode = true;
   } else {

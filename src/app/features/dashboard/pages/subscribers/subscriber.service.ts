@@ -50,5 +50,13 @@ getCitiesByCountry(countryId: number) {
 getRegionsByCity(cityId: number) {
   return this.http.get<any[]>(`${this.api_url}/regions?cityId=${cityId}`);
 }
-
+getRenwalSubscribers(page: number, limit: number, search: string = '') {
+  return this.http.get<any>(`${this.api_url}/reports/renewal-status`, {
+    params: {
+      page,
+      limit,
+      search
+    }
+  });
+}
 }

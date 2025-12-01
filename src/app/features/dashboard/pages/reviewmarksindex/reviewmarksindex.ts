@@ -20,6 +20,7 @@ type TranslationKey = keyof typeof EN;
 export class ReviewmarksindexComponent implements OnInit {
 
   translations: typeof EN = EN;
+
   allMarks: Reviewmarksindex[] = [];
   displayedMarks: Reviewmarksindex[] = [];
 
@@ -42,6 +43,15 @@ export class ReviewmarksindexComponent implements OnInit {
   uploadProgress = 0;
   isUploading = false;
 
+  // Add/Edit Modal
+  isModalOpen = false;
+  isEditMode = false;
+  newMark: Partial<Reviewmarksindex> = {};
+  selectedMark: Reviewmarksindex | null = null;
+
+  // Search
+  searchText: string = '';
+
   constructor(private svc: ReviewmarksindexService, private lang: TranslateService, private eRef: ElementRef) {}
 
   ngOnInit() {
@@ -62,6 +72,7 @@ export class ReviewmarksindexComponent implements OnInit {
         this.currentPage = 1;
         this.updateDisplayedData();
         this.initFilterOptions();
+        this.calculatePagination();
       },
       error: err => { console.error(err); Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error'); }
     });
@@ -81,6 +92,7 @@ export class ReviewmarksindexComponent implements OnInit {
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.currentPage = 1;
     this.updateDisplayedData();
+    this.calculatePagination();
     this.closeFilter();
   }
 
@@ -112,11 +124,38 @@ export class ReviewmarksindexComponent implements OnInit {
     this.displayedMarks.forEach(m => m.selected = !allSelected);
   }
 
+  selectMark(mark: Reviewmarksindex) {
+    this.selectedMark = mark;
+    this.displayedMarks.forEach(m => m.selected = m === mark);
+  }
+
   get showingRangeText() {
     const start = (this.currentPage-1)*this.itemsPerPage+1;
     const end = Math.min(this.currentPage*this.itemsPerPage, this.totalItems);
     return `${start}-${end} ${this.t('page')} ${this.totalItems.toLocaleString()}`;
   }
+
+  // ---- Search ----
+applySearch() {
+  const text = this.searchText.trim().toLowerCase();
+
+  // فلترة allMarks مباشرة بدون إعادة slice
+  this.displayedMarks = this.allMarks.filter(m =>
+    m.name?.toLowerCase().includes(text) ||
+    m.shortDescription?.toLowerCase().includes(text) ||
+    m.codeImage?.toLowerCase().includes(text)
+  );
+
+  this.totalItems = this.displayedMarks.length;
+  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+  this.currentPage = 1;
+
+  // قم بتقطيع displayedMarks حسب الصفحة بعد البحث
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  this.displayedMarks = this.displayedMarks.slice(start, start + this.itemsPerPage);
+
+  this.calculatePagination();
+}
 
   // ---- Import / Export ----
   openImportModal(){ this.isImportModalOpen=true; }
@@ -129,7 +168,12 @@ export class ReviewmarksindexComponent implements OnInit {
     this.svc.iimportReviewmarksindex(this.selectedFile).subscribe({
       next: e=>{
         if(e.type===HttpEventType.UploadProgress && e.total) this.uploadProgress=Math.round((100*e.loaded)/e.total);
-        else if(e.type===HttpEventType.Response){ this.isUploading=false; Swal.fire(this.t('success'), this.t('success'),'success'); this.closeImportModal(); this.loadMarks(); }
+        else if(e.type===HttpEventType.Response){
+          this.isUploading=false;
+          Swal.fire(this.t('success'), this.t('success'),'success');
+          this.closeImportModal();
+          this.loadMarks();
+        }
       },
       error: err => { this.isUploading=false; console.error(err); Swal.fire(this.t('error'), this.t('somethingWentWrong'),'error'); }
     });
@@ -157,4 +201,122 @@ export class ReviewmarksindexComponent implements OnInit {
     if(this.selectedExportOption==='excel') this.svc.exportAllExcel().subscribe(b=>this.downloadFile(b,'reviewmarks.xlsx'));
     this.closeExportModal();
   }
+
+  // ---- Modal Add/Edit ----
+  openAddEditModal(mark: Reviewmarksindex | null) {
+  if (!mark) {
+    this.isEditMode = false;
+    this.newMark = {
+  codeImage: '',
+  name: '',
+  shortDescription: '',
+  suggestedStage: '',
+  whenToUse: '',
+  exampleShortForm: '',
+  sectorTags: '',
+  assertion: '',
+  benchmark: '',
+  scoreWeight: 0,      // <- تأكد أنها number
+  severityLevel: 0,    // <- تأكد أنها number
+  severityWeight: 0,   // <- تأكد أنها number
+  priorityRating: ''
+};
+  } else {
+    this.isEditMode = true;
+    this.newMark = { ...mark };
+  }
+  this.currentStep = 1;
+  this.isModalOpen = true;
+}
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.newMark = {};
+  }
+submitMark() {
+  // نجعل نسخة من newMark لتعديلها قبل الإرسال
+  const body: Partial<Reviewmarksindex> = {};
+
+  // قائمة الحقول التي نرسلها للباك فقط
+  const fieldsToSend: (keyof Reviewmarksindex)[] = [
+    'codeImage',
+    'name',
+    'shortDescription',
+    'suggestedStage',
+    'whenToUse',
+    'exampleShortForm',
+    'sectorTags',
+    'assertion',
+    'benchmark',
+    'scoreWeight',
+    'severityLevel',
+    'severityWeight',
+    'priorityRating'
+  ];
+
+  fieldsToSend.forEach(key => {
+    let value = this.newMark[key];
+
+    // تحويل الحقول الرقمية إلى number صريح
+    if (['scoreWeight', 'severityLevel', 'severityWeight'].includes(key)) {
+      value = Number(value);
+    }
+
+    // تجاهل undefined، null أو نص فارغ
+    if (value !== undefined && value !== null) {
+      if (typeof value === 'string' && value.trim() === '') return;
+      body[key] = value as any;
+    }
+  });
+
+  // إرسال البيانات للباك
+  if (this.isEditMode && this.newMark.id) {
+    this.svc.updateReviewmarksindex(this.newMark.id, body).subscribe({
+      next: () => {
+        Swal.fire(this.t('success'), this.t('success'),'success');
+        this.closeModal();
+        this.loadMarks();
+      },
+      error: () => Swal.fire(this.t('error'), this.t('somethingWentWrong'),'error')
+    });
+  } else {
+    this.svc.createReviewmarksindex(body).subscribe({
+      next: () => {
+        Swal.fire(this.t('success'), this.t('success'),'success');
+        this.closeModal();
+        this.loadMarks();
+      },
+      error: () => Swal.fire(this.t('error'), this.t('somethingWentWrong'),'error')
+    });
+  }
+}
+
+  // ---- Delete ----
+  deleteMark(mark: Reviewmarksindex) {
+    if(!mark.id) return;
+    Swal.fire({
+      title: this.t('confirmDelete'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: this.t('yesDelete'),
+      cancelButtonText: this.t('cancel')
+    }).then(result => {
+      if(result.isConfirmed) {
+        this.svc.deleteReviewmarksindex(mark.id!).subscribe({
+          next: () => { Swal.fire(this.t('success'), this.t('deleted'),'success'); this.loadMarks(); },
+          error: () => Swal.fire(this.t('error'), this.t('somethingWentWrong'),'error')
+        });
+      }
+    });
+  }
+  currentStep: number = 1;
+
+nextStep() {
+  if (this.currentStep < 3) this.currentStep++;
+}
+
+prevStep() {
+  if (this.currentStep > 1) this.currentStep--;
+}
+
 }

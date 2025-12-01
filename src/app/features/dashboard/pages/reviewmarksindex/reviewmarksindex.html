@@ -5,16 +5,25 @@
     <h2 class="page-title">{{ t('reviewMarksTitle') }}</h2>
 
     <div class="actions-group">
+
+      <!-- Edit/Delete -->
       <div class="edit-actions">
-        <button class="btn-text"><i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}</button>
-        <button class="btn-text"><i class="fa-regular fa-trash-can"></i> {{ t('delete') }}</button>
+        <button class="btn-text" [disabled]="!selectedMark" (click)="selectedMark && openAddEditModal(selectedMark)">
+          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+        </button>
+
+        <button class="btn-text" [disabled]="!selectedMark" (click)="selectedMark && deleteMark(selectedMark)">
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
+        </button>
       </div>
 
+      <!-- Search -->
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" [placeholder]="t('search')" class="search-input">
+        <input type="text" [(ngModel)]="searchText" (input)="applySearch()" [placeholder]="t('search')" class="search-input">
       </div>
 
+      <!-- Import / Export / Add -->
       <div class="file-actions">
         <button class="btn-outline" (click)="openImportModal()">
           <i class="fa-solid fa-file-import"></i> {{ t('import') }}
@@ -24,7 +33,9 @@
           <i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}
         </button>
 
-        <button class="btn-primary"><i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}</button>
+        <button class="btn-primary" (click)="openAddEditModal(null)">
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
+        </button>
       </div>
     </div>
   </div>
@@ -53,9 +64,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let mark of displayedMarks" [class.selected-row]="mark.selected">
+        <tr *ngFor="let mark of displayedMarks"
+            [class.selected-row]="mark.selected"
+            (click)="selectMark(mark)">
           <td class="checkbox-col">
-            <div class="custom-checkbox" [class.checked]="mark.selected" (click)="toggleSelection(mark)">
+            <div class="custom-checkbox" [class.checked]="mark.selected" (click)="toggleSelection(mark); $event.stopPropagation()">
               <i *ngIf="mark.selected" class="fa-solid fa-check"></i>
             </div>
           </td>
@@ -107,7 +120,7 @@
     </div>
   </div>
 
-  <!-- Export Modal -->
+  <!-- ---- Export Modal ---- -->
   <div class="modal-overlay" *ngIf="isExportModalOpen">
     <div class="export-modal-container">
       <div class="export-header">
@@ -133,7 +146,7 @@
     </div>
   </div>
 
-  <!-- Import Modal -->
+  <!-- ---- Import Modal ---- -->
   <div class="modal-overlay" *ngIf="isImportModalOpen">
     <div class="import-modal-container">
       <div class="export-header">
@@ -151,12 +164,11 @@
           <div class="file-icon-wrapper"><i class="fa-solid fa-file"></i></div>
           <div class="file-info-wrapper">
             <div class="file-header">
-              <span class="file-name" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+              <span class="file-name">{{ selectedFile.name }}</span>
               <button class="remove-file-btn" (click)="selectedFile=null; uploadProgress=0">×</button>
             </div>
             <div class="file-stats">
-              <span *ngIf="selectedFile">{{ (selectedFile.size / 1024 / 1024) | number:'1.1-2' }} MB</span>
-
+              <span>{{ (selectedFile.size / 1024 / 1024) | number:'1.1-2' }} MB</span>
               <span class="percentage">{{ uploadProgress }}%</span>
             </div>
             <div class="progress-bar-container">
@@ -166,9 +178,81 @@
         </div>
       </div>
       <div class="export-footer">
-        <button class="btn-primary download-btn" (click)="uploadFile()">{{ t('import') }}</button>
+        <button class="btn-primary download-btn" (click)="uploadFile()">{{ t('submit') }}</button>
       </div>
     </div>
   </div>
+
+  <!-- ---- Add/Edit Modal ---- -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-container white-bg">
+    <h3>{{ isEditMode ? t('editMark') : t('addMark') }}</h3>
+    <form (ngSubmit)="submitMark()">
+
+      <!-- Step Indicators -->
+      <div class="steps-indicator">
+        <span [class.active]="currentStep===1">{{ t('step1') }}</span>
+        <span [class.active]="currentStep===2">{{ t('step2') }}</span>
+        <span [class.active]="currentStep===3">{{ t('step3') }}</span>
+      </div>
+
+      <!-- Step 1 -->
+      <div *ngIf="currentStep===1" class="form-step">
+        <label>{{ t('name') }}</label>
+        <input type="text" [(ngModel)]="newMark.name" name="name" required>
+
+        <label>{{ t('codeImage') }}</label>
+        <input type="text" [(ngModel)]="newMark.codeImage" name="codeImage">
+
+        <label>{{ t('shortDescription') }}</label>
+        <textarea [(ngModel)]="newMark.shortDescription" name="shortDescription"></textarea>
+      </div>
+
+      <!-- Step 2 -->
+      <div *ngIf="currentStep===2" class="form-step">
+        <label>{{ t('suggestedStage') }}</label>
+        <input type="text" [(ngModel)]="newMark.suggestedStage" name="suggestedStage">
+
+        <label>{{ t('whenToUse') }}</label>
+        <input type="text" [(ngModel)]="newMark.whenToUse" name="whenToUse">
+
+        <label>{{ t('exampleShortForm') }}</label>
+        <input type="text" [(ngModel)]="newMark.exampleShortForm" name="exampleShortForm">
+
+        <label>{{ t('sectorTags') }}</label>
+        <input type="text" [(ngModel)]="newMark.sectorTags" name="sectorTags">
+      </div>
+
+      <!-- Step 3 -->
+      <div *ngIf="currentStep===3" class="form-step">
+        <label>{{ t('assertion') }}</label>
+        <input type="text" [(ngModel)]="newMark.assertion" name="assertion">
+
+        <label>{{ t('benchmark') }}</label>
+        <input type="text" [(ngModel)]="newMark.benchmark" name="benchmark">
+
+        <label>{{ t('scoreWeight') }}</label>
+        <input type="number" [(ngModel)]="newMark.scoreWeight" name="scoreWeight" [ngModelOptions]="{updateOn:'blur'}">
+
+        <label>{{ t('severityLevel') }}</label>
+        <input type="number" [(ngModel)]="newMark.severityLevel" name="severityLevel" [ngModelOptions]="{updateOn:'blur'}">
+
+        <label>{{ t('severityWeight') }}</label>
+        <input type="number" [(ngModel)]="newMark.severityWeight" name="severityWeight" [ngModelOptions]="{updateOn:'blur'}">
+
+        <label>{{ t('priorityRating') }}</label>
+        <input type="text" [(ngModel)]="newMark.priorityRating" name="priorityRating">
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="modal-buttons">
+        <button type="button" class="btn-secondary" (click)="prevStep()" [disabled]="currentStep===1">{{ t('back') }}</button>
+        <button type="button" class="btn-secondary" (click)="nextStep()" *ngIf="currentStep<3">{{ t('next') }}</button>
+        <button type="submit" class="btn-primary" *ngIf="currentStep===3">Submit</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">{{ t('cancel') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 </div>

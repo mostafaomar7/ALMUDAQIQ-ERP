@@ -7,7 +7,7 @@
                 <h5 class="mb-0 table-title">
                     {{ t('complaintsTable') }}
                     <span class="total-count p-1 rounded small bg-success text-white">
-                        {{ t('total') }} 126
+                        {{ t('total') }} {{ totalItems }}
                     </span>
                     <p class="text-muted fs-6">{{ t('complaintsOverview') }}</p>
                 </h5>
@@ -15,19 +15,27 @@
 
             <div class="d-flex align-items-center gap-3 flex-nowrap ms-auto">
 
+                <!-- Search -->
                 <div class="search-container">
-                    <input type="text" [placeholder]="t('search')">
+                    <input type="text"
+                           [(ngModel)]="searchText"
+                           (input)="fetchComplaints()"
+                           [placeholder]="t('search')">
                     <i class="fas fa-search search-icon"></i>
                 </div>
 
+                <!-- Type Filter -->
                 <div class="dropdown-filter">
-                    <select class="form-select btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
-                        <option value="" disabled selected>{{ t('type') }}</option>
-                        <option value="technical">{{ t('technical') }}</option>
-                        <option value="commercial">{{ t('commercial') }}</option>
+                    <select class="form-select btn btn-outline-secondary btn-sm"
+                            [(ngModel)]="filterType"
+                            (change)="fetchComplaints()">
+                        <option value="">{{ t('type') }}</option>
+                        <option value="TECHNICAL">{{ t('technical') }}</option>
+                        <option value="COMMERCIAL">{{ t('commercial') }}</option>
                     </select>
                 </div>
 
+                <!-- Date Filter Button -->
                 <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
                     <i class="fas fa-calendar-alt"></i> {{ t('dateRange') }}
                 </button>
@@ -35,39 +43,67 @@
         </div>
 
         <div class="table-responsive">
+
             <table class="table table-hover align-middle">
 
                 <thead class="bg-light">
                     <tr class="text-muted small text-uppercase">
-                        <th scope="col" style="width: 50px;"></th>
-                        <th scope="col">{{ t('name') }}</th>
-                        <th scope="col">{{ t('email') }}</th>
-                        <th scope="col">{{ t('mobile') }}</th>
-                        <th scope="col">{{ t('complaintType') }}</th>
-                        <th scope="col">{{ t('message') }}</th>
-                        <th scope="col">{{ t('license') }}</th>
+                        <th style="width: 50px;"></th>
+                        <th>{{ t('name') }}</th>
+                        <th>{{ t('email') }}</th>
+                        <th>{{ t('mobile') }}</th>
+                        <th>{{ t('complaintType') }}</th>
+                        <th>{{ t('message') }}</th>
+                        <th>{{ t('license') }}</th>
+                        <th>{{ t('date') }}</th>
+                        <th>{{ t('actions') }}</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr *ngFor="let complaint of complaintsData"
-                        class="border-bottom complaint-row"
-                        (click)="openComplaintDetails(complaint)"
-                        role="button">
 
-                        <td>
-                            <input type="checkbox" class="custom-checkbox" (click)="$event.stopPropagation()" />
+                    <!-- Loading Spinner -->
+                    <tr *ngIf="loading">
+                        <td colspan="8" class="text-center py-5">
+                            <div class="spinner-border"></div>
                         </td>
-                        <td class="fw-bold text-dark">{{ complaint.name }}</td>
-                        <td class="text-muted">{{ complaint.email }}</td>
-                        <td class="text-muted">{{ complaint.mobile }}</td>
-                        <td class="text-muted">{{ complaint.type }}</td>
-                        <td class="text-muted">{{ complaint.message }}</td>
-                        <td class="text-muted">{{ complaint.license }}</td>
+                    </tr>
+
+                    <!-- Error -->
+                    <tr *ngIf="!loading && errorMessage">
+                        <td colspan="8" class="text-center text-danger py-4">
+                            {{ errorMessage }}
+                        </td>
+                    </tr>
+
+                    <!-- Table Rows -->
+                    <tr *ngFor="let complaint of complaintsData"
+    class="border-bottom complaint-row">
+
+    <!-- البيانات -->
+    <td>
+        <input type="checkbox" class="custom-checkbox" (click)="$event.stopPropagation()" />
+    </td>
+    <td class="fw-bold text-dark">{{ complaint.subscriberName }}</td>
+    <td class="text-muted">{{ complaint.email }}</td>
+    <td class="text-muted">{{ complaint.phone }}</td>
+    <td class="text-muted">{{ complaint.type }}</td>
+    <td class="text-muted">{{ complaint.message }}</td>
+    <td class="text-muted">{{ complaint.subscriber?.subdomain }}</td>
+    <td class="text-muted">{{ complaint.complaintDate | date: 'yyyy-MM-dd HH:mm' }}</td>
+
+    <!-- Actions -->
+    <td>
+        <button class="btn btn-success btn-sm"
+                (click)="openRespondModal(complaint); $event.stopPropagation()">
+            {{ t('respond') }}
+        </button>
+    </td>
                     </tr>
                 </tbody>
             </table>
 
+            <!-- Pagination -->
             <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pb-3 px-2">
 
                 <div class="text-muted small">
@@ -115,6 +151,7 @@
     </div>
 </div>
 
+<!-- Modal -->
 <div class="modal-backdrop" *ngIf="showComplaintModal" (click)="closeComplaintDetails()"></div>
 
 <div class="custom-modal" [class.show]="showComplaintModal">
@@ -128,14 +165,15 @@
         </header>
 
         <div class="modal-body" *ngIf="selectedComplaint">
+
             <div class="detail-item">
                 <span class="detail-label">{{ t('subscriberName') }}</span>
-                <p class="detail-value">{{ selectedComplaint.name }}</p>
+                <p class="detail-value">{{ selectedComplaint.subscriberName }}</p>
             </div>
 
             <div class="detail-item">
                 <span class="detail-label">{{ t('date') }}</span>
-                <p class="detail-value">{{ selectedComplaint.date }}</p>
+                <p class="detail-value">{{ selectedComplaint.complaintDate | date:'yyyy-MM-dd HH:mm' }}</p>
             </div>
 
             <div class="detail-item">
@@ -151,3 +189,27 @@
 
     </div>
 </div>
+<div class="custom-modal" [class.show]="showRespondModal">
+  <div class="modal-content">
+    <header class="modal-header">
+      <h5 class="modal-title">{{ t('respondToComplaint') }}</h5>
+      <button type="button" class="close-btn" (click)="closeRespondModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+
+    <div class="modal-body" *ngIf="selectedComplaint">
+      <div class="mb-3">
+        <label>{{ t('yourResponse') }}</label>
+        <input type="text" class="form-control" [(ngModel)]="responseText">
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" (click)="closeRespondModal()">{{ t('cancel') }}</button>
+        <button class="btn btn-primary" (click)="sendResponse()">
+          {{ t('send') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

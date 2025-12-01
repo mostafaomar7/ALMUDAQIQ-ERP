@@ -157,6 +157,9 @@ SubscriptionRenewals : " تجديد الاشتراكات" ,
   goToSubscribers: "الذهاب للمشتركين",
   addAnother: "إضافة مشترك آخر" ,
   commRegisternumber : 'commercial Register number'  ,
-  update :'تحديث'
-
+  update :'تحديث',
+subscriptionstart : 'subscription start',
+subscriptionEnd  : 'Subscription End' ,
+lastrenewal : 'last renewal ' ,
+Actions : 'Actions' ,
 };
