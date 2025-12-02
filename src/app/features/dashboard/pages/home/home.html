@@ -1,102 +1,104 @@
-<div class="container-fluid" [class.rtl]="isRtl" >
+<div class="container-fluid" [class.rtl]="isRtl">
 
-  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="h4 fw-semibold">{{ t('goodMorning') }}, {{ userName }} 👋</h2>
-      <p class="small mb-0">{{ t('overviewToday') }}</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="h4 fw-semibold">{{ t('goodMorning') }}, {{ userName }} 👋</h2>
+    <p class="small mb-0">{{ t('overviewToday') }}</p>
+  </div>
+
+  <div class="d-flex align-items-center mt-3 mt-md-0">
+
+    <!-- Select + Custom Date -->
+    <div class="d-flex align-items-center me-2">
+      <select class="form-select ps-5 me-2" (change)="onModeChange($event)">
+        <option value="day">{{ t('today') }}</option>
+        <option value="yesterday">{{ t('yesterday') }}</option>
+        <option value="week">{{ t('last7Days') }}</option>
+        <option value="month">{{ t('last30Days') }}</option>
+        <option value="custom">{{ t('custom') }}</option>
+      </select>
+
+      <input *ngIf="selectedMode==='custom'" type="date" class="form-control me-2"
+             [value]="selectedDate"
+             (change)="onCustomDateChange($event)" />
     </div>
-    <div class="d-flex align-items-center mt-3 mt-md-0">
 
-      <!-- فلتر Select + أيقونة -->
-      <div class="filter-select position-relative me-2">
-        <select class="form-select ps-5">
-          <option selected disabled>15 Oct 2024</option>
-          <option value="today">{{ t('today') }}</option>
-          <option value="yesterday">{{ t('yesterday') }}</option>
-          <option value="week">{{ t('last7Days') }}</option>
-          <option value="month">{{ t('last30Days') }}</option>
-        </select>
-        <i class="fas fa-calendar-alt filter-icon"></i>
+    <!-- Export -->
+    <button class="btn btn-export text-white">
+      <i class="fas fa-arrow-up-from-bracket me-2"></i>
+      {{ t('export') }}
+    </button>
+
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row mb-4 w-100">
+
+  <!-- Total Users -->
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h6 class="card-title mb-3">{{ t('totalUsers') }}</h6>
+            <h3 class="fm-0">{{ subscribersKpi?.total || 0 }}</h3>
+          </div>
+          <div class="icon-box bg-light-purple">
+            <i class="fas fa-users text-purple"></i>
+          </div>
+        </div>
+        <div class="stat-footer small"
+             [ngClass]="{'text-success': subscribersKpi?.trend==='UP', 'text-danger': subscribersKpi?.trend==='DOWN'}">
+          <i class="fas" [ngClass]="{'fa-arrow-up': subscribersKpi?.trend==='UP', 'fa-arrow-down': subscribersKpi?.trend==='DOWN'}"></i>
+          <span>{{ subscribersKpi?.changePercentage || 0 }}%</span>
+        </div>
       </div>
-
-      <!-- زرار Export -->
-      <button class="btn btn-export text-white">
-        <i class="fas fa-arrow-up-from-bracket me-2"></i>
-        {{ t('export') }}
-      </button>
-
     </div>
   </div>
 
-  <div class="row">
-
-    <!-- Card 1 -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm border-0 h-100">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <h6 class="card-title mb-3">{{ t('totalUsers') }}</h6>
-              <h3 class="fm-0">15,342</h3>
-            </div>
-            <div class="icon-box bg-light-purple">
-              <i class="fas fa-users text-purple"></i>
-            </div>
+  <!-- Files Created -->
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h6 class="card-title mb-3">{{ t('filesCreated') }}</h6>
+            <h3 class="m-0">1,342,454</h3>
           </div>
-
-          <div class="stat-footer small text-danger">
-            <i class="fas fa-arrow-down"></i>
-            <span>{{ t('downFromYesterday', { value: '3.7%' }) }}</span>
+          <div class="icon-box bg-light-green">
+            <i class="fas fa-file-lines text-green"></i>
           </div>
+        </div>
+        <div class="stat-footer small text-success mt-4">
+          <i class="fas fa-arrow-up"></i>
+          <span>{{ t('upFromYesterday', { value: '10.2%' }) }}</span>
         </div>
       </div>
     </div>
-
-    <!-- Card 2 -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm border-0 h-100">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <h6 class="card-title mb-3">{{ t('filesCreated') }}</h6>
-              <h3 class="m-0">1,342,454</h3>
-            </div>
-            <div class="icon-box bg-light-green">
-              <i class="fas fa-file-lines text-green"></i>
-            </div>
-          </div>
-
-          <div class="stat-footer small text-success mt-4">
-            <i class="fas fa-arrow-up"></i>
-            <span>{{ t('upFromYesterday', { value: '10.2%' }) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 3 -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm border-0 h-100">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <h6 class="card-title mb-3">{{ t('totalFileSize') }}</h6>
-              <h3 class="m-0">320 GB</h3>
-            </div>
-            <div class="icon-box bg-light-yellow">
-              <i class="fas fa-box-archive text-yellow"></i>
-            </div>
-          </div>
-
-          <div class="stat-footer small text-success mt-4">
-            <i class="fas fa-arrow-up"></i>
-            <span>{{ t('upFromYesterday', { value: '8.5%' }) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
+
+  <!-- Total File Size -->
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h6 class="card-title mb-3">{{ t('totalFileSize') }}</h6>
+            <h3 class="m-0">320 GB</h3>
+          </div>
+          <div class="icon-box bg-light-yellow">
+            <i class="fas fa-box-archive text-yellow"></i>
+          </div>
+        </div>
+        <div class="stat-footer small text-success mt-4">
+          <i class="fas fa-arrow-up"></i>
+          <span>{{ t('upFromYesterday', { value: '8.5%' }) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="container-fluid" [class.rtl]="isRtl" >
@@ -167,21 +169,19 @@
     <div class="card shadow-sm border-0 px-4">
       <div class="d-flex align-items-center flex-wrap py-4">
 
-        <!-- العنوان وأزرار Edit/Delete -->
-        <div class="d-flex align-items-center gap-4 flex-nowrap mx-4">
+        <div class="d-flex align-items-center gap-4 flex-nowrap mx-1">
           <h5 class="mb-0 table-title">{{ t('subscribersTable') }}</h5>
-          <div class="d-flex gap-3 text-muted small">
+          <!-- <div class="d-flex gap-3 text-muted small">
             <span role="button" class="d-flex align-items-center gap-1 hover-primary">
               <i class="fas fa-pen"></i> {{ t('edit') }}
             </span>
             <span role="button" class="d-flex align-items-center gap-1 hover-danger">
               <i class="fas fa-trash"></i> {{ t('delete') }}
             </span>
-          </div>
+          </div> -->
         </div>
 
-        <!-- البحث والأزرار -->
-        <div class="d-flex align-items-center gap-2 flex-nowrap">
+        <!-- <div class="d-flex align-items-center gap-2 flex-nowrap">
           <div class="search-container">
             <input type="text" [placeholder]="t('search')">
             <i class="fas fa-search search-icon"></i>
@@ -198,7 +198,7 @@
           <button class="btn btn-success btn-sm d-flex align-items-center gap-2">
             <i class="fas fa-plus"></i> {{ t('addNewUser') }}
           </button>
-        </div>
+        </div> -->
       </div>
 
       <div class="table-responsive">
@@ -214,22 +214,36 @@
               <th scope="col">{{ t('country') }}</th>
               <th scope="col">{{ t('city') }}</th>
               <th scope="col">{{ t('region') }}</th>
+              <th scope="col">{{ t('LegalEntity') }}</th>
+              <th scope="col">{{ t('LicenseNo') }}</th>
+              <th scope="col">{{ t('LicenseDate') }}</th>
+              <th scope="col">{{ t('Status') }}</th>
+              <th scope="col">{{ t('SubscriptionEnd') }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of subscribers" class="border-bottom">
-              <td>
-                <div class="custom-checkbox bg-success rounded d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
-                  <i class="fas fa-check text-white" style="font-size: 0.7rem;"></i>
-                </div>
-              </td>
-              <td class="fw-bold text-dark">{{ user.name }}</td>
-              <td class="text-muted">{{ user.email }}</td>
-              <td class="text-muted">{{ user.mobile }}</td>
-              <td class="text-muted">{{ user.country }}</td>
-              <td class="text-muted">{{ user.city }}</td>
-              <td class="text-muted">{{ user.region }}</td>
-            </tr>
+             <tr *ngFor="let user of subscribers; let i = index" class="border-bottom">
+    <td>
+      <input
+        type="checkbox"
+        class="custom-checkbox"
+        id="chk{{i}}"
+      />
+    </td>
+<td class="fw-bold text-dark">{{ user.licenseName }}</td>
+<td class="text-muted">{{ user.subscriberEmail }}</td>
+<td class="text-muted">{{ user.primaryMobile }}</td>
+<td class="text-muted">{{ user.country?.name }}</td>
+<td class="text-muted">{{ user.city?.name }}</td>
+<td class="text-muted">{{ user.region?.name }}</td>
+<td class="text-muted">{{ user.legalEntityType }}</td>
+<td class="text-muted">{{ user.licenseNumber }}</td>
+<td class="text-muted">{{ user.licenseDate }}</td>
+<td class="text-muted">{{ user.status }}</td>
+<td class="text-muted">
+  {{ user.subscriptionEndDate ? (user.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
+</td>
+  </tr>
           </tbody>
         </table>
 
@@ -238,6 +252,6 @@
         </div>
       </div>
 
-    </div>
+    </div>>
   </div>
 </div>

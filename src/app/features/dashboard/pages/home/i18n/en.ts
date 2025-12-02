@@ -161,4 +161,5 @@ export const EN = {
 subscriptionEnd  : 'Subscription End' ,
 lastrenewal : 'last renewal ' ,
 Actions : 'Actions' ,
+custom : 'custom'
 };

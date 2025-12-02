@@ -14,4 +14,10 @@ export const AR = {
   // NEW KEYS
   "5daysAgo": "منذ 5 أيام",
   "6daysAgo": "منذ 6 أيام",
+    timeAgo : "timeAgo" ,
+  action : 'حدث' ,
+  role : 'دور' ,
+  dateHeader : 'dateHeader',
+  yesterday: "أمس"
+
 };

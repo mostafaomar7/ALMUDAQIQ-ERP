@@ -6,6 +6,9 @@ import { RouterLink } from '@angular/router';
 import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';
+import { Subscribers } from '../subscribers/subscribers';
+import { SubscriberService } from '../subscribers/subscriber.service';
+import { HomeService } from './home.service';
 
 Chart.register(...registerables);
 
@@ -14,7 +17,7 @@ type TranslationKey = keyof typeof EN;
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective , RouterLink],
+  imports: [CommonModule, BaseChartDirective , RouterLink ],
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
 })
@@ -22,13 +25,11 @@ export class Home implements OnInit {
   userName = 'khalil';
   translations: typeof EN = EN;
   isRtl = false;
+  subscribersKpi: any = null; // لحفظ الـ KPI
+  selectedMode: 'day' | 'month' | 'year' | 'custom' = 'day';
+  selectedDate: string = new Date().toISOString().split('T')[0]; // اليوم الحالي بصيغة yyyy-mm-dd
 
-  subscribers = [
-    { name: 'Ahmed Ali', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', country: 'Saudi Arabia', city: 'Makkah Region', region: 'Jeddah' },
-    { name: 'Youssef Hassan', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', country: 'Saudi Arabia', city: 'Makkah Region', region: 'Jeddah' },
-    { name: 'Omar Khaled', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', country: 'Saudi Arabia', city: 'Makkah Region', region: 'Jeddah' },
-    { name: 'Mona Ibrahim', email: 'AhmedAli@gmail.com', mobile: '+966 54 123 4567', country: 'Saudi Arabia', city: 'Makkah Region', region: 'Jeddah' },
-  ];
+  subscribers :any[] = [];
 
   // --- Bar Chart ---
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
@@ -86,7 +87,9 @@ export class Home implements OnInit {
     }],
   };
 
-  constructor(private translate: TranslateService) {}
+  constructor(private translate: TranslateService ,
+     private subscriberService : SubscriberService ,
+    private homeService: HomeService ) {}
 
   ngOnInit(): void {
     this.isRtl = this.translate.currentLang === 'ar';
@@ -96,6 +99,8 @@ export class Home implements OnInit {
       this.isRtl = lang === 'ar';
       this.loadTranslations(lang);
     });
+    this.loadSubscribers();
+    this.loadSubscribersKpi();
   }
 
   loadTranslations(lang: 'en' | 'ar') {
@@ -111,4 +116,83 @@ export class Home implements OnInit {
     }
     return text;
   }
+loadSubscribers() {
+  this.subscriberService.getSubscribers(1, 10)
+    .subscribe({
+      next: (res) => {
+        this.subscribers = (res.data || []).slice(0, 3); // أول 3 فقط
+      },
+      error: (err) => {
+        console.error('Failed to load subscribers', err);
+      }
+    });
 }
+loadSubscribersKpi() {
+    this.homeService.getSubscribersKpi(this.selectedMode, this.selectedDate)
+      .subscribe({
+        next: (res) => {
+          this.subscribersKpi = res.data;
+          console.log('KPI Data:', this.subscribersKpi);
+        },
+        error: (err) => console.error('Failed to load KPI', err)
+      });
+  }
+
+  // عند تغيير الفلتر
+  onFilterChange(mode: 'day' | 'month' | 'year' | 'custom', date?: string) {
+    this.selectedMode = mode;
+    if (date) this.selectedDate = date;
+    this.loadSubscribersKpi();
+  }
+  // عند تغيير الـ select
+// عند تغيير الـ select
+onModeChange(event: Event) {
+  const value = (event.target as HTMLSelectElement).value;
+  const today = new Date();
+  let startDate = today;
+  let endDate = today;
+
+  switch (value) {
+    case 'today':
+      this.onFilterChange('day', this.formatDate(today));
+      break;
+    case 'yesterday':
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 1);
+      this.onFilterChange('day', this.formatDate(startDate));
+      break;
+    case 'week':
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 6);
+      this.onFilterChange('custom', `${this.formatDate(startDate)},${this.formatDate(today)}`);
+      break;
+    case 'month':
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 29);
+      this.onFilterChange('custom', `${this.formatDate(startDate)},${this.formatDate(today)}`);
+      break;
+    case 'year':
+      startDate = new Date();
+      startDate.setFullYear(today.getFullYear() - 1);
+      this.onFilterChange('custom', `${this.formatDate(startDate)},${this.formatDate(today)}`);
+      break;
+    case 'custom':
+      this.onFilterChange('custom', this.selectedDate);
+      break;
+  }
+}
+
+// دالة مساعدة لتحويل التاريخ لصيغة yyyy-mm-dd
+formatDate(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
+// عند تغيير تاريخ الـ custom
+onCustomDateChange(event: Event) {
+  const date = (event.target as HTMLInputElement).value;
+  this.onFilterChange('custom', date);
+}
+
+
+}
+

@@ -14,4 +14,9 @@ export const EN = {
   // NEW KEYS
   "5daysAgo": "5 days ago",
   "6daysAgo": "6 days ago",
+  timeAgo : "timeAgo" ,
+  action : 'action' ,
+  role : 'role' ,
+  dateHeader : 'dateHeader',
+  yesterday: "Yesterday"
 };
