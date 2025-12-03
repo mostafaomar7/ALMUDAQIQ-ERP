@@ -8,5 +8,11 @@ export const AR = {
   subscriptionDuration: "مدة الاشتراك",
   storageCapacity: "سعة التخزين (جيجابايت)",
   paidFees: "الرسوم المدفوعة",
-  number: "العدد"
+  number: "العدد",
+  branchesLimit : 'حد الفروع',
+  clientsLimit : 'حد العملاء' ,
+  usersLimit : 'حد المستخدمين',
+  update : 'تحديث',
+  cancel : 'الغاء',
+  editPlan : 'تعديل الخطة'
 };

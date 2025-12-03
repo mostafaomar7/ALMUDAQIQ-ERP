@@ -6,30 +6,38 @@
     <p class="small mb-0">{{ t('overviewToday') }}</p>
   </div>
 
-  <div class="d-flex align-items-center mt-3 mt-md-0">
+  <div class="d-flex align-items-center me-2">
+  <select class="form-select ps-5 me-2" (change)="onModeChange($event)">
+    <option value="day">{{ t('today') }}</option>
+    <!-- <option value="yesterday">{{ t('yesterday') }}</option> -->
+    <option value="month">{{ t('month') }}</option>
+    <option value="year">{{ t('year') }}</option>
+    <option value="custom">{{ t('custom') }}</option>
+  </select>
 
-    <!-- Select + Custom Date -->
-    <div class="d-flex align-items-center me-2">
-      <select class="form-select ps-5 me-2" (change)="onModeChange($event)">
-        <option value="day">{{ t('today') }}</option>
-        <option value="yesterday">{{ t('yesterday') }}</option>
-        <option value="week">{{ t('last7Days') }}</option>
-        <option value="month">{{ t('last30Days') }}</option>
-        <option value="custom">{{ t('custom') }}</option>
-      </select>
+  <!-- Day / Yesterday -->
+  <input *ngIf="selectedMode==='day'" type="date" class="form-control me-2"
+         [value]="selectedDate"
+         (change)="onDayChange($event)" />
 
-      <input *ngIf="selectedMode==='custom'" type="date" class="form-control me-2"
-             [value]="selectedDate"
-             (change)="onCustomDateChange($event)" />
-    </div>
+  <!-- Month -->
+  <input *ngIf="selectedMode==='month'" type="month" class="form-control me-2"
+         [value]="selectedMonth"
+         (change)="onMonthChange($event)" />
 
-    <!-- Export -->
-    <button class="btn btn-export text-white">
-      <i class="fas fa-arrow-up-from-bracket me-2"></i>
-      {{ t('export') }}
-    </button>
+  <!-- Year -->
+  <input *ngIf="selectedMode==='year'" type="number" class="form-control me-2"
+         [value]="selectedYear"
+         min="2000" max="2100"
+         (change)="onYearChange($event)" />
 
+  <!-- Custom range -->
+  <div *ngIf="selectedMode==='custom'" class="d-flex">
+    <input type="date" class="form-control me-2" [value]="customFrom" (change)="onCustomFromChange($event)" />
+    <input type="date" class="form-control" [value]="customTo" (change)="onCustomToChange($event)" />
   </div>
+</div>
+
 </div>
 
 <!-- KPI Cards -->
@@ -48,7 +56,7 @@
             <i class="fas fa-users text-purple"></i>
           </div>
         </div>
-        <div class="stat-footer small"
+        <div class="stat-footer small" style="margin-top: -5px;"
              [ngClass]="{'text-success': subscribersKpi?.trend==='UP', 'text-danger': subscribersKpi?.trend==='DOWN'}">
           <i class="fas" [ngClass]="{'fa-arrow-up': subscribersKpi?.trend==='UP', 'fa-arrow-down': subscribersKpi?.trend==='DOWN'}"></i>
           <span>{{ subscribersKpi?.changePercentage || 0 }}%</span>
@@ -56,48 +64,49 @@
       </div>
     </div>
   </div>
-
-  <!-- Files Created -->
-  <div class="col-lg-4 col-md-6 mb-4">
-    <div class="card shadow-sm border-0 h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-          <div>
-            <h6 class="card-title mb-3">{{ t('filesCreated') }}</h6>
-            <h3 class="m-0">1,342,454</h3>
-          </div>
-          <div class="icon-box bg-light-green">
-            <i class="fas fa-file-lines text-green"></i>
-          </div>
+<!-- Files Created -->
+<div class="col-lg-4 col-md-6 mb-4">
+  <div class="card shadow-sm border-0 h-100">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h6 class="card-title mb-3">{{ t('filesCreated') }}</h6>
+          <h3 class="m-0">{{ filesKpi?.totalFiles || 0 }}</h3>
         </div>
-        <div class="stat-footer small text-success mt-4">
-          <i class="fas fa-arrow-up"></i>
-          <span>{{ t('upFromYesterday', { value: '10.2%' }) }}</span>
+        <div class="icon-box bg-light-green">
+          <i class="fas fa-file-lines text-green"></i>
         </div>
+      </div>
+      <div class="stat-footer small"
+           [ngClass]="{'text-success': filesKpi?.filesTrend==='UP', 'text-danger': filesKpi?.filesTrend==='DOWN'}">
+        <i class="fas" [ngClass]="{'fa-arrow-up': filesKpi?.filesTrend==='UP', 'fa-arrow-down': filesKpi?.filesTrend==='DOWN'}"></i>
+        <span>{{ filesKpi?.filesChangePercentage || 0 }}%</span>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Total File Size -->
-  <div class="col-lg-4 col-md-6 mb-4">
-    <div class="card shadow-sm border-0 h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-          <div>
-            <h6 class="card-title mb-3">{{ t('totalFileSize') }}</h6>
-            <h3 class="m-0">320 GB</h3>
-          </div>
-          <div class="icon-box bg-light-yellow">
-            <i class="fas fa-box-archive text-yellow"></i>
-          </div>
+<!-- Total File Size -->
+<div class="col-lg-4 col-md-6 mb-4">
+  <div class="card shadow-sm border-0 h-100">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h6 class="card-title mb-3">{{ t('totalFileSize') }}</h6>
+          <h3 class="m-0">{{ filesKpi?.totalSizeGB || 0 }} GB</h3>
         </div>
-        <div class="stat-footer small text-success mt-4">
-          <i class="fas fa-arrow-up"></i>
-          <span>{{ t('upFromYesterday', { value: '8.5%' }) }}</span>
+        <div class="icon-box bg-light-yellow">
+          <i class="fas fa-box-archive text-yellow"></i>
         </div>
+      </div>
+      <div class="stat-footer small"
+           [ngClass]="{'text-success': filesKpi?.sizeTrend==='UP', 'text-danger': filesKpi?.sizeTrend==='DOWN'}">
+        <i class="fas" [ngClass]="{'fa-arrow-up': filesKpi?.sizeTrend==='UP', 'fa-arrow-down': filesKpi?.sizeTrend==='DOWN'}"></i>
+        <span>{{ filesKpi?.sizeChangePercentage || 0 }}%</span>
       </div>
     </div>
   </div>
+</div>
 
 </div>
 
@@ -112,54 +121,70 @@
             <h3 class="fw-bold">$1,342,454</h3>
           </div>
           <div class="d-flex gap-2">
-            <button class="btn btn-dark btn-sm d-flex align-items-center px-3" style="background-color: #007d58; border: none; border-radius: 16px;">
-              2024 <i class="fas fa-chevron-down ms-2" style="font-size: 0.7rem;"></i>
-            </button>
-            <button class="btn btn-light btn-sm px-3 text-muted fw-medium" style="border-radius: 16px;">
-              {{ t('yearly') }}
-            </button>
-          </div>
+  <!-- Dropdown للسنة -->
+  <div class="btn-group">
+    <button type="button" class="btn btn-success rounded btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+      {{ selectedYear }}
+    </button>
+    <ul class="dropdown-menu">
+      <li *ngFor="let year of years">
+        <a class="dropdown-item"  (click)="onYearSelect(year)">{{ year }}</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- زر yearly -->
+  <button class="btn btn-light btn-sm" (click)="loadProfits('ALL_YEARS')">
+    {{ t('yearly') }}
+  </button>
+</div>
+
         </div>
 
         <div style="height: 300px;">
-          <canvas baseChart
-            [data]="barChartData"
-            [options]="barChartOptions"
-            [type]="barChartType">
-          </canvas>
-        </div>
+  <canvas baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="barChartType">
+  </canvas>
+</div>
       </div>
     </div>
 
-    <div class="col-lg-4 mb-4">
-      <div class="card shadow-sm border-0 p-4 h-100">
-        <h5 class="card-title fw-semibold mb-4" style="font-size: 1rem;">{{ t('supportTickets') }}</h5>
+      <div class="col-lg-4 mb-4">
+    <div class="card shadow-sm border-0 p-4 h-100">
+      <h5 class="card-title fw-semibold mb-4" style="font-size: 1rem;">{{ t('supportTickets') }}</h5>
 
-        <div class="d-flex justify-content-center align-items-center mb-4 mt-4" style="height: 220px; position: relative;">
-           <canvas baseChart
-             [data]="doughnutChartData"
-             [options]="doughnutChartOptions"
-             [type]="doughnutChartType">
-           </canvas>
+      <div class="d-flex justify-content-center align-items-center mb-4 mt-4" style="height: 220px; position: relative;">
+   <canvas baseChart
+     [data]="doughnutChartData"
+     [options]="doughnutChartOptions"
+     [type]="doughnutChartType">
+   </canvas>
+</div>
+
+      <div class="d-flex justify-content-around px-2 mt-4">
+        <div class="d-flex align-items-center">
+          <span class="legend-dot" style="background-color: #007d58;"></span>
+          <span class="fw-medium small ms-2">
+            {{ t('open') }} ({{ complaintsKpi?.open || 0 }})
+          </span>
         </div>
-
-        <div class="d-flex justify-content-around px-2 mt-4">
-          <div class="d-flex align-items-center">
-            <span class="legend-dot" style="background-color: #007d58;"></span>
-            <span class=" fw-medium small ms-2">{{ t('open') }}</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <span class="legend-dot" style="background-color: #10b981;"></span>
-            <span class=" fw-medium small ms-2">{{ t('closed') }}</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <span class="legend-dot" style="background-color: #34d399;"></span>
-            <span class=" fw-medium small ms-2">{{ t('pending') }}</span>
-          </div>
+        <div class="d-flex align-items-center">
+          <span class="legend-dot" style="background-color: #10b981;"></span>
+          <span class="fw-medium small ms-2">
+            {{ t('closed') }} ({{ complaintsKpi?.closed || 0 }})
+          </span>
         </div>
-
+        <div class="d-flex align-items-center">
+          <span class="legend-dot" style="background-color: #34d399;"></span>
+          <span class="fw-medium small ms-2">
+            {{ t('pending') }} ({{ complaintsKpi?.pending || 0 }})
+          </span>
+        </div>
       </div>
     </div>
+  </div>
 
   </div>
 </div>

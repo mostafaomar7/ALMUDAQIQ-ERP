@@ -9,10 +9,16 @@ export class HomeService {
  private api_url =  environment.apiUrl;
    constructor(private http: HttpClient) {}
 
-   getSubscribersKpi(mode: 'day' | 'month' | 'year' | 'custom', date: string) {
-  return this.http.get<any>(
-    `${this.api_url}/kpi/subscribers/stats?mode=${mode}&date=${date}`
-  );
+getSubscribersKpi(params: any) {
+  return this.http.get<any>(`${this.api_url}/kpi/subscribers/stats`, { params });
+}
+
+getSubscribersFile(params: any) {
+ return this.http.get<any>(`${this.api_url}/kpi/files/stats`, { params });
+}
+
+getSubscriberscomplaints(params: any) {
+  return this.http.get<any>(`${this.api_url}/kpi/complaints/stats`, { params });
 }
 
  getSubscribers(page: number, limit: number) {
@@ -20,5 +26,13 @@ export class HomeService {
     `${this.api_url}/subscribers?page=${page}&limit=${limit}`
   );
 }
+getProfits(year?: number) {
+  if (year) {
+    return this.http.get<any>(`${this.api_url}/kpi/profits`, { params: { year } });
+  } else {
+    return this.http.get<any>(`${this.api_url}/kpi/profits/yearly`);
+  }
+}
+
 
 }

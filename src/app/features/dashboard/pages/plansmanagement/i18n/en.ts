@@ -8,5 +8,11 @@ export const EN = {
   subscriptionDuration: "Subscription Duration",
   storageCapacity: "Storage Capacity (GB)",
   paidFees: "Paid Fees",
-  number: "Number"
+  number: "Number",
+  branchesLimit : 'branches Limit',
+  clientsLimit : 'clients Limit' ,
+  usersLimit : 'usersLimit',
+  update : 'update',
+  cancel :'cancel',
+  editPlan : 'Edit Plan'
 };

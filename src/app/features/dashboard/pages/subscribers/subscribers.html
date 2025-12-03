@@ -97,7 +97,13 @@
             </tr>
           </thead>
           <tbody>
-  <tr *ngFor="let user of subscribers; let i = index" class="border-bottom">
+  <tr
+  *ngFor="let user of subscribers; let i = index"
+  class="border-bottom"
+  (click)="openSubscriberOverlay(user)"
+  style="cursor: pointer;"
+>
+
     <td>
       <input
         type="checkbox"
@@ -790,5 +796,50 @@
       <button class="btn btn-success w-50" (click)="confirmReminder()">{{ t('confirm') }}</button>
     </div>
 
+  </div>
+</div>
+<!-- ================= Subscriber Overlay ================ -->
+<div
+  class="overlay-container"
+  *ngIf="showSubscriberOverlay"
+>
+  <div class="overlay-content">
+
+    <!-- Close Button -->
+    <button class="close-btn" (click)="closeSubscriberOverlay()">✕</button>
+
+    <h3 class="mb-3">Subscriber Details</h3>
+
+    <div class="details-grid">
+
+      <div><strong>Name:</strong> {{ selectedSubscriber?.licenseName }}</div>
+      <div><strong>Email:</strong> {{ selectedSubscriber?.subscriberEmail }}</div>
+      <div><strong>Mobile:</strong> {{ selectedSubscriber?.primaryMobile }}</div>
+
+      <div><strong>Country:</strong> {{ selectedSubscriber?.country?.name }}</div>
+      <div><strong>City:</strong> {{ selectedSubscriber?.city?.name }}</div>
+      <div><strong>Region:</strong> {{ selectedSubscriber?.region?.name }}</div>
+
+      <div><strong>License Number:</strong> {{ selectedSubscriber?.licenseNumber }}</div>
+      <div><strong>License Date:</strong> {{ selectedSubscriber?.licenseDate | date }}</div>
+      <div><strong>Legal Entity:</strong> {{ selectedSubscriber?.legalEntityType }}</div>
+
+      <div><strong>Tax Number:</strong> {{ selectedSubscriber?.taxNumber }}</div>
+      <div><strong>Unified Number:</strong> {{ selectedSubscriber?.unifiedNumber }}</div>
+
+      <div><strong>Subscription End:</strong>
+        {{ selectedSubscriber?.subscriptionEndDate ? (selectedSubscriber.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
+      </div>
+
+      <div><strong>Status:</strong> {{ selectedSubscriber?.status }}</div>
+
+      <div class="image-box">
+        <strong>Factory Logo:</strong><br>
+        <img *ngIf="selectedSubscriber?.factoryLogo"
+             [src]="api_url + '/' + selectedSubscriber.factoryLogo"
+             class="preview-img">
+      </div>
+
+    </div>
   </div>
 </div>

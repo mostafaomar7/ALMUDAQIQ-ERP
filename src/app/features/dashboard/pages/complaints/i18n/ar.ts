@@ -22,7 +22,7 @@ export const AR = {
     go: "اذهب",
 
     complaintMessage: "تفاصيل الشكوى",
-    subscriberName: "اسم المشترك",
+    subscriberName: "حالة المشترك",
     date: "التاريخ",
         actions : 'حدث',
     respond : 'رد',

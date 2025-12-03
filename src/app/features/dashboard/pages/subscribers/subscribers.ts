@@ -6,6 +6,7 @@ import { AR } from '../home/i18n/ar';
 import { FormsModule } from '@angular/forms';
 import { SubscriberService } from './subscriber.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../../../../environment';
 
 type TranslationKey = keyof typeof EN;
 
@@ -617,17 +618,40 @@ loadRenewalSubscribers() {
   });
 }
 changePage(type: 'sub' | 'ren', page: number) {
+
+  if (type === 'sub') {
+    if (page < 1 || page > this.subTotalPages) return;
+
+    this.subCurrentPage = page;
+    this.loadSubscribers();  // تحميل الصفحة الجديدة
+    return;
+  }
+
   if (type === 'ren') {
     if (page < 1 || page > this.renTotalPages) return;
+
     this.renCurrentPage = page;
     this.applyRenewalPagination();
   }
 }
+
 goToPage(table: 'sub' | 'ren') {
   if (this.goToPageInput) {
     this.changePage(table, this.goToPageInput);
     this.goToPageInput = null;
   }
 }
+selectedSubscriber: any = null;
+showSubscriberOverlay: boolean = false;
 
+openSubscriberOverlay(user: any) {
+  this.selectedSubscriber = user;
+  this.showSubscriberOverlay = true;
+}
+
+closeSubscriberOverlay() {
+  this.showSubscriberOverlay = false;
+  this.selectedSubscriber = null;
+}
+api_url = environment.apiUrl;
 }
