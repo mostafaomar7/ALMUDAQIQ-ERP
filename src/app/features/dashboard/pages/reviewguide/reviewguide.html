@@ -48,7 +48,9 @@
               <i class="fa-solid fa-minus"></i>
             </div>
           </th>
-          <th>{{ t('level') }}</th>
+          <th (click)="sortByLevel()" style="cursor: pointer;">
+  {{ t('level') }}
+</th>
           <th>{{ t('separator') }}</th>
           <th>{{ t('number') }}</th>
           <th>{{ t('statement') }}</th>
@@ -144,52 +146,72 @@
 
     <div class="modal-body">
       <!-- Step 1 -->
-      <div *ngIf="currentStep === 1">
-        <label>{{ t('level') }}</label>
-        <input type="text" [(ngModel)]="newReview.level" [placeholder]="t('enterLevel')" class="form-control">
+      <div class="step step-1" *ngIf="currentStep === 1">
 
-        <label>{{ t('separator') }}</label>
-        <input type="text" [(ngModel)]="newReview.separator" [placeholder]="t('enterSeparator')" class="form-control">
+  <label>{{ t('level') }}</label>
+  <input type="text" required [(ngModel)]="newReview.level" #level="ngModel" class="form-control">
+  <span *ngIf="level.invalid && level.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('number') }}</label>
-        <input type="text" [(ngModel)]="newReview.number" [placeholder]="t('enterNumber')" class="form-control">
+  <label>{{ t('separator') }}</label>
+  <input type="text" required [(ngModel)]="newReview.separator" #separator="ngModel" class="form-control">
+  <span *ngIf="separator.invalid && separator.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('statement') }}</label>
-        <input type="text" [(ngModel)]="newReview.statement" [placeholder]="t('enterStatement')" class="form-control">
+  <label>{{ t('number') }}</label>
+  <input type="text" required [(ngModel)]="newReview.number" #number="ngModel" class="form-control">
+  <span *ngIf="number.invalid && number.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('purpose') }}</label>
-        <input type="text" [(ngModel)]="newReview.purpose" [placeholder]="t('enterPurpose')" class="form-control">
-      </div>
+  <label>{{ t('statement') }}</label>
+  <input type="text" required [(ngModel)]="newReview.statement" #statement="ngModel" class="form-control">
+  <span *ngIf="statement.invalid && statement.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('purpose') }}</label>
+  <input type="text" required [(ngModel)]="newReview.purpose" #purpose="ngModel" class="form-control">
+  <span *ngIf="purpose.invalid && purpose.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
 
       <!-- Step 2 -->
-      <div *ngIf="currentStep === 2">
-        <label>{{ t('responsibility') }}</label>
-        <input type="text" [(ngModel)]="newReview.responsiblePerson" [placeholder]="t('enterResponsiblePerson')" class="form-control">
+      <div class="step step-2" *ngIf="currentStep === 2">
 
-        <label>{{ t('DatePrepared') }}</label>
-        <input type="date" [(ngModel)]="newReview.datePrepared" class="form-control">
+  <label>{{ t('responsibility') }}</label>
+  <input type="text" required [(ngModel)]="newReview.responsiblePerson" #responsiblePerson="ngModel" class="form-control">
+  <span *ngIf="responsiblePerson.invalid && responsiblePerson.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('DateReviewed') }}</label>
-        <input type="date" [(ngModel)]="newReview.dateReviewed" class="form-control">
+  <label>{{ t('DatePrepared') }}</label>
+  <input type="date" required [(ngModel)]="newReview.datePrepared" #datePrepared="ngModel" class="form-control">
+  <span *ngIf="datePrepared.invalid && datePrepared.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('Conclusion') }}</label>
-        <input type="text" [(ngModel)]="newReview.conclusion" [placeholder]="t('enterConclusion')" class="form-control">
+  <label>{{ t('DateReviewed') }}</label>
+  <input type="date" required [(ngModel)]="newReview.dateReviewed" #dateReviewed="ngModel" class="form-control">
+  <span *ngIf="dateReviewed.invalid && dateReviewed.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('Notes1') }}</label>
-        <input type="text" [(ngModel)]="newReview.notes1" [placeholder]="t('enterNotes1')" class="form-control">
+  <label>{{ t('Conclusion') }}</label>
+  <input type="text" required [(ngModel)]="newReview.conclusion" #conclusion="ngModel" class="form-control">
+  <span *ngIf="conclusion.invalid && conclusion.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('Notes2') }}</label>
-        <input type="text" [(ngModel)]="newReview.notes2" [placeholder]="t('enterNotes2')" class="form-control">
+  <label>{{ t('Notes1') }}</label>
+  <input type="text" required [(ngModel)]="newReview.notes1" #notes1="ngModel" class="form-control">
+  <span *ngIf="notes1.invalid && notes1.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('Notes3') }}</label>
-        <input type="text" [(ngModel)]="newReview.notes3" [placeholder]="t('enterNotes3')" class="form-control">
-      </div>
+  <label>{{ t('Notes2') }}</label>
+  <input type="text" required [(ngModel)]="newReview.notes2" #notes2="ngModel" class="form-control">
+  <span *ngIf="notes2.invalid && notes2.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('Notes3') }}</label>
+  <input type="text" required [(ngModel)]="newReview.notes3" #notes3="ngModel" class="form-control">
+  <span *ngIf="notes3.invalid && notes3.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
 
       <!-- Step 3 -->
-      <div *ngIf="currentStep === 3">
-        <label>{{ t('Attachments') }}</label>
-        <input type="text" [(ngModel)]="newReview.attachments" [placeholder]="t('enterAttachments')" class="form-control">
-      </div>
+      <div class="step step-3" *ngIf="currentStep === 3">
+
+  <label>{{ t('Attachments') }}</label>
+  <input type="text" required [(ngModel)]="newReview.attachments" #attachments="ngModel" class="form-control">
+  <span *ngIf="attachments.invalid && attachments.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
     </div>
 
     <div class="modal-footer">

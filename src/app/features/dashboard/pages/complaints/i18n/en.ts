@@ -29,5 +29,7 @@ export const EN = {
     send : 'Send' ,
     cancel : 'Cancel',
     yourResponse : 'Your Response' ,
-    respondToComplaint : 'Response To Complaint'
+    respondToComplaint : 'Response To Complaint',
+    delete : 'Delete'
+
 };

@@ -120,88 +120,104 @@
       <!-- ============================= -->
       <!-- STEP 1 -->
       <!-- ============================= -->
-      <div *ngIf="currentStep === 1">
-
-        <label>{{ t('stageCode') }}</label>
-        <input [(ngModel)]="newStage.stageCode" class="form-control">
-
-        <label>{{ t('stage') }}</label>
-        <input [(ngModel)]="newStage.stage" class="form-control">
-
-        <label>{{ t('entityType') }}</label>
-        <input [(ngModel)]="newStage.entityType" class="form-control">
-
-        <label>{{ t('economicSector') }}</label>
-        <input [(ngModel)]="newStage.economicSector" class="form-control">
-
-        <label>{{ t('procedure') }}</label>
-        <textarea [(ngModel)]="newStage.procedure" class="form-control"></textarea>
-
-        <label>{{ t('responsibleAuthority') }}</label>
-        <input [(ngModel)]="newStage.responsibleAuthority" class="form-control">
-
-        <label>{{ t('implementationPeriod') }}</label>
-        <input [(ngModel)]="newStage.implementationPeriod" class="form-control">
-
-        <label>{{ t('scopeOfProcedure') }}</label>
-        <input [(ngModel)]="newStage.scopeOfProcedure" class="form-control">
-      </div>
-
       <!-- ============================= -->
-      <!-- STEP 2 -->
-      <!-- ============================= -->
-      <div *ngIf="currentStep === 2">
+<!-- STEP 1 -->
+<!-- ============================= -->
+<div *ngIf="currentStep === 1" class="step-1">
 
-        <label>{{ t('selectionMethod') }}</label>
-        <input [(ngModel)]="newStage.selectionMethod" class="form-control">
+  <label>{{ t('stageCode') }}</label>
+  <input required [(ngModel)]="newStage.stageCode" #stageCode="ngModel" class="form-control">
+  <span *ngIf="stageCode.invalid && stageCode.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('examplesOfUse') }}</label>
-        <textarea [(ngModel)]="newStage.examplesOfUse" class="form-control"></textarea>
+  <label>{{ t('stage') }}</label>
+  <input required [(ngModel)]="newStage.stage" #stage="ngModel" class="form-control">
+  <span *ngIf="stage.invalid && stage.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('ias') }}</label>
-        <input [(ngModel)]="newStage.IAS" class="form-control">
+  <label>{{ t('entityType') }}</label>
+  <input required [(ngModel)]="newStage.entityType" #entityType="ngModel" class="form-control">
+  <span *ngIf="entityType.invalid && entityType.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('ifrs') }}</label>
-        <input [(ngModel)]="newStage.IFRS" class="form-control">
+  <label>{{ t('economicSector') }}</label>
+  <input required [(ngModel)]="newStage.economicSector" #economicSector="ngModel" class="form-control">
+  <span *ngIf="economicSector.invalid && economicSector.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('isa') }}</label>
-        <input [(ngModel)]="newStage.ISA" class="form-control">
+  <label>{{ t('procedure') }}</label>
+  <textarea required [(ngModel)]="newStage.procedure" #procedure="ngModel" class="form-control"></textarea>
+  <span *ngIf="procedure.invalid && procedure.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('relevantPolicies') }}</label>
-        <textarea [(ngModel)]="newStage.relevantPolicies" class="form-control"></textarea>
-        <label>{{ t('detailedStageExplanation') }}</label>
-        <textarea [(ngModel)]="newStage.detailedExplanation" class="form-control"></textarea>
+  <label>{{ t('responsibleAuthority') }}</label>
+  <input required [(ngModel)]="newStage.responsibleAuthority" #responsibleAuthority="ngModel" class="form-control">
+  <span *ngIf="responsibleAuthority.invalid && responsibleAuthority.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('formsToBeCompleted') }}</label>
-        <textarea [(ngModel)]="newStage.formsToBeCompleted" class="form-control"></textarea>
-      </div>
+  <label>{{ t('implementationPeriod') }}</label>
+  <input required [(ngModel)]="newStage.implementationPeriod" #implementationPeriod="ngModel" class="form-control">
+  <span *ngIf="implementationPeriod.invalid && implementationPeriod.touched" class="error-text">هذا الحقل مطلوب</span>
 
-      <!-- ============================= -->
-      <!-- STEP 3 -->
-      <!-- ============================= -->
-      <div *ngIf="currentStep === 3">
+  <label>{{ t('scopeOfProcedure') }}</label>
+  <input required [(ngModel)]="newStage.scopeOfProcedure" #scopeOfProcedure="ngModel" class="form-control">
+  <span *ngIf="scopeOfProcedure.invalid && scopeOfProcedure.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('practicalReviewProcedures') }}</label>
-        <textarea [(ngModel)]="newStage.practicalProcedures" class="form-control"></textarea>
+</div>
 
-        <label>{{ t('associatedRisks') }}</label>
-        <textarea [(ngModel)]="newStage.associatedRisks" class="form-control"></textarea>
+<!-- ============================= -->
+<!-- STEP 2 -->
+<!-- ============================= -->
+<div *ngIf="currentStep === 2" class="step-2">
 
-        <label>{{ t('riskLevel') }}</label>
-        <input [(ngModel)]="newStage.riskLevel" class="form-control">
+  <label>{{ t('selectionMethod') }}</label>
+  <input [(ngModel)]="newStage.selectionMethod" class="form-control">
 
-        <label>{{ t('outputs') }}</label>
-        <textarea [(ngModel)]="newStage.outputs" class="form-control"></textarea>
+  <label>{{ t('examplesOfUse') }}</label>
+  <textarea [(ngModel)]="newStage.examplesOfUse" class="form-control"></textarea>
 
-        <label>{{ t('strengths') }}</label>
-        <textarea [(ngModel)]="newStage.strengths" class="form-control"></textarea>
+  <label>{{ t('ias') }}</label>
+  <input [(ngModel)]="newStage.IAS" class="form-control">
 
-        <label>{{ t('potentialWeaknesses') }}</label>
-        <textarea [(ngModel)]="newStage.potentialWeaknesses" class="form-control"></textarea>
+  <label>{{ t('ifrs') }}</label>
+  <input [(ngModel)]="newStage.IFRS" class="form-control">
 
-        <label>{{ t('performanceIndicators') }}</label>
-        <textarea [(ngModel)]="newStage.performanceIndicators" class="form-control"></textarea>
-      </div>
+  <label>{{ t('isa') }}</label>
+  <input [(ngModel)]="newStage.ISA" class="form-control">
+
+  <label>{{ t('relevantPolicies') }}</label>
+  <textarea [(ngModel)]="newStage.relevantPolicies" class="form-control"></textarea>
+
+  <label>{{ t('detailedStageExplanation') }}</label>
+  <textarea [(ngModel)]="newStage.detailedExplanation" class="form-control"></textarea>
+
+  <label>{{ t('formsToBeCompleted') }}</label>
+  <textarea [(ngModel)]="newStage.formsToBeCompleted" class="form-control"></textarea>
+
+</div>
+
+<!-- ============================= -->
+<!-- STEP 3 -->
+<!-- ============================= -->
+<div *ngIf="currentStep === 3" class="step-3">
+
+  <label>{{ t('practicalReviewProcedures') }}</label>
+  <textarea [(ngModel)]="newStage.practicalProcedures" class="form-control"></textarea>
+
+  <label>{{ t('associatedRisks') }}</label>
+  <textarea [(ngModel)]="newStage.associatedRisks" class="form-control"></textarea>
+
+  <label>{{ t('riskLevel') }}</label>
+  <input [(ngModel)]="newStage.riskLevel" class="form-control">
+
+  <label>{{ t('outputs') }}</label>
+  <textarea [(ngModel)]="newStage.outputs" class="form-control"></textarea>
+
+  <label>{{ t('strengths') }}</label>
+  <textarea [(ngModel)]="newStage.strengths" class="form-control"></textarea>
+
+  <label>{{ t('potentialWeaknesses') }}</label>
+  <textarea [(ngModel)]="newStage.potentialWeaknesses" class="form-control"></textarea>
+
+  <label>{{ t('performanceIndicators') }}</label>
+  <textarea [(ngModel)]="newStage.performanceIndicators" class="form-control"></textarea>
+
+</div>
+
 
     </div>
 

@@ -118,18 +118,44 @@ searchTerm: string = '';
 }
 
   loadReviews() {
-    this.reviewService.getAccountGuides().subscribe((res: any) => {
-      const data = res.data || res;
-      this.allReviews = data.map((item: any) => ({
-        ...item,
-        selected: false
-      }));
-      this.totalItems = this.allReviews.length;
-      this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-      this.updateDisplayedData();
-      this.calculatePagination();
-    });
-  }
+  this.reviewService.getAccountGuides().subscribe((res: any) => {
+    const data = res.data || res;
+
+    this.allReviews = data.map((item: any) => ({
+      ...item,
+      selected: false
+    }));
+
+    // ⭐ ترتيب مبدئي حسب level
+    this.allReviews.sort((a, b) => Number(a.level) - Number(b.level));
+
+    this.totalItems = this.allReviews.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    this.updateDisplayedData();
+    this.calculatePagination();
+  });
+}
+sortAsc: boolean = true;
+
+sortByLevel() {
+  this.sortAsc = !this.sortAsc;
+
+  this.allReviews.sort((a, b) => {
+    const A = Number(a.level);
+    const B = Number(b.level);
+
+    // لو level نص وليس رقم، استخدم المقارنة النصية:
+    if (isNaN(A) || isNaN(B)) {
+      return this.sortAsc
+        ? a.level.localeCompare(b.level)
+        : b.level.localeCompare(a.level);
+    }
+
+    return this.sortAsc ? A - B : B - A;
+  });
+
+  this.updateDisplayedData();
+}
 
   openAddModal(review?: ReviewItem) {
     this.isModalOpen = true;
@@ -146,9 +172,13 @@ searchTerm: string = '';
   }
 
   prevStep() { if(this.currentStep>1) this.currentStep--; }
-  nextStep() { if(this.currentStep<3) this.currentStep++; }
+  nextStep() {
+  if (!this.validateCurrentStep()) return;
+  if (this.currentStep < 3) this.currentStep++;
+}
 
  submitReview() {
+  if (!this.validateCurrentStep()) return;
   if (this.editingId) {
     // تحضير كل الحقول
    const payload = {
@@ -373,5 +403,27 @@ handleExport() {
 
   this.closeExportModal();
 }
+validateCurrentStep(): boolean {
+  const step = document.querySelector(`.step-${this.currentStep}`);
+  if (!step) return false;
+
+  const inputs = step.querySelectorAll('input, textarea');
+  let valid = true;
+
+  inputs.forEach((input: any) => {
+    // يجعل Angular يعتبر الحقل touched
+    input.dispatchEvent(new Event('blur'));
+
+    if (!input.value || !input.value.trim()) {
+      input.classList.add('input-error');
+      valid = false;
+    } else {
+      input.classList.remove('input-error');
+    }
+  });
+
+  return valid;
+}
+
 
 }

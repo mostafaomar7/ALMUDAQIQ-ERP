@@ -14,5 +14,7 @@ export const AR = {
   usersLimit : 'حد المستخدمين',
   update : 'تحديث',
   cancel : 'الغاء',
-  editPlan : 'تعديل الخطة'
+  editPlan : 'تعديل الخطة',
+  maxFileSizeMB : 'اقصي حجم الفايلات',
+  fileLimit : 'حدود الفايلات'
 };

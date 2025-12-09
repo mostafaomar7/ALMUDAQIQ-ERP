@@ -29,5 +29,6 @@ export const AR = {
         send : 'ارسال' ,
     cancel : 'الغاء',
     yourResponse : 'ردك' ,
-    respondToComplaint : 'رد علي المشكلة'
+    respondToComplaint : 'رد علي المشكلة',
+    delete : 'مسح'
 };

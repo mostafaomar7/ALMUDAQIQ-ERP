@@ -131,58 +131,76 @@
       </div>
 
       <!-- STEP 1: Basic -->
-      <div *ngIf="currentStep === 1">
-        <label>{{ t('codesCollected') }}</label>
-        <input type="text" [(ngModel)]="newGuide.codesCollected" class="form-control">
+      <div *ngIf="currentStep === 1" class="step-1">
 
-        <label>{{ t('implementationStatus') }}</label>
-        <input type="text" [(ngModel)]="newGuide.implementationStatus" class="form-control">
+  <label>{{ t('codesCollected') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.codesCollected" #codesCollected="ngModel" class="form-control">
+  <span *ngIf="codesCollected.invalid && codesCollected.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('actualPerformance') }}</label>
-        <input type="text" [(ngModel)]="newGuide.actualPerformance" class="form-control">
-      </div>
+  <label>{{ t('implementationStatus') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.implementationStatus" #implementationStatus="ngModel" class="form-control">
+  <span *ngIf="implementationStatus.invalid && implementationStatus.touched" class="error-text">هذا الحقل مطلوب</span>
 
-      <!-- STEP 2: Percentages -->
-      <div *ngIf="currentStep === 2">
-
-  <label>{{ t('ethicalCompliancePercentage') }}</label>
-  <input type="number" [(ngModel)]="newGuide.ethicalCompliancePercentage" class="form-control">
-
-  <label>{{ t('professionalPlanningPercentage') }}</label>
-  <input type="number" [(ngModel)]="newGuide.professionalPlanningPercentage" class="form-control">
-
-  <label>{{ t('internalControlPercentage') }}</label>
-  <input type="number" [(ngModel)]="newGuide.internalControlPercentage" class="form-control">
-
-  <label>{{ t('evidencePercentage') }}</label>
-  <input type="number" [(ngModel)]="newGuide.evidencePercentage" class="form-control">
-
-  <label>{{ t('evaluationPercentage') }}</label>
-  <input type="number" [(ngModel)]="newGuide.evaluationPercentage" class="form-control">
-
-  <label>{{ t('documentationPercentage') }}</label>
-  <input type="number" [(ngModel)]="newGuide.documentationPercentage" class="form-control">
+  <label>{{ t('actualPerformance') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.actualPerformance" #actualPerformance="ngModel" class="form-control">
+  <span *ngIf="actualPerformance.invalid && actualPerformance.touched" class="error-text">هذا الحقل مطلوب</span>
 
 </div>
 
+      <!-- STEP 2: Percentages -->
+      <div *ngIf="currentStep === 2" class="step-2">
+
+  <label>{{ t('ethicalCompliancePercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.ethicalCompliancePercentage" #ethical="ngModel" class="form-control">
+  <span *ngIf="ethical.invalid && ethical.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('professionalPlanningPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.professionalPlanningPercentage" #planning="ngModel" class="form-control">
+  <span *ngIf="planning.invalid && planning.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('internalControlPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.internalControlPercentage" #control="ngModel" class="form-control">
+  <span *ngIf="control.invalid && control.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('evidencePercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.evidencePercentage" #evidence="ngModel" class="form-control">
+  <span *ngIf="evidence.invalid && evidence.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('evaluationPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.evaluationPercentage" #evaluation="ngModel" class="form-control">
+  <span *ngIf="evaluation.invalid && evaluation.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('documentationPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.documentationPercentage" #documentation="ngModel" class="form-control">
+  <span *ngIf="documentation.invalid && documentation.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
 
       <!-- STEP 3: Codes / Policies -->
-      <div *ngIf="currentStep === 3">
-        <label>{{ t('codeOfEthics') }}</label>
-        <input type="text" [(ngModel)]="newGuide.codeOfEthics" class="form-control">
+      <div *ngIf="currentStep === 3" class="step-3">
 
-        <label>{{ t('policies') }}</label>
-        <textarea [(ngModel)]="newGuide.policies" class="form-control"></textarea>
+  <label>{{ t('codeOfEthics') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.codeOfEthics" #codeOfEthics="ngModel" class="form-control">
+  <span *ngIf="codeOfEthics.invalid && codeOfEthics.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('ifrs') }}</label>
-        <input type="text" [(ngModel)]="newGuide.ifrs" class="form-control">
+  <label>{{ t('policies') }}</label>
+  <textarea required [(ngModel)]="newGuide.policies" #policies="ngModel" class="form-control"></textarea>
+  <span *ngIf="policies.invalid && policies.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('ias') }}</label>
-        <input type="text" [(ngModel)]="newGuide.ias" class="form-control">
+  <label>{{ t('ifrs') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.ifrs" #ifrs="ngModel" class="form-control">
+  <span *ngIf="ifrs.invalid && ifrs.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('notes') }}</label>
-        <textarea [(ngModel)]="newGuide.notes" class="form-control"></textarea>
-      </div>
+  <label>{{ t('ias') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.ias" #ias="ngModel" class="form-control">
+  <span *ngIf="ias.invalid && ias.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('notes') }}</label>
+  <textarea required [(ngModel)]="newGuide.notes" #notes="ngModel" class="form-control"></textarea>
+  <span *ngIf="notes.invalid && notes.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
     </div>
 
     <div class="modal-footer">

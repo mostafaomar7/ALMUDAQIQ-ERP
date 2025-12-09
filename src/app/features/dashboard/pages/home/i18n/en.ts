@@ -8,7 +8,7 @@ export const EN = {
   month : 'month' ,
   lastyear: 'Last Year',
   export: 'Export',
-  totalUsers: 'Total Users',
+  totalUsers: 'Total Subscribers',
   downFromYesterday: '{{value}} Down from yesterday',
   filesCreated: 'Number of Files Created',
   upFromYesterday: '{{value}} Up from yesterday',
@@ -24,7 +24,7 @@ export const EN = {
   delete: 'Delete',
   search: 'Search',
   filter: 'Filter',
-  addNewUser: 'Add new User',
+  addNewUser: 'Add new Subscriber',
   name: 'Name',
   email: 'Email',
   mobile: 'Mobile',
@@ -108,7 +108,7 @@ export const EN = {
   commRegisterActivity: 'Commercial Register Activity',
   enterCommActivity: 'Enter activity',
   commRegisternumber : 'commercial Register number'  ,
-
+  commercialExpireDate : 'commercial Expire Date' ,
   // Step 4
   subPackage: 'Subscription Package',
   selectSubPackage: 'Select subscription package',
@@ -163,5 +163,10 @@ export const EN = {
 subscriptionEnd  : 'Subscription End' ,
 lastrenewal : 'last renewal ' ,
 Actions : 'Actions' ,
-custom : 'custom'
+custom : 'custom',
+maxFileSizeMB : 'maxFileSizeMB',
+  fileLimit : 'fileLimit',
+    exportTitle: "Export Data",
+  selectFileType: "Select file type",
+  download: "Download",
 };

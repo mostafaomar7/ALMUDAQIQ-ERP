@@ -14,5 +14,7 @@ export const EN = {
   usersLimit : 'usersLimit',
   update : 'update',
   cancel :'cancel',
-  editPlan : 'Edit Plan'
+  editPlan : 'Edit Plan',
+  maxFileSizeMB : 'maxFileSizeMB',
+  fileLimit : 'fileLimit'
 };

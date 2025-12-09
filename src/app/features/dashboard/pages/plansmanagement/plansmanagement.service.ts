@@ -10,9 +10,11 @@ export interface Plan {
   durationMonths: number;
   paidFees: number;
   usersLimit: number;
-  clientsLimit: number;
+  // clientsLimit: number;
   branchesLimit: number;
   isActive?: boolean;
+  maxFileSizeMB : number;
+  fileLimit : number ;
 }
 
 @Injectable({

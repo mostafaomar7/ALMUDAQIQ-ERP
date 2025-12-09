@@ -28,5 +28,7 @@ respondComplaint(complaintId: number, body: { response: string }): Observable<an
     const url = `${this.apiUrl}/${complaintId}/respond`;
     return this.http.patch(url, body);
 }
-
+deleteComplaints(id: number) {
+  return this.http.delete(`${this.apiUrl}/${id}`);
+}
 }

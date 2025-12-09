@@ -194,11 +194,36 @@ export class Filestagesguide implements OnInit {
     }
   }
   prevStep() { if (this.currentStep > 1) this.currentStep--; }
-  nextStep() { if (this.currentStep < 3) this.currentStep++; }
+  nextStep() {
+  if (!this.validateStep()) return;
+  if (this.currentStep < 3) this.currentStep++;
+}
 
+validateStep(): boolean {
+  const step = document.querySelector(`.step-${this.currentStep}`);
+  if (!step) return false;
+
+  const fields = step.querySelectorAll('input, textarea');
+  let isValid = true;
+
+  fields.forEach((field: any) => {
+    // يجعل Angular يعتبره touched
+    field.dispatchEvent(new Event('blur'));
+
+    if (!field.value || !field.value.trim()) {
+      field.classList.add('input-error');
+      isValid = false;
+    } else {
+      field.classList.remove('input-error');
+    }
+  });
+
+  return isValid;
+}
 
   // ---- Create / Update ----
   submitStage() {
+      if (!this.validateStep()) return;
     const payload: Partial<fileGuide> = {
       stageCode: this.newStage.stageCode || '',
       stage: this.newStage.stage || '',

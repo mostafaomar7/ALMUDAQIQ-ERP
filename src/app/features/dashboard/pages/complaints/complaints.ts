@@ -26,6 +26,7 @@ interface Complaint {
     id: number;
     subdomain: string;
   };
+  selected :boolean;
 }
 
 @Component({
@@ -238,4 +239,36 @@ sendResponse() {
       }
     });
 }
+deleteSelected() {
+  const selectedAccounts = this.complaintsData.filter(a => a.selected);
+
+  if (selectedAccounts.length === 0) {
+    Swal.fire('No selection', 'Please select at least one row to delete.', 'info');
+    return;
+  }
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `You are about to delete ${selectedAccounts.length} account(s).`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      selectedAccounts.forEach((acc: Complaint) => {
+        this.api.deleteComplaints(acc.id).subscribe({
+          next: () => {
+            this.complaintsData = this.complaintsData.filter((a: Complaint) => a.id !== acc.id);
+            this.fetchComplaints(); // تحديث الجدول
+          },
+          error: (err: any) => console.error(`Error deleting account ${acc.id}:`, err)
+        });
+      });
+
+      Swal.fire('Deleted!', 'Selected account(s) have been deleted.', 'success');
+    }
+  });
+}
+
 }

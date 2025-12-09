@@ -198,10 +198,32 @@ export class Reviewobjectivesguide implements OnInit {
     this.editingId = null;
   }
 
-  nextStep() { if (this.currentStep < 3) this.currentStep++; }
+  nextStep() {
+  if (!this.validateStep()) return;
+  if (this.currentStep < 3) this.currentStep++;
+}
+validateStep(): boolean {
+  const stepElement = document.querySelector(`.step-${this.currentStep}`);
+  if (!stepElement) return true;
+
+  const fields = stepElement.querySelectorAll('input[required], textarea[required]');
+  let valid = true;
+
+  fields.forEach((field: any) => {
+    field.dispatchEvent(new Event('blur'));
+    if (!field.value || field.value.trim() === '') {
+      valid = false;
+    }
+  });
+
+  return valid;
+}
+
   prevStep() { if (this.currentStep > 1) this.currentStep--; }
 
   submitGuide() {
+      if (!this.validateStep()) return;
+
     const payload: Partial<ReviewObjectives> = {
   codesCollected: this.newGuide.codesCollected || '',
 

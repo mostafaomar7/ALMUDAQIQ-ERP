@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { SubscriberService } from './subscriber.service';
 import Swal from 'sweetalert2';
 import { environment } from '../../../../../environment';
+import { HttpClient } from '@angular/common/http';
 
 type TranslationKey = keyof typeof EN;
 
@@ -37,20 +38,25 @@ formData: any = {
   taxCertificateFile: null,
   commercialRegisterDate: '',
   commercialRegisterNumber : '' ,
+  commercialExpireDate : '' ,
   fiscalYear: '',
   unifiedNumber: '',
-  unifiedNumberFile: null,
+  // unifiedNumberFile: null,
   commercialActivityFile: null,
   subscriptionType: '',
   subscriptionStartDate: '',
   subscriptionEndDate: '',
   numberOfUsers: '',
-  numberOfClients: '',
+  // numberOfClients: '',
   numberOfBranches: '',
   facilityLink: '',
   factoryLogo: null,
   language: '',
-  currency: 'SAR'
+  currency: '',
+  planId : '',
+  planDate : '',
+  fileLimit : '' ,
+  maxFileSizeMB : ''
 };
 
   translations: typeof EN = EN;
@@ -168,12 +174,68 @@ onFileSelect(event: any, field: string) {
   closeAddUserModal() {
     this.showAddUserModal = false;
   }
+validateStep(step: number): boolean {
+  switch (step) {
+
+    case 1:
+      return this.formData.countryId &&
+             this.formData.cityId
+            //  this.formData.regionId
+             ;
+
+    case 2:
+      return this.formData.licenseName &&
+             this.formData.licenseNumber &&
+             this.formData.licenseDate &&
+             this.formData.licenseType;
+
+    case 3:
+      return this.formData.ownersNames &&
+             this.formData.subscriberEmail &&
+             this.formData.primaryMobile &&
+             this.formData.legalEntityType &&
+             this.formData.legalEntityNationality &&
+             this.formData.taxNumber &&
+             this.formData.commercialRegisterDate &&
+             this.formData.fiscalYear &&
+             this.formData.unifiedNumber &&
+             this.formData.commercialRegisterNumber &&
+             this.formData.commercialExpireDate;
+
+    case 4:
+      return this.formData.subscriptionType &&
+            //  this.formData.subscriptionStartDate &&
+            //  this.formData.subscriptionEndDate &&
+             this.formData.numberOfUsers &&
+            //  this.formData.numberOfClients &&
+             this.formData.numberOfBranches;
+             this.formData.fileLimit;
+             this.formData.maxFileSizeMB;
+
+    case 5:
+      return true; // الخطوة 5 اختيارية
+
+    default:
+      return false;
+  }
+}
 
   nextStep() {
-    if (this.currentStep < this.totalSteps) {
-      this.currentStep++;
-    }
+  if (!this.validateStep(this.currentStep)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Missing information',
+      text: 'Please complete all required fields before proceeding.',
+      confirmButtonText: 'OK'
+    });
+    return;
   }
+
+  if (this.currentStep < this.totalSteps) {
+    this.currentStep++;
+  }
+}
+
 
   prevStep() {
     if (this.currentStep > 1) {
@@ -195,6 +257,19 @@ submitNewUser() {
     });
     return;
   }
+if (!this.validateStep(1) ||
+    !this.validateStep(2) ||
+    !this.validateStep(3) ||
+    !this.validateStep(4)) {
+
+  Swal.fire({
+    icon: 'error',
+    title: 'Required fields missing',
+    text: 'Please complete all mandatory steps before submitting.',
+  });
+
+  return;
+}
 
   if (!this.formData.cityId) {
     Swal.fire({
@@ -266,8 +341,12 @@ loadCountries() {
     }
   });
 }
+// داخل الكلاس Subscribers
+countryLinks: { name: string, url: string }[] = [];
+
+// داخل كلاس Subscribers
 onCountryChange() {
-  const countryId = this.formData.countryId;
+  const countryId = Number(this.formData.countryId);
 
   this.cities = [];
   this.regions = [];
@@ -276,11 +355,25 @@ onCountryChange() {
 
   if (!countryId) return;
 
-  this.subscriberService.getCitiesByCountry(countryId).subscribe({
-    next: (res) => {
-      this.cities = res;
-    }
-  });
+  const country = this.countries.find(c => c.id === countryId);
+  if (!country) return;
+
+  // تحميل المدن
+  this.cities = country.cities || [];
+
+  // الجنسية تلقائيًا
+  this.formData.legalEntityNationality = country.name;
+
+  // تعيين العملة تلقائيًا من ملف JSON
+  const currencyObj = this.currencies.find(c => c.id === countryId);
+  this.formData.currency = currencyObj ? currencyObj.currency : '';
+
+  // روابط الدولة
+  this.countryLinks = [
+    { name: 'CPA', url: country.cpaWebsite },
+    { name: 'Commerce Ministry', url: country.commerceWebsite },
+    { name: 'Tax/Zakat Authority', url: country.taxWebsite }
+  ];
 }
 
 onCityChange() {
@@ -347,7 +440,7 @@ showReminderModal: boolean = false;
   totalItems: number = 1250;
   goToPageInput: number | null = null;
 
-  constructor(public translate: TranslateService ,   private subscriberService: SubscriberService
+  constructor(public translate: TranslateService ,private http: HttpClient ,   private subscriberService: SubscriberService
 ) {
     this.currentLang = this.translate.currentLang;
   }
@@ -362,8 +455,42 @@ showReminderModal: boolean = false;
     this.loadCountries();
 // this.loadRenwalSubscribers();
 this.loadRenewalSubscribers();
-
+  this.loadPlans();
+    this.loadCountriesCurrency();
   }
+  currencies: any[] = [];
+loadCountriesCurrency() {
+  this.http.get<any[]>('assets/data/countries-currency.json').subscribe({
+    next: (data) => this.currencies = data,
+    error: (err) => console.error('Error loading countries-currency.json', err)
+  });
+}
+  plans: any[] = [];
+selectedPlan: any = null; // لتخزين الخطة المختارة
+
+loadPlans() {
+  this.subscriberService.getPlans().subscribe({
+    next: (res: any) => {
+      this.plans = res;
+    },
+    error: (err) => {
+      console.error('Error loading plans:', err);
+    }
+  });
+}
+onPlanChange(event: Event) {
+  const selectedId = Number((event.target as HTMLSelectElement).value);
+  const plan = this.plans.find(p => p.id === selectedId);
+  if (!plan) return;
+
+  this.selectedPlan = plan;
+  this.formData.subscriptionType = plan.name; // أو plan.id لو عايز تخزن id
+  this.formData.numberOfUsers = plan.usersLimit;
+  // this.formData.numberOfClients = plan.clientsLimit;
+  this.formData.numberOfBranches = plan.branchesLimit;
+  this.formData.fileLimit = plan.fileLimit;
+  this.formData.maxFileSizeMB = plan.maxFileSizeMB;
+}
 
   loadTranslations(lang: 'en' | 'ar') {
     this.translations = lang === 'en' ? EN : AR;
@@ -373,15 +500,33 @@ this.loadRenewalSubscribers();
     return this.translations[key] || key;
   }
 loadSubscribers() {
+  const { countryId, cityId, regionId, status, newSubscribersDays, endingSubscriptionDays } = this.filterData;
+
   this.subscriberService
-    .getSubscribers(this.subCurrentPage, this.subItemsPerPage, this.searchTerm, this.filterData)
+    .getSubscribers(
+      this.subCurrentPage,
+      this.subItemsPerPage,
+      this.searchTerm, // لو عندك سيرش عالمي
+      {
+        countryId,
+        cityId,
+        regionId,
+        status,
+        newSubscribersDays,
+        endingSubscriptionDays
+      }
+    )
     .subscribe({
       next: (res) => {
         this.subscribers = res.data;
-        this.subTotalItems = res.total;
+        this.subTotalItems = res.total || res.data.length;
+      },
+      error: (err) => {
+        console.error('Error loading subscribers:', err);
       }
     });
 }
+
 loadRenwalSubscribers() {
   this.subscriberService
     .getRenwalSubscribers(this.renCurrentPage, this.renItemsPerPage, this.searchTerm)
@@ -421,7 +566,7 @@ updateSelectedUsers() {
     ...sub,
     licenseCertificate: null,
     taxCertificateFile: null,
-    unifiedNumberFile: null,
+    // unifiedNumberFile: null,
     commercialActivityFile: null,
     factoryLogo: null
   };
@@ -654,4 +799,105 @@ closeSubscriberOverlay() {
   this.selectedSubscriber = null;
 }
 api_url = environment.apiUrl;
+autoUpdateStatus(newStatus: string) {
+  if (!newStatus) return;
+
+  const selected = this.subscribers.filter(u => u.selected);
+
+  if (selected.length !== 1) return;
+
+  const sub = selected[0];
+
+  this.subscriberService.updateSubscriberStatus(sub.id, newStatus)
+    .subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Status Updated Automatically!',
+          confirmButtonText: 'OK'
+        });
+
+        this.loadSubscribers(); // تحديث الجدول
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.error?.message || 'Something went wrong'
+        });
+      }
+    });
+}
+isExportModalOpen = false;
+selectedExportOption: 'excel' | 'pdf' | null = null;
+openExportModal() {
+  this.isExportModalOpen = true;
+}
+
+closeExportModal() {
+  this.isExportModalOpen = false;
+  this.selectedExportOption = null;
+}
+
+selectExportOption(option: 'excel' | 'pdf') {
+  this.selectedExportOption = option;
+}
+
+handleExport() {
+  if (!this.selectedExportOption) {
+    alert('Please select file type.');
+    return;
+  }
+
+  if (this.selectedExportOption === 'excel') {
+    this.exportToExcel();
+  }
+
+  if (this.selectedExportOption === 'pdf') {
+    this.exportToPDF();
+  }
+
+  this.closeExportModal();
+}
+
+exportToExcel() {
+  this.subscriberService.exportExcel().subscribe({
+    next: (file: Blob) => {
+      const blob = new Blob([file], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'subscribers.xlsx';
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err) => {
+      console.error('Excel export error:', err);
+      alert('Failed to export Excel file.');
+    }
+  });
+}
+exportToPDF() {
+  this.subscriberService.exportPDF().subscribe({
+    next: (file: Blob) => {
+      const blob = new Blob([file], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'subscribers.pdf';
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err) => {
+      console.error('PDF export error:', err);
+      alert('Failed to export PDF file.');
+    }
+  });
+}
+
+
 }

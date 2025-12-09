@@ -59,4 +59,22 @@ getRenwalSubscribers(page: number, limit: number, search: string = '') {
     }
   });
 }
+getCountryById(countryId: number) {
+  return this.http.get<any>(`${this.api_url}/countries/${countryId}`);
+}
+getPlans() {
+    return this.http.get(`${this.api_url}/plans`);
+  }
+  exportExcel(): Observable<Blob> {
+  return this.http.get(`${this.api_url}/subscribers/export/excel`, {
+    responseType: 'blob'
+  });
+}
+
+exportPDF(): Observable<Blob> {
+  return this.http.get(`${this.api_url}/subscribers/export/pdf`, {
+    responseType: 'blob'
+  });
+}
+
 }

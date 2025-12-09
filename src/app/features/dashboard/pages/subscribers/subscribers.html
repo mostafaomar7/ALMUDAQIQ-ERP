@@ -34,19 +34,20 @@
             </span> -->
              <!-- Status Select -->
               <select class="form-select form-select-sm"
-                      [disabled]="selectedUsers.length !== 1"
-                      [(ngModel)]="selectedSubscriberStatus">
+        [disabled]="selectedUsers.length !== 1"
+        [(ngModel)]="selectedSubscriberStatus"
+        (ngModelChange)="autoUpdateStatus($event)">
                 <option value="">Select Status</option>
                 <option value="ACTIVE">Active</option>
                 <option value="INACTIVE">Inactive</option>
                 <option value="PENDING">Pending</option>
               </select>
 
-              <button class="btn btn-sm btn-primary"
+              <!-- <button class="btn btn-sm btn-primary"
                       [disabled]="selectedUsers.length !== 1 || !selectedSubscriberStatus"
                       (click)="updateSubscriberStatus()">
                 Update Status
-              </button>
+              </button> -->
           </div>
         </div>
 
@@ -66,7 +67,7 @@
             <i class="fas fa-filter"></i> {{ t('filter') }}
           </button>
 
-          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2" (click)="openExportModal()">
             <i class="fas fa-cloud-arrow-down"></i> {{ t('export') }}
           </button>
 
@@ -88,7 +89,7 @@
               <th scope="col">{{ t('mobile') }}</th>
               <th scope="col">{{ t('country') }}</th>
               <th scope="col">{{ t('city') }}</th>
-              <th scope="col">{{ t('region') }}</th>
+              <!-- <th scope="col">{{ t('region') }}</th> -->
               <th scope="col">{{ t('LegalEntity') }}</th>
               <th scope="col">{{ t('LicenseNo') }}</th>
               <th scope="col">{{ t('LicenseDate') }}</th>
@@ -110,6 +111,7 @@
         [(ngModel)]="user.selected"
         class="custom-checkbox"
         id="chk{{i}}"
+        (click)="$event.stopPropagation()"
       />
     </td>
 <td class="fw-bold text-dark">{{ user.licenseName }}</td>
@@ -117,7 +119,7 @@
 <td class="text-muted">{{ user.primaryMobile }}</td>
 <td class="text-muted">{{ user.country?.name }}</td>
 <td class="text-muted">{{ user.city?.name }}</td>
-<td class="text-muted">{{ user.region?.name }}</td>
+<!-- <td class="text-muted">{{ user.region?.name }}</td> -->
 <td class="text-muted">{{ user.legalEntityType }}</td>
 <td class="text-muted">{{ user.licenseNumber }}</td>
 <td class="text-muted">{{ user.licenseDate }}</td>
@@ -466,7 +468,7 @@
         </div>
 
         <div class="row mb-4">
-          <div class="col-6">
+          <div class="col-12">
             <label class="form-label text-muted small">{{ t('city') }}</label>
               <select class="form-select"
               [(ngModel)]="formData.cityId"
@@ -480,7 +482,7 @@
 
       </select>
           </div>
-          <div class="col-6">
+          <!-- <div class="col-6">
             <label class="form-label text-muted small">{{ t('region') }}</label>
               <select class="form-select"
               [(ngModel)]="formData.regionId">
@@ -492,30 +494,22 @@
         </option>
 
       </select>
-          </div>
+          </div> -->
         </div>
 
         <!-- STATIC LINKS (unchanged) -->
-        <div class="row g-3">
-          <div class="col-6">
-            <div class="d-flex align-items-start gap-2">
-              <i class="fas fa-gavel text-muted mt-1"></i>
-              <div>
-                <div class="fw-bold small">{{ t('cpa') }}</div>
-                <a href="#" class="text-muted x-small text-decoration-none">https://socpa.org.sa</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="d-flex align-items-start gap-2">
-              <i class="fas fa-building text-muted mt-1"></i>
-              <div>
-                <div class="fw-bold small">{{ t('commerceMinistry') }}</div>
-                <a href="#" class="text-muted x-small text-decoration-none">https://mc.gov.sa</a>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="row g-3" *ngIf="countryLinks.length > 0">
+  <div class="col-6" *ngFor="let link of countryLinks">
+    <div class="d-flex align-items-start gap-2">
+      <i class="fas fa-building text-muted mt-1"></i>
+      <div>
+        <div class="fw-bold small">{{ link.name }}</div>
+        <a [href]="link.url" target="_blank" class="text-muted x-small text-decoration-none">{{ link.url }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
       </div>
 
       <!-- STEP 2 -->
@@ -586,9 +580,9 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('legalEntityNationality') }}</label>
-          <input class="form-control" [(ngModel)]="formData.legalEntityNationality">
-        </div>
+  <label class="form-label text-muted small">{{ t('legalEntityNationality') }}</label>
+  <input class="form-control" [(ngModel)]="formData.legalEntityNationality" readonly>
+</div>
 
         <!-- TAX NUMBER + FILE -->
         <div class="mb-3">
@@ -598,10 +592,6 @@
         </div>
 
         <!-- DATES -->
-        <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('commRegisterDate') }}</label>
-          <input type="date" class="form-control text-muted" [(ngModel)]="formData.commercialRegisterDate">
-        </div>
 
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('fiscalYear') }}</label>
@@ -612,7 +602,7 @@
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('unifiedNumber') }}</label>
           <input type="text" class="form-control mb-2" [(ngModel)]="formData.unifiedNumber">
-          <input type="file" class="form-control" (change)="onFileSelect($event,'unifiedNumberFile')">
+          <!-- <input type="file" class="form-control" (change)="onFileSelect($event,'unifiedNumberFile')"> -->
         </div>
 
         <!-- Activity -->
@@ -622,48 +612,64 @@
           <input type="file" class="form-control" (change)="onFileSelect($event,'commercialActivityFile')">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('commRegisternumber) }}</label>
+          <label class="form-label text-muted small"> {{ t('commRegisternumber') }}</label>
           <input type="text" class="form-control mb-2" [(ngModel)]="formData.commercialRegisterNumber">
         </div>
-
+        <div class="mb-3">
+          <label class="form-label text-muted small">{{ t('commRegisterDate') }}</label>
+          <input type="date" class="form-control text-muted" [(ngModel)]="formData.commercialRegisterDate">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small"> {{ t('commercialExpireDate') }}</label>
+          <input type="date" class="form-control mb-2 text-muted" [(ngModel)]="formData.commercialExpireDate">
+        </div>
       </div>
 
       <!-- STEP 4 -->
       <div *ngIf="currentStep === 4">
-        <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('subPackage') }}</label>
-          <select class="form-select" [(ngModel)]="formData.subscriptionType">
-            <option>{{ t('selectSubPackage') }}</option>
-            <option value="monthly">Monthly</option>
-            <option value="annual">Annual</option>
-          </select>
-        </div>
 
-        <div class="row mb-3">
-          <div class="col-6">
-            <label class="form-label text-muted small">{{ t('startDate') }}</label>
-            <input type="date" class="form-control" [(ngModel)]="formData.subscriptionStartDate">
-          </div>
-          <div class="col-6">
-            <label class="form-label text-muted small">{{ t('endDate') }}</label>
-            <input type="date" class="form-control" [(ngModel)]="formData.subscriptionEndDate">
-          </div>
-        </div>
-
+<div class="row mb-3">
+  <div class="col-6">
+    <label class="form-label text-muted small">{{ t('startDate') }}</label>
+    <input type="date" class="form-control" [(ngModel)]="formData.subscriptionStartDate">
+  </div>
+  <div class="col-6">
+    <label class="form-label text-muted small">{{ t('endDate') }}</label>
+    <input type="date" class="form-control" [(ngModel)]="formData.subscriptionEndDate">
+  </div>
+</div>
         <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('numOfUsers') }}</label>
-          <input class="form-control" [(ngModel)]="formData.numberOfUsers">
-        </div>
+  <label class="form-label text-muted small">{{ t('subPackage') }}</label>
+  <select class="form-select" [(ngModel)]="formData.planId"
+        (change)="onPlanChange($event)">
+  <option value="">{{ t('selectSubPackage') }}</option>
+  <option *ngFor="let plan of plans" [value]="plan.id">{{ plan.name }}</option>
+</select>
 
-        <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('numOfFiles') }}</label>
-          <input class="form-control" [(ngModel)]="formData.numberOfClients">
-        </div>
+</div>
 
-        <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('numOfBranches') }}</label>
-          <input class="form-control" [(ngModel)]="formData.numberOfBranches">
-        </div>
+<div class="mb-3">
+  <label class="form-label text-muted small">{{ t('numOfUsers') }}</label>
+  <input class="form-control" [(ngModel)]="formData.numberOfUsers" readonly>
+</div>
+
+<!-- <div class="mb-3">
+  <label class="form-label text-muted small">{{ t('numOfFiles') }}</label>
+  <input class="form-control" [(ngModel)]="formData.numberOfClients" readonly>
+</div> -->
+
+<div class="mb-3">
+  <label class="form-label text-muted small">{{ t('numOfBranches') }}</label>
+  <input class="form-control" [(ngModel)]="formData.numberOfBranches" readonly>
+</div>
+<div class="mb-3">
+  <label class="form-label text-muted small">{{ t('fileLimit') }}</label>
+  <input class="form-control" [(ngModel)]="formData.fileLimit" readonly>
+</div>
+<div class="mb-3">
+  <label class="form-label text-muted small">{{ t('maxFileSizeMB') }}</label>
+  <input class="form-control" [(ngModel)]="formData.maxFileSizeMB" readonly>
+</div>
       </div>
 
       <!-- STEP 5 -->
@@ -690,7 +696,7 @@
 
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('currencySettings') }}</label>
-          <input class="form-control" value="SAR" [(ngModel)]="formData.currency" readonly>
+          <input class="form-control" [(ngModel)]="formData.currency" readonly>
         </div>
 
       </div>
@@ -811,35 +817,131 @@
     <h3 class="mb-3">Subscriber Details</h3>
 
     <div class="details-grid">
+  <div><strong>Name:</strong> {{ selectedSubscriber?.licenseName }}</div>
+  <div><strong>Email:</strong> {{ selectedSubscriber?.subscriberEmail }}</div>
+  <div><strong>Mobile:</strong> {{ selectedSubscriber?.primaryMobile }}</div>
 
-      <div><strong>Name:</strong> {{ selectedSubscriber?.licenseName }}</div>
-      <div><strong>Email:</strong> {{ selectedSubscriber?.subscriberEmail }}</div>
-      <div><strong>Mobile:</strong> {{ selectedSubscriber?.primaryMobile }}</div>
+  <div><strong>Country:</strong> {{ selectedSubscriber?.country?.name }}</div>
+  <div><strong>City:</strong> {{ selectedSubscriber?.city?.name }}</div>
+  <!-- <div><strong>Region:</strong> {{ selectedSubscriber?.region?.name }}</div> -->
 
-      <div><strong>Country:</strong> {{ selectedSubscriber?.country?.name }}</div>
-      <div><strong>City:</strong> {{ selectedSubscriber?.city?.name }}</div>
-      <div><strong>Region:</strong> {{ selectedSubscriber?.region?.name }}</div>
+  <div><strong>License Number:</strong> {{ selectedSubscriber?.licenseNumber }}</div>
+  <div><strong>License Date:</strong> {{ selectedSubscriber?.licenseDate | date:'yyyy-MM-dd' }}</div>
+  <div><strong>License Type:</strong> {{ selectedSubscriber?.licenseType }}</div>
+  <div><strong>Legal Entity:</strong> {{ selectedSubscriber?.legalEntityType }}</div>
+  <div><strong>Nationality:</strong> {{ selectedSubscriber?.legalEntityNationality }}</div>
+  <div><strong>Owners:</strong> {{ selectedSubscriber?.ownersNames }}</div>
+  <div><strong>Commercial Register Number:</strong> {{ selectedSubscriber?.commercialRegisterNumber }}</div>
+  <div><strong>Commercial Register Date:</strong> {{ selectedSubscriber?.commercialRegisterDate | date:'yyyy-MM-dd' }}</div>
 
-      <div><strong>License Number:</strong> {{ selectedSubscriber?.licenseNumber }}</div>
-      <div><strong>License Date:</strong> {{ selectedSubscriber?.licenseDate | date }}</div>
-      <div><strong>Legal Entity:</strong> {{ selectedSubscriber?.legalEntityType }}</div>
+  <div><strong>Tax Number:</strong> {{ selectedSubscriber?.taxNumber }}</div>
+  <div><strong>Unified Number:</strong> {{ selectedSubscriber?.unifiedNumber }}</div>
+  <div><strong>Fiscal Year:</strong> {{ selectedSubscriber?.fiscalYear | date:'yyyy-MM-dd' }}</div>
 
-      <div><strong>Tax Number:</strong> {{ selectedSubscriber?.taxNumber }}</div>
-      <div><strong>Unified Number:</strong> {{ selectedSubscriber?.unifiedNumber }}</div>
+  <div><strong>Subscription Start:</strong>
+       {{ selectedSubscriber?.subscriptionStartDate ? (selectedSubscriber.subscriptionStartDate | date:'yyyy-MM-dd') : '—' }}
+  </div>
+  <div><strong>Subscription End:</strong>
+       {{ selectedSubscriber?.subscriptionEndDate ? (selectedSubscriber.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
+  </div>
 
-      <div><strong>Subscription End:</strong>
-        {{ selectedSubscriber?.subscriptionEndDate ? (selectedSubscriber.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
-      </div>
+  <div><strong>Status:</strong> {{ selectedSubscriber?.status }}</div>
+  <div><strong>Plan:</strong> {{ selectedSubscriber?.plan?.name }}</div>
+  <div><strong>Paid Fees:</strong> {{ selectedSubscriber?.plan?.paidFees || '—' }}</div>
+  <div><strong>Users Limit:</strong> {{ selectedSubscriber?.plan?.usersLimit || '—' }}</div>
+  <!-- <div><strong>Clients Limit:</strong> {{ selectedSubscriber?.plan?.clientsLimit || '—' }}</div> -->
+  <div><strong>Branches Limit:</strong> {{ selectedSubscriber?.plan?.branchesLimit || '—' }}</div>
 
-      <div><strong>Status:</strong> {{ selectedSubscriber?.status }}</div>
+  <div><strong>Subdomain:</strong> {{ selectedSubscriber?.subdomain }}</div>
+  <div><strong>Facility Link:</strong> {{ selectedSubscriber?.facilityLink || '—' }}</div>
+  <!-- <div><strong>Language:</strong> {{ selectedSubscriber?.language || '—' }}</div> -->
+  <div><strong>Currency:</strong> {{ selectedSubscriber?.currency || '—' }}</div>
+  <!-- <div><strong>Internal Notes:</strong> {{ selectedSubscriber?.internalNotes || '—' }}</div> -->
 
-      <div class="image-box">
-        <strong>Factory Logo:</strong><br>
-        <img *ngIf="selectedSubscriber?.factoryLogo"
-             [src]="api_url + '/' + selectedSubscriber.factoryLogo"
-             class="preview-img">
-      </div>
+  <!-- الملفات -->
+  <div><strong>License Certificate:</strong>
+       <a *ngIf="selectedSubscriber?.licenseCertificate"
+          [href]="api_url + '/' + selectedSubscriber.licenseCertificate" target="_blank">
+          View
+       </a>
+  </div>
+  <div><strong>Commercial Register File:</strong>
+       <a *ngIf="selectedSubscriber?.commercialRegisterFile"
+          [href]="api_url + '/' + selectedSubscriber.commercialRegisterFile" target="_blank">
+          View
+       </a>
+  </div>
+  <div><strong>Tax Certificate:</strong>
+       <a *ngIf="selectedSubscriber?.taxCertificateFile"
+          [href]="api_url + '/' + selectedSubscriber.taxCertificateFile" target="_blank">
+          View
+       </a>
+  </div>
+  <!-- <div><strong>Unified Number File:</strong>
+       <a *ngIf="selectedSubscriber?.unifiedNumberFile"
+          [href]="api_url + '/' + selectedSubscriber.unifiedNumberFile" target="_blank">
+          View
+       </a>
+  </div> -->
+  <div><strong>Commercial Activity File:</strong>
+       <a *ngIf="selectedSubscriber?.commercialActivityFile"
+          [href]="api_url + '/' + selectedSubscriber.commercialActivityFile" target="_blank">
+          View
+       </a>
+  </div>
 
+  <!-- صورة المصنع -->
+  <div class="image-box">
+    <strong>Factory Logo:</strong><br>
+    <img *ngIf="selectedSubscriber?.factoryLogo"
+         [src]="api_url + '/' + selectedSubscriber.factoryLogo"
+         class="preview-img">
+  </div>
+</div>
+
+  </div>
+</div>
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+  <div class="export-modal-container">
+
+    <div class="export-header">
+      <h3>{{ t('exportTitle') }}</h3>
+      <button class="close-btn" (click)="closeExportModal()">×</button>
     </div>
+
+    <p class="export-subtitle">{{ t('selectFileType') }}</p>
+
+
+      <div class="export-options-grid">
+
+  <!-- Excel -->
+  <div class="export-option-card"
+       [class.selected]="selectedExportOption==='excel'"
+       (click)="selectExportOption('excel')">
+    <div class="file-icon green">
+      <i class="fa-solid fa-file-excel"></i>
+    </div>
+    <span>Excel file</span>
+  </div>
+
+  <!-- PDF -->
+  <div class="export-option-card"
+       [class.selected]="selectedExportOption==='pdf'"
+       (click)="selectExportOption('pdf')">
+    <div class="file-icon red">
+      <i class="fa-solid fa-file-pdf"></i>
+    </div>
+    <span>PDF file</span>
+  </div>
+
+</div>
+
+
+    <div class="export-footer">
+      <button class="btn-primary download-btn" (click)="handleExport()">
+    <i class="fa-solid fa-download"></i> {{ t('download') }}
+</button>
+    </div>
+
   </div>
 </div>

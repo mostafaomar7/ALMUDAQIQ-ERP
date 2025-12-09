@@ -280,3 +280,17 @@
   font-size: 13px;
   color: #666;
 }
+.input-error {
+  border: 1px solid red !important;
+}
+
+.error-text {
+  color: red;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.step input {
+  margin-bottom: 5px;
+}

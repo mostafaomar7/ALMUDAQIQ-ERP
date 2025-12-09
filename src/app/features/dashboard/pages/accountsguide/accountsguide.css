@@ -666,3 +666,15 @@
   border-radius: 6px;
 }
 
+.shake {
+  animation: shake 0.25s ease-in-out;
+  border: 1px solid red !important;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}

@@ -12,7 +12,7 @@ export const appConfig = {
 
     provideHttpClient(
       withInterceptors([
-        AuthInterceptor 
+        AuthInterceptor
       ])
     )
 

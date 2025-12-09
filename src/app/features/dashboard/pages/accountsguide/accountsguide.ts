@@ -169,26 +169,43 @@ filterAccounts() {
     next: (res: any) => {
       const dataArray: AccountGuide[] = res.data || []; // نجيب المصفوفة من المفتاح data
       this.allAccounts = dataArray.map(a => ({
-        id: a.id,
-        name: a.accountName || '',
-        level: a.level,
-        number: a.accountNumber.toString(),
-        rules: a.rulesAndRegulations || '',
-        notes: a.disclosureNotes || '',
-        code: a.code1 || '',
-        objectiveCode : a.objectiveCode,
-        relatedObjectives : a.relatedObjectives,
-        selected: false
-      }));
+  id: a.id,
+  name: a.accountName || '',
+  level: a.level,
+  number: a.accountNumber.toString(),
+  rules: a.rulesAndRegulations || '',
+  notes: a.disclosureNotes || '',
+  code: a.code1 || '',
+  objectiveCode : a.objectiveCode,
+  relatedObjectives : a.relatedObjectives,
+  selected: false
+}));
 
-      this.totalItems = this.allAccounts.length;
-      this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-      this.updateDisplayedData();
-      this.calculatePagination();
+// ⭐ ترتيب حسب level
+// this.allAccounts.sort((a, b) => Number(a.level) - Number(b.level));
+
+this.totalItems = this.allAccounts.length;
+this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+this.updateDisplayedData();
+this.calculatePagination();
+
     },
     error: (err) => console.error('Error fetching accounts:', err)
   });
 }
+sortAsc = true;
+
+// sortByLevel() {
+//   this.sortAsc = !this.sortAsc;
+
+//   this.allAccounts.sort((a, b) => {
+//     return this.sortAsc
+//       ? Number(a.level) - Number(b.level)
+//       : Number(b.level) - Number(a.level);
+//   });
+
+//   this.updateDisplayedData();
+// }
 
 deleteSelected() {
   const selectedAccounts = this.displayedAccounts.filter(a => a.selected);
@@ -224,7 +241,6 @@ deleteSelected() {
     }
   });
 }
-
 
   updateDisplayedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -303,11 +319,31 @@ toggleAll() {
     return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
   }
   nextStep() {
-    // 💡 يمكن إضافة تحقق هنا قبل الانتقال للخطوة التالية (مثل التحقق من صحة البيانات المدخلة في الخطوة الحالية)
-    if (this.currentStep < 3) { // 3 هي العدد الكلي للخطوات
-      this.currentStep++;
+  const currentStepElement = document.querySelector(`.step-${this.currentStep}`);
+
+  if (!currentStepElement) return;
+
+  // نجيب كل الحقول في الخطوة الحالية فقط
+  const fields = currentStepElement.querySelectorAll('input, textarea');
+
+  let isValid = true;
+
+  fields.forEach((field: any) => {
+    field.classList.add('ng-touched'); // عشان الرسالة تظهر
+
+    if (!field.value || field.value.trim() === '') {
+      field.classList.add('shake');   // هزة بسيطة (اختياري)
+      isValid = false;
     }
+  });
+
+  if (!isValid) return; // منع الانتقال
+
+  // لو الخطوة سليمة → انتقل
+  if (this.currentStep < 3) {
+    this.currentStep++;
   }
+}
 
   // 🆕 للعودة إلى الخطوة السابقة
   prevStep() {

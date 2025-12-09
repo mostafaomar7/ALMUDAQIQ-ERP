@@ -31,6 +31,16 @@
   flex-grow: 1;
   /* justify-content: flex-end; */
 }
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.input-error {
+  border: 1px solid red !important;
+}
 
 .edit-actions {
   display: flex;

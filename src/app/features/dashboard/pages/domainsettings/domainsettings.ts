@@ -320,9 +320,19 @@ saveCity(): void {
     next: (res: any) => {
       const newCity = res.city;
 
-      // ⬅️ إضافة المدينة فوراً في الـ array بدون Refresh
-      this.cities.push({
+      // ⭐ أولاً: أضفه إلى الدولة المختارة
+      if (!this.selectedCountry.cities) {
+        this.selectedCountry.cities = [];
+      }
+      this.selectedCountry.cities.push({
         ...newCity,
+        regions: []
+      });
+
+      // ⭐ ثانياً: أضفه إلى addedCities إذا كنت تستخدمها في العرض
+      this.addedCities.push({
+        ...newCity,
+        regionsCount: 0,
         regions: []
       });
 

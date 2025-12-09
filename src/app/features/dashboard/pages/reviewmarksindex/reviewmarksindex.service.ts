@@ -56,5 +56,5 @@ export class ReviewmarksindexService {
   }
 
   exportAllPDF() { return this.http.get(`${this.apiUrl}/export/pdf`, { responseType: 'blob' }); }
-  exportAllExcel() { return this.http.get(`${this.apiUrl}/all/export/excel`, { responseType: 'blob' }); }
+  exportAllExcel() { return this.http.get(`${this.apiUrl}/export/excel`, { responseType: 'blob' }); }
 }

@@ -1,4 +1,7 @@
 /* تنسيق الكروت بزوايا دائرية ناعمة */
+.container-fluid{
+  padding-left: 0;
+}
 .card {
   border-radius: 0.75rem;
 }

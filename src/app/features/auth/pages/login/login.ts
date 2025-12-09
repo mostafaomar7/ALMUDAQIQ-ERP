@@ -73,4 +73,10 @@ export class Login implements OnInit {
         if (res) this.router.navigate(['/dashboard']);
       });
   }
+  showPassword: boolean = false;
+
+togglePassword() {
+  this.showPassword = !this.showPassword;
+}
+
 }

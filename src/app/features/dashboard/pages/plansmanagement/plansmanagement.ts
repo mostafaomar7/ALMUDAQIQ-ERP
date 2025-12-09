@@ -16,9 +16,11 @@ interface Plan {
   durationMonths: number;
   paidFees: number;
   branchesLimit: number;
-  clientsLimit: number;
+  // clientsLimit: number;
   usersLimit: number;
   selected?: boolean;
+  fileLimit : number ;
+  maxFileSizeMB : number ;
 }
 
 @Component({
@@ -55,8 +57,10 @@ export class Plansmanagement {
         durationMonths: p.durationMonths,
         paidFees: p.paidFees,
         usersLimit: p.usersLimit,
-        clientsLimit: p.clientsLimit,
+        // clientsLimit: p.clientsLimit,
         branchesLimit: p.branchesLimit,
+        fileLimit : p.fileLimit ,
+        maxFileSizeMB : p.maxFileSizeMB,
         selected: false,
       }));
     });

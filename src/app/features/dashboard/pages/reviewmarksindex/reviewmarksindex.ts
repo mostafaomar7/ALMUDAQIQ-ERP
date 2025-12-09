@@ -234,6 +234,8 @@ applySearch() {
     this.newMark = {};
   }
 submitMark() {
+    if (!this.validateStep()) return;
+
   // نجعل نسخة من newMark لتعديلها قبل الإرسال
   const body: Partial<Reviewmarksindex> = {};
 
@@ -312,7 +314,24 @@ submitMark() {
   currentStep: number = 1;
 
 nextStep() {
+  if (!this.validateStep()) return;
   if (this.currentStep < 3) this.currentStep++;
+}
+validateStep(): boolean {
+  const stepElement = document.querySelector(`.step-${this.currentStep}`);
+  if (!stepElement) return true;
+
+  const fields = stepElement.querySelectorAll('input[required], textarea[required]');
+  let valid = true;
+
+  fields.forEach((field: any) => {
+    field.dispatchEvent(new Event('blur'));
+    if (!field.value || field.value.toString().trim() === '') {
+      valid = false;
+    }
+  });
+
+  return valid;
 }
 
 prevStep() {

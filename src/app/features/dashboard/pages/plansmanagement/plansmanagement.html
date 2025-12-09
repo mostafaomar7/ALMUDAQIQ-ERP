@@ -29,8 +29,10 @@
         <th>{{ t('subscriptionDuration') }}</th>
         <th>{{ t('paidFees') }}</th>
         <th>{{ t('branchesLimit') }}</th>
-        <th>{{ t('clientsLimit') }}</th>
+        <!-- <th>{{ t('clientsLimit') }}</th> -->
         <th>{{ t('usersLimit') }}</th>
+        <th>{{ t('fileLimit') }}</th>
+        <th>{{ t('maxFileSizeMB') }}</th>
         <!-- <th>Actions</th> -->
       </tr>
     </thead>
@@ -41,11 +43,12 @@
         </td>
         <td>{{ plan.name }}</td>
         <td>{{ plan.description }}</td>
-        <td>{{ plan.durationMonths }}</td>
+        <td>{{ plan.durationMonths }} Months</td>
         <td>{{ plan.paidFees }}</td>
         <td>{{ plan.branchesLimit }}</td>
-        <td>{{ plan.clientsLimit }}</td>
         <td>{{ plan.usersLimit }}</td>
+        <td>{{ plan.fileLimit }}</td>
+        <td>{{ plan.maxFileSizeMB }} MB</td>
         <!-- <td>
           <button class="btn btn-sm btn-warning" (click)="openEditForm(plan)">
             {{ t('update') }}
@@ -66,8 +69,9 @@
       <input type="number" [(ngModel)]="editingPlan.durationMonths" name="durationMonths" required placeholder="{{ t('subscriptionDuration') }}" class="form-control mb-2">
       <input type="number" [(ngModel)]="editingPlan.paidFees" name="paidFees" required placeholder="{{ t('paidFees') }}" class="form-control mb-2">
       <input type="number" [(ngModel)]="editingPlan.branchesLimit" name="branchesLimit" placeholder="{{ t('branchesLimit') }}" class="form-control mb-2">
-      <input type="number" [(ngModel)]="editingPlan.clientsLimit" name="clientsLimit" placeholder="{{ t('clientsLimit') }}" class="form-control mb-2">
       <input type="number" [(ngModel)]="editingPlan.usersLimit" name="usersLimit" placeholder="{{ t('usersLimit') }}" class="form-control mb-2">
+      <input type="number" [(ngModel)]="editingPlan.fileLimit" name="clientsLimit" placeholder="{{ t('fileLimit') }}" class="form-control mb-2">
+      <input type="number" [(ngModel)]="editingPlan.maxFileSizeMB" name="clientsLimit" placeholder="{{ t('maxFileSizeMB') }}" class="form-control mb-2">
 
       <div class="d-flex gap-2 mt-3">
         <button type="submit" class="btn btn-primary">{{ editingPlan.id ? t('update') : t('addNewPlan') }}</button>

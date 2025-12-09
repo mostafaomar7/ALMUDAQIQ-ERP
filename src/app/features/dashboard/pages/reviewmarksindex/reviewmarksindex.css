@@ -303,3 +303,13 @@
   justify-content: flex-end;
   gap: 10px;
 }
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.input-error {
+  border: 1px solid red !important;
+}

@@ -1,4 +1,4 @@
-<div class="container-fluid" [class.rtl]="isRtl">
+<div class="container-fluid" id="dashboardToExport" [class.rtl]="isRtl">
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
   <div>
@@ -36,6 +36,10 @@
     <input type="date" class="form-control me-2" [value]="customFrom" (change)="onCustomFromChange($event)" />
     <input type="date" class="form-control" [value]="customTo" (change)="onCustomToChange($event)" />
   </div>
+  <button class="btn btn-export text-white d-flex align-items-center gap-1 ms-1" (click)="exportDashboard()">
+        <i class="fas fa-arrow-up-from-bracket me-2"></i>
+        {{ t('export') }}
+      </button>
 </div>
 
 </div>
@@ -111,14 +115,14 @@
 </div>
 
 <div class="container-fluid" [class.rtl]="isRtl" >
-  <div class="row mt-4">
+  <div class="row w-100 mt-4">
 
     <div class="col-lg-8 mb-4">
       <div class="card shadow-sm border-0 p-4 h-100">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
             <p class="text-muted mb-1">{{ t('totalIncome') }}</p>
-            <h3 class="fw-bold">$1,342,454</h3>
+            <h3 class="fw-bold">$0</h3>
           </div>
           <div class="d-flex gap-2">
   <!-- Dropdown للسنة -->
@@ -163,22 +167,22 @@
    </canvas>
 </div>
 
-      <div class="d-flex justify-content-around px-2 mt-4">
+      <div class="d-flex justify-content-around  mt-4">
         <div class="d-flex align-items-center">
           <span class="legend-dot" style="background-color: #007d58;"></span>
-          <span class="fw-medium small ms-2">
+          <span class="fw-medium small ">
             {{ t('open') }} ({{ complaintsKpi?.open || 0 }})
           </span>
         </div>
         <div class="d-flex align-items-center">
           <span class="legend-dot" style="background-color: #10b981;"></span>
-          <span class="fw-medium small ms-2">
+          <span class="fw-medium small ">
             {{ t('closed') }} ({{ complaintsKpi?.closed || 0 }})
           </span>
         </div>
         <div class="d-flex align-items-center">
           <span class="legend-dot" style="background-color: #34d399;"></span>
-          <span class="fw-medium small ms-2">
+          <span class="fw-medium small ">
             {{ t('pending') }} ({{ complaintsKpi?.pending || 0 }})
           </span>
         </div>
@@ -189,7 +193,7 @@
   </div>
 </div>
 
-<div class="row mt-4">
+<div class="row w-100 mt-4">
   <div class="col-12">
     <div class="card shadow-sm border-0 px-4">
       <div class="d-flex align-items-center flex-wrap py-4">
@@ -230,9 +234,9 @@
         <table class="table table-hover align-middle">
           <thead class="bg-light">
             <tr class="text-muted small text-uppercase">
-              <th scope="col" style="width: 50px;">
+              <!-- <th scope="col" style="width: 50px;">
                 <i class="far fa-square-minus text-success fs-5" role="button"></i>
-              </th>
+              </th> -->
               <th scope="col">{{ t('name') }}</th>
               <th scope="col">{{ t('email') }}</th>
               <th scope="col">{{ t('mobile') }}</th>
@@ -242,19 +246,19 @@
               <th scope="col">{{ t('LegalEntity') }}</th>
               <th scope="col">{{ t('LicenseNo') }}</th>
               <th scope="col">{{ t('LicenseDate') }}</th>
-              <th scope="col">{{ t('Status') }}</th>
-              <th scope="col">{{ t('SubscriptionEnd') }}</th>
+              <!-- <th scope="col">{{ t('Status') }}</th> -->
+              <!-- <th scope="col">{{ t('SubscriptionEnd') }}</th> -->
             </tr>
           </thead>
           <tbody>
              <tr *ngFor="let user of subscribers; let i = index" class="border-bottom">
-    <td>
+    <!-- <td>
       <input
         type="checkbox"
         class="custom-checkbox"
         id="chk{{i}}"
       />
-    </td>
+    </td> -->
 <td class="fw-bold text-dark">{{ user.licenseName }}</td>
 <td class="text-muted">{{ user.subscriberEmail }}</td>
 <td class="text-muted">{{ user.primaryMobile }}</td>
@@ -264,10 +268,10 @@
 <td class="text-muted">{{ user.legalEntityType }}</td>
 <td class="text-muted">{{ user.licenseNumber }}</td>
 <td class="text-muted">{{ user.licenseDate }}</td>
-<td class="text-muted">{{ user.status }}</td>
-<td class="text-muted">
+<!-- <td class="text-muted">{{ user.status }}</td> -->
+<!-- <td class="text-muted">
   {{ user.subscriptionEndDate ? (user.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
-</td>
+</td> -->
   </tr>
           </tbody>
         </table>
@@ -277,6 +281,6 @@
         </div>
       </div>
 
-    </div>>
+    </div>
   </div>
 </div>

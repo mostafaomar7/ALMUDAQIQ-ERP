@@ -197,52 +197,63 @@
       </div>
 
       <!-- Step 1 -->
-      <div *ngIf="currentStep===1" class="form-step">
-        <label>{{ t('name') }}</label>
-        <input type="text" [(ngModel)]="newMark.name" name="name" required>
+      <div *ngIf="currentStep===1" class="form-step step-1">
 
-        <label>{{ t('codeImage') }}</label>
-        <input type="text" [(ngModel)]="newMark.codeImage" name="codeImage">
+  <label>{{ t('name') }}</label>
+  <input type="text" [(ngModel)]="newMark.name" name="name" #name="ngModel" required class="form-control">
+  <span *ngIf="name.invalid && name.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('shortDescription') }}</label>
-        <textarea [(ngModel)]="newMark.shortDescription" name="shortDescription"></textarea>
-      </div>
+  <label>{{ t('codeImage') }}</label>
+  <input type="text" [(ngModel)]="newMark.codeImage" name="codeImage" class="form-control">
+
+  <label>{{ t('shortDescription') }}</label>
+  <textarea [(ngModel)]="newMark.shortDescription" name="shortDescription" class="form-control"></textarea>
+
+</div>
 
       <!-- Step 2 -->
-      <div *ngIf="currentStep===2" class="form-step">
-        <label>{{ t('suggestedStage') }}</label>
-        <input type="text" [(ngModel)]="newMark.suggestedStage" name="suggestedStage">
+      <div *ngIf="currentStep===2" class="form-step step-2">
 
-        <label>{{ t('whenToUse') }}</label>
-        <input type="text" [(ngModel)]="newMark.whenToUse" name="whenToUse">
+  <label>{{ t('suggestedStage') }}</label>
+  <input type="text" [(ngModel)]="newMark.suggestedStage" name="suggestedStage" #suggestedStage="ngModel" required class="form-control">
+  <span *ngIf="suggestedStage.invalid && suggestedStage.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('exampleShortForm') }}</label>
-        <input type="text" [(ngModel)]="newMark.exampleShortForm" name="exampleShortForm">
+  <label>{{ t('whenToUse') }}</label>
+  <input type="text" [(ngModel)]="newMark.whenToUse" name="whenToUse" #whenToUse="ngModel" required class="form-control">
+  <span *ngIf="whenToUse.invalid && whenToUse.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('sectorTags') }}</label>
-        <input type="text" [(ngModel)]="newMark.sectorTags" name="sectorTags">
-      </div>
+  <label>{{ t('exampleShortForm') }}</label>
+  <input type="text" [(ngModel)]="newMark.exampleShortForm" name="exampleShortForm" class="form-control">
+
+  <label>{{ t('sectorTags') }}</label>
+  <input type="text" [(ngModel)]="newMark.sectorTags" name="sectorTags" class="form-control">
+
+</div>
 
       <!-- Step 3 -->
-      <div *ngIf="currentStep===3" class="form-step">
-        <label>{{ t('assertion') }}</label>
-        <input type="text" [(ngModel)]="newMark.assertion" name="assertion">
+      <div *ngIf="currentStep===3" class="form-step step-3">
 
-        <label>{{ t('benchmark') }}</label>
-        <input type="text" [(ngModel)]="newMark.benchmark" name="benchmark">
+  <label>{{ t('assertion') }}</label>
+  <input type="text" [(ngModel)]="newMark.assertion" name="assertion" #assertion="ngModel" required class="form-control">
+  <span *ngIf="assertion.invalid && assertion.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('scoreWeight') }}</label>
-        <input type="number" [(ngModel)]="newMark.scoreWeight" name="scoreWeight" [ngModelOptions]="{updateOn:'blur'}">
+  <label>{{ t('benchmark') }}</label>
+  <input type="text" [(ngModel)]="newMark.benchmark" name="benchmark" #benchmark="ngModel" required class="form-control">
+  <span *ngIf="benchmark.invalid && benchmark.touched" class="error-text">هذا الحقل مطلوب</span>
 
-        <label>{{ t('severityLevel') }}</label>
-        <input type="number" [(ngModel)]="newMark.severityLevel" name="severityLevel" [ngModelOptions]="{updateOn:'blur'}">
+  <label>{{ t('scoreWeight') }}</label>
+  <input type="number" [(ngModel)]="newMark.scoreWeight" name="scoreWeight" #scoreWeight="ngModel" required class="form-control">
 
-        <label>{{ t('severityWeight') }}</label>
-        <input type="number" [(ngModel)]="newMark.severityWeight" name="severityWeight" [ngModelOptions]="{updateOn:'blur'}">
+  <label>{{ t('severityLevel') }}</label>
+  <input type="number" [(ngModel)]="newMark.severityLevel" name="severityLevel" #severityLevel="ngModel" required class="form-control">
 
-        <label>{{ t('priorityRating') }}</label>
-        <input type="text" [(ngModel)]="newMark.priorityRating" name="priorityRating">
-      </div>
+  <label>{{ t('severityWeight') }}</label>
+  <input type="number" [(ngModel)]="newMark.severityWeight" name="severityWeight" #severityWeight="ngModel" required class="form-control">
+
+  <label>{{ t('priorityRating') }}</label>
+  <input type="text" [(ngModel)]="newMark.priorityRating" name="priorityRating" #priorityRating="ngModel" required class="form-control">
+
+</div>
 
       <!-- Navigation Buttons -->
       <div class="modal-buttons">

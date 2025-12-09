@@ -109,7 +109,7 @@ export const AR = {
   enterUnifiedNumber: 'أدخل الرقم الموحد',
   commRegisterActivity: 'نشاط السجل التجاري',
   enterCommActivity: 'أدخل نشاط السجل التجاري',
-
+commercialExpireDate :  'تاريخ انتهاء الصلاحية التجاري' ,
   // الخطوة 4
   subPackage: 'باقة الاشتراك',
   selectSubPackage: 'اختر باقة الاشتراك',
@@ -165,5 +165,11 @@ subscriptionstart : 'subscription start',
 subscriptionEnd  : 'Subscription End' ,
 lastrenewal : 'last renewal ' ,
 Actions : 'Actions' ,
-custom : 'custom'
+custom : 'custom',
+  editPlan : 'تعديل الخطة',
+  maxFileSizeMB : 'اقصي حجم الفايلات',
+  fileLimit : 'حدود الفايلات',
+    exportTitle: "تصدير البيانات",
+  selectFileType: "اختر نوع الملف",
+  download: "تحميل",
 };

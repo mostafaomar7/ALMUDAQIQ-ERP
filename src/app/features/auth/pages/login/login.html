@@ -30,17 +30,30 @@
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="password-input" class="form-label">{{ t('password') }}</label>
-          <div class="position-relative password-wrapper">
-            <input id="password-input" type="password" placeholder="*************" class="form-control" formControlName="password">
-            <i class="fa fa-eye toggle-password"></i>
-          </div>
-          <div class="text-danger mt-1" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
-            <small *ngIf="form.get('password')?.errors?.['required']">{{ t('passwordRequired') }}</small>
-            <small *ngIf="form.get('password')?.errors?.['minlength']">{{ t('passwordMinLength') }}</small>
-          </div>
+       <div class="mb-3">
+        <label for="password-input" class="form-label">{{ t('password') }}</label>
+
+        <div class="position-relative password-wrapper">
+          <input
+            id="password-input"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="*************"
+            class="form-control"
+            formControlName="password">
+
+          <i
+            class="fa"
+            [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+            (click)="togglePassword()"
+            style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+          </i>
         </div>
+
+        <div class="text-danger mt-1" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+          <small *ngIf="form.get('password')?.errors?.['required']">{{ t('passwordRequired') }}</small>
+          <small *ngIf="form.get('password')?.errors?.['minlength']">{{ t('passwordMinLength') }}</small>
+        </div>
+      </div>
 
         <div class="text-end mb-3">
           <a routerLink="/auth/forgot-password" class="text-black fs-6 text-decoration-none">{{ t('forgotPassword') }}</a>
