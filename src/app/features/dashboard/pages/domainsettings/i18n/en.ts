@@ -40,5 +40,7 @@ export const EN = {
   saveCity: 'Save City',
   saveRegion: 'Save Region',
     selectCityForRegion: 'Select City for Region',
-
+cancel : 'cancel',
+yesDelete : 'yesDelete' ,
+confirmDelete : 'confirmDelete',
 };

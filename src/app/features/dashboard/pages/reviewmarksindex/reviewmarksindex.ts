@@ -118,7 +118,18 @@ export class ReviewmarksindexComponent implements OnInit {
   }
 
   // ---- Selection ----
-  toggleSelection(mark: Reviewmarksindex) { mark.selected = !mark.selected; }
+toggleSelection(mark: Reviewmarksindex) {
+  mark.selected = !mark.selected;
+
+  if (mark.selected) {
+    this.selectedMark = mark;
+    this.displayedMarks.forEach(m => {
+      if (m !== mark) m.selected = false;
+    });
+  } else {
+    this.selectedMark = null;
+  }
+}
   toggleAll() {
     const allSelected = this.displayedMarks.every(m => m.selected);
     this.displayedMarks.forEach(m => m.selected = !allSelected);
@@ -137,6 +148,8 @@ export class ReviewmarksindexComponent implements OnInit {
 
   // ---- Search ----
 applySearch() {
+  this.selectedMark = null;
+
   const text = this.searchText.trim().toLowerCase();
 
   // فلترة allMarks مباشرة بدون إعادة slice
@@ -223,7 +236,7 @@ applySearch() {
 };
   } else {
     this.isEditMode = true;
-    this.newMark = { ...mark };
+    this.newMark = JSON.parse(JSON.stringify(mark));
   }
   this.currentStep = 1;
   this.isModalOpen = true;

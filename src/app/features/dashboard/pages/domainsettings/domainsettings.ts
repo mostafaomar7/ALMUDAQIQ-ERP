@@ -205,12 +205,11 @@ onStateChange(event: any) {
   this.regions = [];
 }
 
-onCityChange(event: any) {
-  this.selectedCity = JSON.parse(event.target.value);
-  this.selectedRegion = null;
-  // إذا عندك بيانات المناطق من API أو من addedCities
-  this.regions = this.selectedCity.regions || [];
-}
+// onCityChange(event: any) {
+//   this.selectedCity = JSON.parse(event.target.value);
+//   this.selectedRegion = null;
+//   this.regions = this.selectedCity.regions || [];
+// }
 
   clear(type: string) {
     switch(type) {
@@ -232,10 +231,10 @@ saveAll() {
     Swal.fire('Error', 'Please select a country', 'error');
     return;
   }
-  if (!this.selectedCity?.name) {
-    Swal.fire('Error', 'Please select a city', 'error');
-    return;
-  }
+  // if (!this.selectedCity?.name) {
+  //   Swal.fire('Error', 'Please select a city', 'error');
+  //   return;
+  // }
 
   const countryBody = {
     name: this.selectedCountry.name,
@@ -341,6 +340,41 @@ saveCity(): void {
       this.closeCityModal();
     },
     error: (err) => console.error(err)
+  });
+}
+deleteCity(city: any) {
+  if (!city?.id) {
+    Swal.fire('Error', 'City id not found', 'error');
+    return;
+  }
+
+  Swal.fire({
+    title: this.t('confirmDelete'),
+    text: `${this.t('delete')} ${city.name}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: this.t('yesDelete'),
+    cancelButtonText: this.t('cancel')
+  }).then(result => {
+    if (result.isConfirmed) {
+      this.domainService.deleteCities(city.id).subscribe({
+        next: () => {
+          // 🟢 احذف من الجدول فورًا
+          this.addedCities = this.addedCities.filter(c => c.id !== city.id);
+
+          // 🟢 احذف من الدولة المختارة لو موجودة
+          if (this.selectedCountry?.cities) {
+            this.selectedCountry.cities =
+              this.selectedCountry.cities.filter((c: any) => c.id !== city.id);
+          }
+
+          Swal.fire('Success', 'City deleted successfully', 'success');
+        },
+        error: () => {
+          Swal.fire('Error', 'Something went wrong', 'error');
+        }
+      });
+    }
   });
 }
 

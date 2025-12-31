@@ -55,7 +55,7 @@ exportAllPDF() {
 
 // === EXPORT ALL EXCEL ===
 exportAllExcel() {
-  return this.http.get(`${this.apiUrl}/all/export/excel`, {
+  return this.http.get(`${this.apiUrl}/export/excel`, {
     responseType: 'blob'
   });
 }

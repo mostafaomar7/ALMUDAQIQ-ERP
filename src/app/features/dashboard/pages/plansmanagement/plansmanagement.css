@@ -116,6 +116,16 @@
   background-color: #00875a;
   border-color: #00875a;
 }
+/* علامة الصح */
+.checkbox-icon.checked::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: rotate(-45deg);
+  display: block;
+}
 
 /* ستايل خاص لعلامة الناقص (Indeterminate) في الهيدر */
 .checkbox-icon.indeterminate {

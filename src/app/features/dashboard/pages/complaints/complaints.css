@@ -245,3 +245,34 @@ h3 {
 .complaint-row {
     cursor: pointer;
 }
+/* علامة الصح */
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid #047857;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  background-color: #fff;
+}
+
+/* الحالة Checked */
+.custom-checkbox:checked {
+  background-color: #047857; /* الخلفية الخضرا */
+  border-color: #047857;
+}
+
+/* علامة الصح SVG */
+.custom-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+}
+

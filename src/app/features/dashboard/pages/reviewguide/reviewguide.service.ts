@@ -53,7 +53,7 @@ iimportReviewGuides(file: File): Observable<HttpEvent<any>> {
 }
 
 exportAllPDF() { return this.http.get(`${this.apiUrl}/export/pdf`, { responseType: 'blob' }); }
-exportAllExcel() { return this.http.get(`${this.apiUrl}/all/export/excel`, { responseType: 'blob' }); }
+exportAllExcel() { return this.http.get(`${this.apiUrl}/export/excel`, { responseType: 'blob' }); }
 exportSelectedPDF(id: number) { return this.http.get(`${this.apiUrl}/${id}/export/pdf`, { responseType: 'blob' }); }
 exportSelectedExcel(id: number) { return this.http.get(`${this.apiUrl}/${id}/export/excel`, { responseType: 'blob' }); }
 

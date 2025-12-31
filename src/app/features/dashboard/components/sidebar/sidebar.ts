@@ -1,6 +1,7 @@
+import { routes } from './../../../../app.routes';
 // ... (الاستيرادات لم تتغير)
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Route, Router, RouterModule } from '@angular/router';
 import { ThemeService } from '../../../../core/services/theme.service';
 import { CommonModule } from '@angular/common';
 import { TranslateService } from '../../../../core/services/translate.service';
@@ -57,12 +58,14 @@ export class Sidebar implements OnInit {
     }
   ];
 
+
   // ... (Constructor و ngOnInit و loadTranslations لم تتغير، تذكر إضافة مفاتيح الترجمة الجديدة في EN و AR)
 
   constructor(
     public themeService: ThemeService,
     private languageService: TranslateService,
-    private auth : AuthService
+    private auth : AuthService,
+    private router : Router
   ) {}
 
   ngOnInit(): void {
@@ -96,7 +99,9 @@ export class Sidebar implements OnInit {
   toggleSettingsDropdown() {
     this.isSettingsOpen = !this.isSettingsOpen;
   }
-  logout(){
-    this.auth.logout();
-  }
+  logout() {
+  this.auth.logout();
+  this.router.navigate(['/auth/login']); // optional: redirect بعد logout
+}
+
 }

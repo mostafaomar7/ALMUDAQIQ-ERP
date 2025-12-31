@@ -28,10 +28,10 @@
 
                 <!-- Type Filter -->
                 <div class="dropdown-filter">
-                    <select class="form-select btn btn-outline-secondary btn-sm"
+                    <select class="form-select btn btn-outline-light btn-sm text-black"
                             [(ngModel)]="filterType"
                             (change)="fetchComplaints()">
-                        <option value="">{{ t('type') }}</option>
+                        <option value="" >{{ t('type') }}</option>
                         <option value="TECHNICAL">{{ t('technical') }}</option>
                         <option value="COMMERCIAL">{{ t('commercial') }}</option>
                     </select>

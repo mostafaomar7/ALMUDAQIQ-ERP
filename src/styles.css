@@ -84,6 +84,95 @@ body.dark-mode .user-name {
 body.dark-mode .activity-action {
   color: #afafaf;
 }
+body.dark-mode .container {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .title {
+  color: #fefefe;
+}
+body.dark-mode .header-text[_ngcontent-ng-c3111930374] h2[_ngcontent-ng-c3111930374] {
+  color: #fefefe;
+}
+body.dark-mode .custom-table[_ngcontent-ng-c4014098341] th[_ngcontent-ng-c4014098341] {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .domain-container[_ngcontent-ng-c3111930374] {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .card-footer-action[_ngcontent-ng-c3111930374] {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .data-table[_ngcontent-ng-c3111930374] th[_ngcontent-ng-c3111930374] {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .guide-container[_ngcontent-ng-c3688965817] {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .page-title[_ngcontent-ng-c3688965817] {
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .accounts-table[_ngcontent-ng-c3688965817] th[_ngcontent-ng-c3688965817]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .review-container[_ngcontent-ng-c2693189043]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .page-title[_ngcontent-ng-c2693189043]{
+  color: #fefefe;
+}
+body.dark-mode .review-container[_ngcontent-ng-c2693189043]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .review-table[_ngcontent-ng-c2693189043] th[_ngcontent-ng-c2693189043]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .stages-container[_ngcontent-ng-c4190476704]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .stages-table[_ngcontent-ng-c4190476704] th[_ngcontent-ng-c4190476704]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .objectives-container[_ngcontent-ng-c3086034582]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .objectives-table[_ngcontent-ng-c3086034582] th[_ngcontent-ng-c3086034582]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .marks-container[_ngcontent-ng-c1953642005]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .marks-table[_ngcontent-ng-c1953642005] th[_ngcontent-ng-c1953642005]{
+  background-color: #1e1e1e;
+  color: #fefefe;
+}
+body.dark-mode .menu[_ngcontent-ng-c3416707430] li[_ngcontent-ng-c3416707430] a.active-route[_ngcontent-ng-c3416707430]{
+  background-color: #6b6b66 !important;
+  color: #fefefe !important;
+}
+body.dark-mode .menu[_ngcontent-ng-c3416707430] li[_ngcontent-ng-c3416707430] a.active-route[_ngcontent-ng-c3416707430] i[_ngcontent-ng-c3416707430]{
+  color: #fefefe !important;
+}
+body.dark-mode .reminder{
+  background-color: #c9c9c9 !important;
+  border-radius: 8px;
+  padding: 4px;
+}
 /* 🆕 Modal Overlay and Container */
 /* ----------------------------------- */
 .modal-overlay {

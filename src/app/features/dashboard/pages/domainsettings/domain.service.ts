@@ -38,5 +38,7 @@ getStatesByCountry(countryId: number) {
 getCitiesByState(stateId: number) {
   return this.http.get<any[]>(`${this.api_url}/cities?stateId=${stateId}`);
 }
-
+deleteCities(cityId: number) {
+  return this.http.delete(`${this.api_url}/cities/${cityId}`);
+}
 }

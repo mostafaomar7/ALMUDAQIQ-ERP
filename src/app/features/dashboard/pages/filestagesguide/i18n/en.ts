@@ -44,5 +44,5 @@ export const EN = {
   implementationPeriod: 'implementation Period',
   strengths: 'strengths',
   potentialWeaknesses: 'potential Weaknesses',
-  performanceIndicators: 'Performance Indicators'
+  performanceIndicators: 'Performance Indicators',
 };

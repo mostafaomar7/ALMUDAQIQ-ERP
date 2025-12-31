@@ -42,10 +42,12 @@
   </ul>
 
   <div class="sidebar-footer">
-    <li class="btn btn-sm d-flex align-items-center" click="logout()">
-      <i class="fas fa-sign-out-alt mx-2"></i>
-      <a href="" class="text-decoration-none text-muted fs-6">{{ t('logout') }}</a>
-    </li>
+    <li class="btn btn-sm d-flex align-items-center" (click)="logout()">
+  <i class="fas fa-sign-out-alt mx-2"></i>
+  <a href="#" class="text-decoration-none text-muted fs-6" (click)="$event.preventDefault(); logout()">
+    {{ t('logout') }}
+  </a>
+</li>
   </div>
 
 </aside>
