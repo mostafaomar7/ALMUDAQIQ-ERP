@@ -27,7 +27,7 @@ export const EN = {
   go: 'Go',
   download: 'Download',
   dropFileHere: 'Drop your file here or click to browse',
-  fileTypesHint: 'Excel, Pdf, CSV',
+  fileTypesHint: 'Excel',
   selectFileType: 'Select the file type you would like to download',
   exportTitle: 'Export',
   importTitle: 'Import Files',

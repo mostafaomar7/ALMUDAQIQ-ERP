@@ -20,7 +20,7 @@ export const EN = {
   search: 'Search',
   import: 'Import',
   export: 'Export',
-  addNewGuide: 'Add new Guide',
+  addNewGuide: 'Add New Account',
 
   accountName: 'Account Name',
   level: 'Level',

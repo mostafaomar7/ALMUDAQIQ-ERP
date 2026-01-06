@@ -1,20 +1,26 @@
 import { Routes } from '@angular/router';
-import { Login } from './features/auth/pages/login/login';
-import { AUTH_ROUTES } from './features/auth/auth.routes';
-import { dashboardRoutes } from './features/dashboard/dashboard.routes';
+// import { AUTH_ROUTES } from './features/auth/auth.routes';
+// import { dashboardRoutes } from './features/dashboard/dashboard.routes';
 import { AuthGuard } from './features/dashboard/guard/auth.guard';
 import { GuestGuard } from './features/auth/guard/guest.guard';
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // root يذهب لـ dashboard
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
   {
     path: 'auth',
-    canActivate: [GuestGuard], // إذا مسجل دخول، يمنع الوصول
-    children: AUTH_ROUTES
+    canActivate: [GuestGuard],
+    loadChildren: () =>
+      import('./features/auth/auth.routes')
+        .then(r => r.AUTH_ROUTES)
   },
+
   {
     path: 'dashboard',
-    canActivate: [AuthGuard], // إذا لم يسجل دخول، يمنع الوصول
-    children: dashboardRoutes
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./features/dashboard/dashboard.routes')
+        .then(r => r.dashboardRoutes)
   },
-  { path: '**', redirectTo: '', pathMatch: 'full' } // fallback
+
+  { path: '**', redirectTo: '' }
 ];

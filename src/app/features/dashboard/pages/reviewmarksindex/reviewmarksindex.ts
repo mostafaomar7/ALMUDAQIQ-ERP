@@ -188,8 +188,35 @@ applySearch() {
           this.loadMarks();
         }
       },
-      error: err => { this.isUploading=false; console.error(err); Swal.fire(this.t('error'), this.t('somethingWentWrong'),'error'); }
-    });
+error: err => {
+  this.isUploading = false;
+  console.error('Import err', err);
+
+  // منطق ذكي لاستخراج الرسالة:
+  // نبحث في err.error.error أولاً لأن الباك اند يضع فيها التفاصيل
+  // ثم err.error.message
+  // ثم err.error نفسها (لو كانت String)
+
+  let displayMessage = this.t('somethingWentWrong');
+
+  if (err.error) {
+    if (typeof err.error.error === 'string') {
+      displayMessage = err.error.error; // ستجلب "Only Excel (.xlsx) files are allowed"
+    } else if (typeof err.error.message === 'string' && err.error.message !== 'Internal Server Error') {
+      displayMessage = err.error.message;
+    } else if (typeof err.error === 'string') {
+      displayMessage = err.error;
+    }
+  }
+
+  Swal.fire({
+    title: this.t('error'),
+    text: displayMessage,
+    icon: 'error',
+    // هذا يضمن أن SweetAlert سيبحث عن الحاوية الصحيحة
+    target: document.querySelector('.objectives-container') as HTMLElement || 'body'
+  });
+}    });
   }
 
   openExportModal(){ this.isExportModalOpen=true; }

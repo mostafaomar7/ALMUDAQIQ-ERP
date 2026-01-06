@@ -27,7 +27,7 @@ export const AR = {
   go: 'اذهب',
   download: 'تحميل',
   dropFileHere: 'اسحب ملفك هنا أو اضغط للاستعراض',
-  fileTypesHint: 'Excel, Pdf, CSV',
+  fileTypesHint: 'Excel',
   selectFileType: 'اختر نوع الملف الذي ترغب بتنزيله',
   exportTitle: 'تصدير',
   importTitle: 'استيراد ملفات',

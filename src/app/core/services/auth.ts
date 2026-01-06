@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environment';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -52,8 +53,23 @@ verifyEmailWithEmail(email: string, otp: string): Observable<any> {
   }
 
   // optional: helper to know if logged in
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
+isLoggedIn(): boolean {
+  const token = this.getToken();
+  if (!token) return false;
 
+  try {
+    const decoded: any = jwtDecode(token);
+    const now = Math.floor(Date.now() / 1000);
+
+    if (decoded.exp < now) {
+      this.logout();
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    this.logout();
+    return false;
+  }
+}
 }

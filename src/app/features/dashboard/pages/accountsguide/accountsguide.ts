@@ -413,17 +413,65 @@ uploadFile() {
       if (event.type === HttpEventType.UploadProgress && event.total) {
         this.uploadProgress = Math.round((100 * event.loaded) / event.total);
       } else if (event.type === HttpEventType.Response) {
-        // انتهاء الرفع
-        this.isUploading = false;
-        Swal.fire('Success', 'تم رفع الملف بنجاح', 'success');
-        this.closeImportModal();
-        this.loadAccounts(); // تحديث البيانات بعد الرفع
-      }
+  this.isUploading = false;
+
+  const res = event.body; // <-- ده الريسبونس اللي انت باعته من الباك
+
+  let message = `تم تنفيذ عملية الاستيراد بنجاح ✅<br>`;
+  let icon: any = 'success';
+
+  if (res.imported > 0) {
+    message += `✔ تم استيراد <b>${res.imported}</b> صف<br>`;
+  }
+
+  if (res.skipped > 0) {
+    message += `⚠ تم تخطي <b>${res.skipped}</b> صف (مكرر)<br>`;
+    icon = 'warning';
+  }
+
+  if (res.errors > 0) {
+    message += `❌ يوجد <b>${res.errors}</b> أخطاء`;
+    icon = 'error';
+  }
+
+  Swal.fire({
+    title: 'نتيجة الاستيراد',
+    html: message,
+    icon: icon,
+    confirmButtonText: 'حسناً'
+  });
+
+  this.closeImportModal();
+  this.loadAccounts();
+}
+
     },
-    error: (err) => {
-      this.isUploading = false;
-      Swal.fire('Error', 'فشل رفع الملف', 'error');
-    }
+error: (err) => {
+  this.isUploading = false;
+
+  let message = 'حدث خطأ غير متوقع';
+
+  if (err?.error) {
+    message =
+      err.error.error ||
+      err.error.message ||
+      message;
+  }
+
+  // 🔥 اقفل المودال الأول
+  this.closeImportModal();
+
+  // ⏱️ استنى frame صغير
+  setTimeout(() => {
+    Swal.fire({
+      title: 'خطأ أثناء الاستيراد',
+      text: message,
+      icon: 'error',
+      confirmButtonText: 'حسناً'
+    });
+  }, 0);
+}
+
   });
 }
 openExportModal() {
@@ -490,6 +538,39 @@ handleExport() {
   }
 
   this.closeExportModal();
+}
+// 🆕 تحديث المستوى تلقائيًا بناءً على عدد الأرقام في رقم الحساب
+updateLevelBasedOnAccountNumber() {
+  const numStr = this.newAccount.accountNumber?.toString() || '';
+  const len = numStr.length;
+
+  if (len === 0) {
+    this.newAccount.level = '';
+  } else if (len === 1) {
+    this.newAccount.level = 'مستوى أول';
+  } else if (len === 2) {
+    this.newAccount.level = 'مستوى ثاني';
+  } else if (len === 3 || len === 4) {
+    this.newAccount.level = 'مستوى ثالث';
+  } else if (len > 4) {
+    this.newAccount.level = 'مستوى رابع';
+  }
+}
+onAccountNumberChange() {
+  if (!this.newAccount.accountNumber) return;
+
+  // نشيل أي حاجة غير أرقام
+  this.newAccount.accountNumber =
+    this.newAccount.accountNumber.replace(/\D/g, '');
+
+  // نثبت الحد الأقصى 8
+  if (this.newAccount.accountNumber.length > 8) {
+    this.newAccount.accountNumber =
+      this.newAccount.accountNumber.slice(0, 8);
+  }
+
+  // تحديث المستوى
+  this.updateLevelBasedOnAccountNumber();
 }
 
 }

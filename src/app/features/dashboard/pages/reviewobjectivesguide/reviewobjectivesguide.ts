@@ -314,29 +314,53 @@ validateStep(): boolean {
   onFileDropped(e: DragEvent) { e.preventDefault(); if (e.dataTransfer?.files.length) this.selectedFile = e.dataTransfer.files[0]; }
   onDragOver(e: DragEvent) { e.preventDefault(); }
 
-  uploadFile() {
-    if (!this.selectedFile) return;
-    this.isUploading = true;
-    this.uploadProgress = 0;
-    this.svc.iimportReviewObjectives(this.selectedFile).subscribe({
-      next: event => {
-        if (event.type === HttpEventType.UploadProgress && event.total) {
-          this.uploadProgress = Math.round((100 * event.loaded) / event.total);
-        } else if (event.type === HttpEventType.Response) {
-          this.isUploading = false;
-          Swal.fire(this.t('success'), this.t('fileUploaded') || 'File uploaded','success');
-          this.closeImportModal();
-          this.loadGuides();
-        }
-      },
-      error: err => {
+ uploadFile() {
+  if (!this.selectedFile) return;
+  this.isUploading = true;
+  this.uploadProgress = 0;
+
+  this.svc.iimportReviewObjectives(this.selectedFile).subscribe({
+    next: event => {
+      if (event.type === HttpEventType.UploadProgress && event.total) {
+        this.uploadProgress = Math.round((100 * event.loaded) / event.total);
+      } else if (event.type === HttpEventType.Response) {
         this.isUploading = false;
-        console.error('Import err', err);
-        Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+        Swal.fire({
+          title: this.t('success'),
+          text: this.t('fileUploaded') || 'File uploaded',
+          icon: 'success',
+          target: 'body' // يضمن ظهورها فوق كل شيء
+        });
+        this.closeImportModal();
+        this.loadGuides();
       }
-    });
+    },
+    error: err => {
+  this.isUploading = false;
+  console.error('Import err', err);
+
+  let displayMessage = this.t('somethingWentWrong');
+
+  if (err.error) {
+    if (typeof err.error.error === 'string') {
+      displayMessage = err.error.error; // ستجلب "Only Excel (.xlsx) files are allowed"
+    } else if (typeof err.error.message === 'string' && err.error.message !== 'Internal Server Error') {
+      displayMessage = err.error.message;
+    } else if (typeof err.error === 'string') {
+      displayMessage = err.error;
+    }
   }
 
+  Swal.fire({
+    title: this.t('error'),
+    text: displayMessage,
+    icon: 'error',
+    // هذا يضمن أن SweetAlert سيبحث عن الحاوية الصحيحة
+    target: document.querySelector('.objectives-container') as HTMLElement || 'body'
+  });
+}
+  });
+}
   openExportModal() { this.isExportModalOpen = true; }
   closeExportModal() { this.isExportModalOpen = false; this.selectedExportOption = null; }
 

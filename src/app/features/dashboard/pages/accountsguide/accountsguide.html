@@ -60,7 +60,7 @@
         <th>{{ t('code') }}</th>
         <th>{{ t('objectiveCode') }}</th>
         <th>{{ t('relatedObjectives') }}</th>
-        <th>Actions</th>
+        <!-- <th>Actions</th> -->
       </tr>
       </thead>
 
@@ -87,11 +87,11 @@
         <td>{{ account.objectiveCode }}</td>
         <td>{{ account.relatedObjectives }}</td>
 
-        <td>
+        <!-- <td>
           <button class="btn-text" (click)="openAddModal(account)">
             <i class="fa-regular fa-pen-to-square"></i> Edit
           </button>
-        </td>
+        </td> -->
 
       </tr>
       </tbody>
@@ -182,6 +182,7 @@
   <!-- level -->
   <label>{{ t('level') }}</label>
   <input type="text"
+  disabled
          name="level"
          [(ngModel)]="newAccount.level"
          #level="ngModel"
@@ -197,17 +198,24 @@
 
   <!-- accountNumber -->
   <label>{{ t('accountNumber') }}</label>
-  <input type="number"
-         name="accountNumber"
-         [(ngModel)]="newAccount.accountNumber"
-         #accountNumber="ngModel"
-         required
-         class="form-control"
-         [placeholder]="t('enterAccountNumber')">
+  <input
+  type="text"
+  name="accountNumber"
+  [(ngModel)]="newAccount.accountNumber"
+  (ngModelChange)="onAccountNumberChange()"
+  #accountNumber="ngModel"
+  required
+  maxlength="8"
+  class="form-control"
+/>
 
-  <div class="text-danger" *ngIf="accountNumber.invalid && accountNumber.touched">
-    <small *ngIf="accountNumber.errors?.['required']">هذا الحقل مطلوب</small>
-  </div>
+<div class="text-danger"
+     *ngIf="accountNumber.invalid && accountNumber.touched">
+  <small *ngIf="accountNumber.errors?.['required']">
+    هذا الحقل مطلوب
+  </small>
+</div>
+
 
   <!-- objectiveCode -->
   <label>{{ t('objectiveCode') }}</label>

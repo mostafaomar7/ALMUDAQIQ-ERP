@@ -13,7 +13,10 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "esModuleInterop": true,          /* يسمح باستيراد مكتبات CommonJS كـ Modules */
+    "allowSyntheticDefaultImports": true, /* يسمح بـ default import للمكتبات اللي مفيهاش default */
+    // ... باقي الإعدادات كما هي
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

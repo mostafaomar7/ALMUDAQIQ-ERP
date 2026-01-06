@@ -60,7 +60,10 @@
   padding: 6px 8px;
   border-radius: 4px;
 }
-
+/* ضع هذا في ملف styles.css العالمي فقط */
+.swal2-container {
+  z-index: 999999 !important;
+}
 .btn-text:hover {
   background-color: #f5f5f5;
 }

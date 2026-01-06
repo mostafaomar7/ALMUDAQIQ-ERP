@@ -1,24 +1,151 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from '../home/i18n/en';
 import { AR } from '../home/i18n/ar';
-import { FormsModule } from '@angular/forms';
 import { SubscriberService } from './subscriber.service';
 import Swal from 'sweetalert2';
 import { environment } from '../../../../../environment';
-import { HttpClient } from '@angular/common/http';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatDatepickerModule, MatDatepicker } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
 
+// 🛑 الحل القاتل: استيراد moment-hijri مباشرة كـ default
+// @ts-ignore
+import moment from 'moment-hijri';
+
+// تعريف الأنواع يدوياً عشان TypeScript ميعملش Errors
+type Moment = any;
 type TranslationKey = keyof typeof EN;
 
-@Component({
+export const HIJRI_DATE_FORMATS = {
+  parse: { dateInput: 'iYYYY/iMM/iDD' },
+  display: {
+    dateInput: 'iD iMMMM iYYYY',
+    monthYearLabel: 'iMMMM iYYYY',
+    dateA11yLabel: 'iD iMMMM iYYYY',
+    monthYearA11yLabel: 'iMMMM iYYYY',
+  }
+};
+
+@Injectable()
+export class HijriMomentDateAdapter extends MomentDateAdapter {
+  constructor() {
+    super('ar-SA');
+    moment.locale('ar-SA');
+  }
+
+  // 1️⃣ لإظهار رقم السنة الهجرية في قائمة السنين (بدل 2025 يظهر 1447)
+  override getYearName(date: any): string {
+    return String((moment(date) as any).iYear());
+  }
+
+  // 2️⃣ لإظهار أرقام الأيام صح (بدل ما يظهر كله 1)
+  override getDateNames(): string[] {
+    const dateNames: string[] = [];
+    for (let i = 1; i <= 31; i++) {
+      dateNames.push(String(i)); // مصفوفة من "1" إلى "31"
+    }
+    return dateNames;
+  }
+
+  override getYear(date: any): number {
+    return (moment(date) as any).iYear();
+  }
+
+  override getMonth(date: any): number {
+    return (moment(date) as any).iMonth();
+  }
+
+  override getDate(date: any): number {
+    return (moment(date) as any).iDate();
+  }
+
+  override getNumDaysInMonth(date: any): number {
+    return (moment(date) as any).iDaysInMonth();
+  }
+
+  override createDate(year: number, month: number, date: number): any {
+    if (month < 0 || month > 11) throw Error(`Invalid month index "${month}".`);
+    if (date < 1) throw Error(`Invalid date "${date}".`);
+
+    // إنشاء التاريخ هجرياً
+    const result = (moment() as any).locale('ar-SA').iYear(year).iMonth(month).iDate(date);
+    result.hours(0).minutes(0).seconds(0).milliseconds(0);
+
+    if (!result.isValid()) throw Error(`Invalid Hijri date.`);
+    return result;
+  }
+
+  override format(date: any, displayFormat: string): string {
+    return (moment(date) as any).locale('ar-SA').format(displayFormat);
+  }
+
+  override getMonthNames(style: 'long' | 'short' | 'narrow'): string[] {
+    return ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+  }
+
+  // مصفوفة أيام الأسبوع
+  override getDayOfWeekNames(style: 'long' | 'short' | 'narrow'): string[] {
+    return ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
+  }
+}@Component({
   selector: 'app-subscribers',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+imports: [
+  CommonModule,
+  FormsModule,
+  MatDatepickerModule,
+  MatInputModule,
+  MatMomentDateModule   // ✅ مهم جدًا
+],
   templateUrl: './subscribers.html',
   styleUrls: ['./subscribers.css'],
+providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'ar-SA' },
+    { provide: DateAdapter, useClass: HijriMomentDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: HIJRI_DATE_FORMATS }
+  ]
 })
 export class Subscribers implements OnInit {
+  // 1. تحويل الـ Moment (الهجري) إلى نص ميلادي ليعرض في الـ input type="date"
+convertToGregorian(momentDate: any): string {
+  if (momentDate && moment.isMoment(momentDate)) {
+    // يجب التحويل لـ locale english لضمان أرقام YYYY-MM-DD صحيحة
+    return momentDate.clone().locale('en').format('YYYY-MM-DD');
+  }
+  return '';
+}
+private searchSubject = new Subject<string>();
+// 2. عند تغيير التاريخ الهجري (تحديث الميلادي يتم تلقائياً بسبب الربط في convertToGregorian)
+syncFromHijri(field: string, value: any) {
+  this.formData[field] = value;
+}
+
+// 3. عند تغيير التاريخ الميلادي (تحديث الـ Moment الهجري)
+syncFromGregorian(field: string, gregDate: string) {
+  if (gregDate) {
+    // تحويل النص الميلادي إلى Moment Object (سيظهر هجري في الـ Picker)
+    this.formData[field] = moment(gregDate, 'YYYY-MM-DD').locale('ar-SA');
+  } else {
+    this.formData[field] = null;
+  }
+}
+  formDataa = {
+    commercialRegisterDate: moment() // اجعلها تأخذ تاريخ اللحظة الحالية كـ moment object
+  };
+  @ViewChild('regPicker') regPicker!: MatDatepicker<any>;
+
+  openRegPicker() {
+    this.regPicker.open();
+  }
+onDateChange(date: any) {
+    if (date) console.log("التاريخ المختار:", date.format('iYYYY/iMM/iDD'));
+  }
 formData: any = {
   countryId: '',
   cityId: '',
@@ -36,9 +163,9 @@ formData: any = {
   legalEntityNationality: '',
   taxNumber: '',
   taxCertificateFile: null,
-  commercialRegisterDate: '',
   commercialRegisterNumber : '' ,
   commercialExpireDate : '' ,
+    commercialRegisterDate: moment() ,
   fiscalYear: '',
   unifiedNumber: '',
   // unifiedNumberFile: null,
@@ -247,36 +374,33 @@ validateStep(step: number): boolean {
   generatedLink: string = 'www.almudaqiq.khalil.com'; // الرابط الوهمي
   errorMessage: string = '';
 submitNewUser() {
-  // ✅ التحقق من اختيار الدولة والمدينة قبل الإرسال
-  if (!this.formData.countryId) {
+  // دالة مساعدة لتحويل الـ Moment object إلى نص ميلادي نظيف
+  const formatMoment = (val: any) => {
+  // التأكد من أنه Moment Object فعلاً
+  if (val && (moment.isMoment(val) || val._isAMomentObject)) {
+    // .clone() لعدم التأثير على الكائن الأصلي في الواجهة
+    // .locale('en') لضمان أرقام إنجليزية وتقويم ميلادي
+    return val.clone().locale('en').format('YYYY-MM-DD');
+  }
+  return val;
+};
+
+  // ✅ التحقق من اختيار الدولة والمدينة والخطوات الإلزامية
+  if (!this.formData.countryId || !this.formData.cityId) {
     Swal.fire({
       icon: 'error',
-      title: 'Error',
-      text: 'Please select a country before submitting.',
+      title: 'Missing information',
+      text: 'Please select a country and a city before proceeding.',
       confirmButtonText: 'OK'
     });
     return;
   }
-if (!this.validateStep(1) ||
-    !this.validateStep(2) ||
-    !this.validateStep(3) ||
-    !this.validateStep(4)) {
 
-  Swal.fire({
-    icon: 'error',
-    title: 'Required fields missing',
-    text: 'Please complete all mandatory steps before submitting.',
-  });
-
-  return;
-}
-
-  if (!this.formData.cityId) {
+  if (!this.validateStep(1) || !this.validateStep(2) || !this.validateStep(3) || !this.validateStep(4)) {
     Swal.fire({
       icon: 'error',
-      title: 'Error',
-      text: 'Please select a city before submitting.',
-      confirmButtonText: 'OK'
+      title: 'Required fields missing',
+      text: 'Please complete all mandatory steps before submitting.',
     });
     return;
   }
@@ -284,19 +408,30 @@ if (!this.validateStep(1) ||
   this.submissionStatus = 'loading';
 
   const fd = new FormData();
+
+  // ✅ نمر على كل المفاتيح ونحول التواريخ قبل الإضافة للـ FormData
   for (const key in this.formData) {
-    if (this.formData[key] !== null && this.formData[key] !== undefined) {
-      fd.append(key, this.formData[key]);
+    let value = this.formData[key];
+
+    // لو الحقل عبارة عن تاريخ Moment، نحوله لـ String ميلادي
+    if (
+      key.toLowerCase().includes('date') ||
+      key === 'commercialExpireDate' ||
+      key === 'subscriptionStartDate' ||
+      key === 'subscriptionEndDate'
+    ) {
+      value = formatMoment(value);
+    }
+
+    if (value !== null && value !== undefined) {
+      fd.append(key, value);
     }
   }
 
   let request$;
-
   if (this.isEditMode && this.editingSubscriberId) {
-    // UPDATE
     request$ = this.subscriberService.updateSubscriber(this.editingSubscriberId, fd);
   } else {
-    // CREATE
     request$ = this.subscriberService.createSubscriber(fd);
   }
 
@@ -305,35 +440,31 @@ if (!this.validateStep(1) ||
       this.submissionStatus = 'success';
       this.generatedLink = res.data.subdomain;
       this.showAddUserModal = false;
-
       Swal.fire({
         icon: 'success',
         title: this.isEditMode ? 'Subscriber Updated!' : 'Subscriber Added!',
         text: `Subscriber link: ${this.generatedLink}`,
         confirmButtonText: 'OK'
       });
-
       this.isEditMode = false;
       this.editingSubscriberId = null;
-
       this.loadSubscribers();
     },
     error: (err) => {
       this.submissionStatus = 'error';
-      this.errorMessage = err.error?.message || 'Something went wrong';
-
+this.errorMessage =
+  err?.error?.error ||     // License already exists ✅
+  err?.error?.message ||   // fallback
+  'Something went wrong';
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: this.errorMessage,
-        confirmButtonText: 'OK'
-      });
-
+  icon: 'error',
+  title: 'Error',
+  text: this.errorMessage
+});
       console.error('Error:', err);
     }
   });
 }
-
 loadCountries() {
   this.subscriberService.getCountries().subscribe({
     next: (res) => {
@@ -444,8 +575,21 @@ showReminderModal: boolean = false;
 ) {
     this.currentLang = this.translate.currentLang;
   }
-
+onSearchChange(event: any) {
+  const value = event.target.value;
+  this.searchSubject.next(value); // إرسال القيمة للمراقب (Subject)
+}
   ngOnInit(): void {
+   this.searchSubject.pipe(
+    debounceTime(500),        // انتظر نصف ثانية بعد توقف الكتابة
+    distinctUntilChanged()    // لا تنفذ إذا كانت الكلمة هي نفسها السابقة
+  ).subscribe(term => {
+    this.searchTerm = term;   // تحديث قيمة البحث
+    this.subCurrentPage = 1;  // إعادة الترقيم للصفحة الأولى
+    this.loadSubscribers();   // الآن نرسل الطلب للـ API
+  });
+    moment.locale('ar-SA');
+    this.formDataa.commercialRegisterDate = moment();
     this.loadTranslations(this.currentLang);
     this.translate.lang$.subscribe(lang => {
       this.currentLang = lang;
@@ -457,6 +601,15 @@ showReminderModal: boolean = false;
 this.loadRenewalSubscribers();
   this.loadPlans();
     this.loadCountriesCurrency();
+      const today = new Date();
+  const threeMonthsLater = new Date();
+  threeMonthsLater.setMonth(today.getMonth() + 3);
+
+  // تحويل التاريخ إلى صيغة YYYY-MM-DD لتوافق input type="date"
+  const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
+  this.formData.subscriptionStartDate = formatDate(today);
+  this.formData.subscriptionEndDate = formatDate(threeMonthsLater);
   }
   currencies: any[] = [];
 loadCountriesCurrency() {
@@ -560,7 +713,7 @@ updateSelectedUsers() {
   }
 
   const sub = selected[0];
-
+this.isEditMode = true;
   // تمرير البيانات للفورم
   this.formData = {
     ...sub,

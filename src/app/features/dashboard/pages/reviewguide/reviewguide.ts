@@ -344,29 +344,73 @@ removeFile() {
   this.selectedFile = null;
   this.uploadProgress = 0;
 }
-
 uploadFile() {
-  if(!this.selectedFile) return;
+  if (!this.selectedFile) return;
+
   this.isUploading = true;
   this.uploadProgress = 0;
 
   this.reviewService.iimportReviewGuides(this.selectedFile).subscribe({
     next: event => {
-      if(event.type === HttpEventType.UploadProgress && event.total) {
-        this.uploadProgress = Math.round((100 * event.loaded)/event.total);
-      } else if(event.type === HttpEventType.Response) {
+      if (event.type === HttpEventType.UploadProgress && event.total) {
+        this.uploadProgress = Math.round((100 * event.loaded) / event.total);
+      } else if (event.type === HttpEventType.Response) {
         this.isUploading = false;
-        Swal.fire('Success', 'تم رفع الملف بنجاح', 'success');
+
+        const res = event.body;
+
+        let message = 'تم رفع الملف بنجاح ✅';
+        let icon: any = 'success';
+
+        // لو في أخطاء أو صفوف متخطاة
+        if (res.imported || res.skipped || res.errors) {
+          message = '';
+          if (res.imported > 0) {
+            message += `✔ تم استيراد <b>${res.imported}</b> صف<br>`;
+          }
+          if (res.skipped > 0) {
+            message += `⚠ تم تخطي <b>${res.skipped}</b> صف (مكرر)<br>`;
+            icon = 'warning';
+          }
+          if (res.errors > 0) {
+            message += `❌ يوجد <b>${res.errors}</b> أخطاء`;
+            icon = 'error';
+          }
+        }
+
         this.closeImportModal();
         this.loadReviews();
+
+        // 🔥 هذا يضمن ظهور الـ SweetAlert فوق أي مودال
+        // @ts-ignore
+        Swal.fire({
+          icon: icon,
+          title: icon === 'success' ? 'نجاح' : 'نتيجة الاستيراد',
+          html: message,
+          confirmButtonText: 'حسناً',
+          appendTo: document.body
+        });
       }
     },
     error: err => {
       this.isUploading = false;
-      Swal.fire('Error', 'فشل رفع الملف', 'error');
+
+      const errorMsg = err?.error?.error || err?.error?.message || 'حدث خطأ غير متوقع';
+
+      this.closeImportModal();
+
+      // @ts-ignore
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ أثناء الاستيراد',
+        html: errorMsg,
+        confirmButtonText: 'حسناً',
+        appendTo: document.body
+      });
     }
   });
 }
+
 openExportModal() { this.isExportModalOpen = true; }
 closeExportModal() { this.isExportModalOpen = false; this.selectedExportOption = null; }
 

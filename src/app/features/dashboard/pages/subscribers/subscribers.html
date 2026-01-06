@@ -1,5 +1,4 @@
 <div class="tabs-container d-flex align-items-center mb-4">
-
   <div class="tab-item"
        [class.active]="activeTab === 'subscribers'"
        (click)="setActiveTab('subscribers')">
@@ -54,14 +53,14 @@
         <!-- البحث والأزرار -->
         <div class="d-flex align-items-center gap-2 flex-nowrap">
           <div class="search-container">
-              <input
-                type="text"
-                [placeholder]="t('search')"
-                [(ngModel)]="searchTerm"
-                (input)="loadSubscribers()"
-              >
-              <i class="fas fa-search search-icon"></i>
-            </div>
+  <input
+    type="text"
+    [placeholder]="t('search')"
+    [(ngModel)]="searchTerm"
+    (input)="onSearchChange($event)"
+  >
+  <i class="fas fa-search search-icon"></i>
+</div>
           <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
                   (click)="toggleFilter()">
             <i class="fas fa-filter"></i> {{ t('filter') }}
@@ -534,8 +533,9 @@
           <label class="form-label text-muted small">{{ t('licenseType') }}</label>
           <select class="form-select" [(ngModel)]="formData.licenseType">
             <option value="">{{ t('selectLicenseType') }}</option>
-            <option value="Company">Company</option>
-            <option value="Office">Office</option>
+            <option value="Company">مراجع قانوني</option>
+            <option value="Office">مهني اخر</option>
+            <option value="Office">بدون</option>
           </select>
         </div>
 
@@ -576,7 +576,12 @@
         <!-- entity -->
         <div class="mb-3">
           <label class="form-label text-muted small">{{ t('legalEntityType') }}</label>
-          <input class="form-control" [(ngModel)]="formData.legalEntityType">
+          <select class="form-control" [(ngModel)]="formData.legalEntityType">
+            <option value="">اختر النوع</option>
+            <option value="مراجع قانوني">مراجع قانوني</option>
+            <option value="استشارات">استشارات</option>
+            <option value="فردي">فردي</option>
+          </select>
         </div>
 
         <div class="mb-3">
@@ -616,27 +621,85 @@
           <input type="text" class="form-control mb-2" [(ngModel)]="formData.commercialRegisterNumber">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('commRegisterDate') }}</label>
-          <input type="date" class="form-control text-muted" [(ngModel)]="formData.commercialRegisterDate">
-        </div>
-        <div class="mb-3">
-          <label class="form-label text-muted small"> {{ t('commercialExpireDate') }}</label>
-          <input type="date" class="form-control mb-2 text-muted" [(ngModel)]="formData.commercialExpireDate">
-        </div>
+  <label class="form-label text-muted small fw-bold mb-2">{{ t('commRegisterDate') }}</label>
+  <div class="row g-2 align-items-end">
+    <div class="col-6">
+      <div class="input-wrapper">
+        <label class="x-small-label text-muted">هجري</label>
+        <mat-form-field appearance="outline" class="w-100" subscriptSizing="dynamic">
+          <input
+            matInput
+            [matDatepicker]="regPickerHijri"
+            [(ngModel)]="formData.commercialRegisterDate"
+            (dateChange)="syncFromHijri('commercialRegisterDate', $event.value)"
+            placeholder="يوم/شهر/سنة"
+          />
+          <mat-datepicker-toggle matSuffix [for]="regPickerHijri"></mat-datepicker-toggle>
+          <mat-datepicker #regPickerHijri></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="input-wrapper">
+        <label class="x-small-label text-muted">ميلادي</label>
+        <input
+          type="date"
+          class="form-control date-input-custom"
+          [ngModel]="convertToGregorian(formData.commercialRegisterDate)"
+          (ngModelChange)="syncFromGregorian('commercialRegisterDate', $event)"
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mb-3">
+  <label class="form-label text-muted small fw-bold mb-2">{{ t('commercialExpireDate') }}</label>
+  <div class="row g-2 align-items-end">
+    <div class="col-6">
+      <div class="input-wrapper">
+        <label class="x-small-label text-muted">هجري</label>
+        <mat-form-field appearance="outline" class="w-100" subscriptSizing="dynamic">
+          <input
+            matInput
+            [matDatepicker]="expPickerHijri"
+            [(ngModel)]="formData.commercialExpireDate"
+            (dateChange)="syncFromHijri('commercialExpireDate', $event.value)"
+          />
+          <mat-datepicker-toggle matSuffix [for]="expPickerHijri"></mat-datepicker-toggle>
+          <mat-datepicker #expPickerHijri></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="input-wrapper">
+        <label class="x-small-label text-muted">ميلادي</label>
+        <input
+          type="date"
+          class="form-control date-input-custom"
+          [ngModel]="convertToGregorian(formData.commercialExpireDate)"
+          (ngModelChange)="syncFromGregorian('commercialExpireDate', $event)"
+        >
+      </div>
+    </div>
+  </div>
+</div>
       </div>
 
       <!-- STEP 4 -->
       <div *ngIf="currentStep === 4">
 
 <div class="row mb-3">
-  <div class="col-6">
-    <label class="form-label text-muted small">{{ t('startDate') }}</label>
-    <input type="date" class="form-control" [(ngModel)]="formData.subscriptionStartDate">
-  </div>
-  <div class="col-6">
-    <label class="form-label text-muted small">{{ t('endDate') }}</label>
-    <input type="date" class="form-control" [(ngModel)]="formData.subscriptionEndDate">
-  </div>
+  <div class="col-12">
+      <label class="form-label text-muted small">{{ t('startDate') }}</label>
+      <input type="date" class="form-control" [(ngModel)]="formData.subscriptionStartDate">
+    </div>
+    <!-- <div class="col-6">
+      <label class="form-label text-muted small">{{ t('endDate') }}</label>
+      <input type="date" class="form-control" [(ngModel)]="formData.subscriptionEndDate">
+    </div> -->
 </div>
         <div class="mb-3">
   <label class="form-label text-muted small">{{ t('subPackage') }}</label>
@@ -705,17 +768,13 @@
 
     <!-- FOOTER BUTTONS -->
     <div class="d-flex justify-content-end align-items-center gap-3 mt-5">
-      <button class="btn border px-4" *ngIf="currentStep > 1" (click)="prevStep()">{{ t('back') }}</button>
-      <button class="btn btn-success px-4" *ngIf="currentStep < totalSteps" (click)="nextStep()">{{ t('next') }}</button>
-     <button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="submitNewUser()">
-  {{ isEditMode ? t('update') : t('submit') }}
-</button>
-<button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="updateSubscriber()">
-  {{ t('update') }}
-</button>
+  <button class="btn border px-4" *ngIf="currentStep > 1" (click)="prevStep()">{{ t('back') }}</button>
+  <button class="btn btn-success px-4" *ngIf="currentStep < totalSteps" (click)="nextStep()">{{ t('next') }}</button>
 
-    </div>
-
+  <button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="submitNewUser()">
+    {{ isEditMode ? t('update') : t('submit') }}
+  </button>
+</div>
   </div>
 </div>
 

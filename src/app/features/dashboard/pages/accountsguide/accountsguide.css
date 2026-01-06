@@ -193,6 +193,9 @@
 .selected-row {
   background-color: #fdfdfd;
 }
+.no-cursor {
+  caret-color: transparent;
+}
 
 /* --- Pagination --- */
 .pagination-footer {

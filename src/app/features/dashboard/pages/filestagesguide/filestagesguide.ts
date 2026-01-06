@@ -329,29 +329,67 @@ validateStep(): boolean {
   onFileSelected(e: any) { if (e.target.files.length) this.selectedFile = e.target.files[0]; }
   removeFile() { this.selectedFile = null; this.uploadProgress = 0; }
 
-  uploadFile() {
-    if (!this.selectedFile) return;
-    this.isUploading = true;
-    this.uploadProgress = 0;
+uploadFile() {
+  if (!this.selectedFile) return;
 
-    this.svc.importAccountGuides(this.selectedFile).subscribe({
-      next: event => {
-        if (event.type === HttpEventType.UploadProgress && event.total) {
-          this.uploadProgress = Math.round((100 * event.loaded) / event.total);
-        } else if (event.type === HttpEventType.Response) {
-          this.isUploading = false;
-          Swal.fire(this.t('success'), this.t('fileUploaded') || 'File uploaded', 'success');
-          this.closeImportModal();
-          this.loadStages();
-        }
-      },
-      error: err => {
+  this.isUploading = true;
+  this.uploadProgress = 0;
+
+  this.svc.importAccountGuides(this.selectedFile).subscribe({
+    next: event => {
+      if (event.type === HttpEventType.UploadProgress && event.total) {
+        this.uploadProgress = Math.round((100 * event.loaded) / event.total);
+      } else if (event.type === HttpEventType.Response) {
         this.isUploading = false;
-        console.error('Import error', err);
-        Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+
+        const res = event.body;
+
+        let message = `تم تنفيذ عملية الاستيراد بنجاح ✅<br>`;
+        let icon: 'success' | 'warning' | 'error' = 'success';
+
+        if (res.imported > 0) {
+          message += `✔ تم استيراد <b>${res.imported}</b> صف<br>`;
+        }
+
+        if (res.skipped > 0) {
+          message += `⚠ تم تخطي <b>${res.skipped}</b> صف (مكرر)<br>`;
+          icon = 'warning';
+        }
+
+        if (res.errors > 0) {
+          message += `❌ يوجد <b>${res.errors}</b> أخطاء`;
+          icon = 'error';
+        }
+
+        Swal.fire({
+          title: this.t('importResult') || 'نتيجة الاستيراد',
+          html: message,
+          icon: icon,
+          confirmButtonText: this.t('ok') || 'حسناً',
+          customClass: {
+            container: 'swal-container' // 🔹 يرفع الـ z-index
+          }
+        });
+
+        this.closeImportModal();
+        this.loadStages();
       }
-    });
-  }
+    },
+    error: err => {
+  this.isUploading = false;
+  const errorMsg = err?.error?.error || err?.error?.message || this.t('somethingWentWrong');
+
+  Swal.fire({
+    title: this.t('error'),
+    html: errorMsg,
+    icon: 'error',
+    confirmButtonText: this.t('ok'),
+    // مرر الكلاس مباشرة كنص، وإذا لم يجد المودال سيستخدم الـ body تلقائياً
+    target: '.import-modal-container'
+  });
+}
+  });
+}
 
   openExportModal() { this.isExportModalOpen = true; }
   closeExportModal() { this.isExportModalOpen = false; this.selectedExportOption = null; }
