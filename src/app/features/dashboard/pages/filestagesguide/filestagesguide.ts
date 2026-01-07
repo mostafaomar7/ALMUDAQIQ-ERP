@@ -58,7 +58,7 @@ export class Filestagesguide implements OnInit {
 
   ngOnInit() {
     this.lang.lang$.subscribe(l => this.loadTranslations(l));
-    this.loadStages();
+    this.loadStages(1);
   }
 
   loadTranslations(lang: 'en' | 'ar') {
@@ -70,24 +70,26 @@ export class Filestagesguide implements OnInit {
   }
 
   // ---- API ----
-  loadStages() {
-    this.svc.getAccountGuides().subscribe({
-      next: (res: any) => {
-        // assume res.data or res as array
-        const data: fileGuide[] = (res && (res.data || res)) || [];
-        this.allStages = data.map(d => ({ ...d }));
-        this.totalItems = this.allStages.length;
-        this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-        this.currentPage = 1;
-        this.updateDisplayedData();
-        this.calculatePagination();
-      },
-      error: (err) => {
-        console.error('Load stages error', err);
-        Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
-      }
-    });
-  }
+  loadStages(page: number = 1) {
+  this.svc.getAccountGuides(page, this.itemsPerPage, this.searchText).subscribe({
+    next: (res: any) => {
+      this.displayedStages = res.data.map((d: any) => ({
+        ...d,
+        selected: false
+      }));
+
+      this.totalItems = res.meta.total;
+      this.totalPages = res.meta.pages;
+      this.currentPage = res.meta.page;
+
+      this.calculatePagination();
+    },
+    error: err => {
+      console.error(err);
+      Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+    }
+  });
+}
 
   // ---- Search / Filter ----
   onSearchInput() {
@@ -126,15 +128,24 @@ export class Filestagesguide implements OnInit {
   }
 
   goToPage(page: number | string) {
-    if (typeof page === 'string') return;
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updateDisplayedData();
-      this.calculatePagination();
-    }
+  if (typeof page === 'string') return;
+  if (page >= 1 && page <= this.totalPages) {
+    this.loadStages(page);
   }
-  nextPage() { if (this.currentPage < this.totalPages) { this.currentPage++; this.updateDisplayedData(); this.calculatePagination(); } }
-  prevPage() { if (this.currentPage > 1) { this.currentPage--; this.updateDisplayedData(); this.calculatePagination(); } }
+}
+
+nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.loadStages(this.currentPage + 1);
+  }
+}
+
+prevPage() {
+  if (this.currentPage > 1) {
+    this.loadStages(this.currentPage - 1);
+  }
+}
+
   goToPageInput(e: any) { const p = parseInt(e.target.value); if (!isNaN(p)) this.goToPage(p); }
 
   calculatePagination() {
@@ -430,8 +441,9 @@ uploadFile() {
 
   // helper showing range
   get showingRangeText() {
-    const start = (this.currentPage - 1) * this.itemsPerPage + 1;
-    const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
-  }
+  const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+  const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+  return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems}`;
+}
+
 }

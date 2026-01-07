@@ -77,64 +77,27 @@ searchTerm: string = '';
     return this.translations[key] || key;
   }
   applySearch() {
-  const term = this.searchTerm.toLowerCase();
-
-  this.displayedReviews = this.allReviews
-    .filter(item =>
-      item.level.toLowerCase().includes(term) ||
-      item.separator.toLowerCase().includes(term) ||
-      item.number.toLowerCase().includes(term) ||
-      item.statement.toLowerCase().includes(term) ||
-      item.purpose.toLowerCase().includes(term) ||
-      item.responsiblePerson.toLowerCase().includes(term) ||
-      (item.datePrepared && item.datePrepared.toString().toLowerCase().includes(term)) ||
-      (item.dateReviewed && item.dateReviewed.toString().toLowerCase().includes(term)) ||
-      item.conclusion.toLowerCase().includes(term) ||
-      item.attachments.toLowerCase().includes(term) ||
-      item.notes1.toLowerCase().includes(term) ||
-      item.notes2.toLowerCase().includes(term) ||
-      item.notes3.toLowerCase().includes(term)
-    )
-    .slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage);
-
-  this.totalItems = this.allReviews.filter(item =>
-    item.level.toLowerCase().includes(term) ||
-    item.separator.toLowerCase().includes(term) ||
-    item.number.toLowerCase().includes(term) ||
-    item.statement.toLowerCase().includes(term) ||
-    item.purpose.toLowerCase().includes(term) ||
-    item.responsiblePerson.toLowerCase().includes(term) ||
-    (item.datePrepared && item.datePrepared.toString().toLowerCase().includes(term)) ||
-    (item.dateReviewed && item.dateReviewed.toString().toLowerCase().includes(term)) ||
-    item.conclusion.toLowerCase().includes(term) ||
-    item.attachments.toLowerCase().includes(term) ||
-    item.notes1.toLowerCase().includes(term) ||
-    item.notes2.toLowerCase().includes(term) ||
-    item.notes3.toLowerCase().includes(term)
-  ).length;
-
-  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-  this.calculatePagination();
+  this.currentPage = 1;
+  this.loadReviews(1);
 }
 
-  loadReviews() {
-  this.reviewService.getAccountGuides().subscribe((res: any) => {
-    const data = res.data || res;
+loadReviews(page: number = 1) {
+  this.reviewService
+    .getAccountGuides(page, this.itemsPerPage, this.searchTerm)
+    .subscribe((res: any) => {
+      this.displayedReviews = res.data.map((item: any) => ({
+        ...item,
+        selected: false
+      }));
 
-    this.allReviews = data.map((item: any) => ({
-      ...item,
-      selected: false
-    }));
+      this.totalItems = res.total;
+      this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+      this.currentPage = page;
 
-    // ⭐ ترتيب مبدئي حسب level
-    this.allReviews.sort((a, b) => Number(a.level) - Number(b.level));
-
-    this.totalItems = this.allReviews.length;
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    this.updateDisplayedData();
-    this.calculatePagination();
-  });
+      this.calculatePagination();
+    });
 }
+
 sortAsc: boolean = true;
 
 sortByLevel() {
@@ -262,12 +225,34 @@ formatDate(date?: string | Date | null): string | null {
     this.currentStep = 1;
     this.editingId = null;
   }
+updateDisplayedData() {
+  const term = this.searchTerm.toLowerCase();
 
-  updateDisplayedData() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.displayedReviews = this.allReviews.slice(start, end);
-  }
+  const filtered = this.allReviews.filter(item =>
+    item.level.toLowerCase().includes(term) ||
+    item.separator.toLowerCase().includes(term) ||
+    item.number.toLowerCase().includes(term) ||
+    item.statement.toLowerCase().includes(term) ||
+    item.purpose.toLowerCase().includes(term) ||
+    item.responsiblePerson.toLowerCase().includes(term) ||
+    (item.datePrepared && item.datePrepared.toString().toLowerCase().includes(term)) ||
+    (item.dateReviewed && item.dateReviewed.toString().toLowerCase().includes(term)) ||
+    item.conclusion.toLowerCase().includes(term) ||
+    item.attachments.toLowerCase().includes(term) ||
+    item.notes1.toLowerCase().includes(term) ||
+    item.notes2.toLowerCase().includes(term) ||
+    item.notes3.toLowerCase().includes(term)
+  );
+
+  this.totalItems = filtered.length;
+  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  const end = start + this.itemsPerPage;
+  this.displayedReviews = filtered.slice(start, end);
+
+  this.calculatePagination();
+}
 
   calculatePagination() {
     const total = this.totalPages;
@@ -316,9 +301,24 @@ selectForEdit(review: ReviewItem) {
     });
   }
 
-  goToPage(page:number|string){ if(typeof page==='string') return; if(page>=1 && page<=this.totalPages){ this.currentPage=page; this.updateDisplayedData(); this.calculatePagination(); } }
-  nextPage(){ if(this.currentPage<this.totalPages){ this.currentPage++; this.updateDisplayedData(); this.calculatePagination(); } }
-  prevPage(){ if(this.currentPage>1){ this.currentPage--; this.updateDisplayedData(); this.calculatePagination(); } }
+goToPage(page: number|string) {
+  if (typeof page === 'string') return;
+  if (page >= 1 && page <= this.totalPages) {
+    this.loadReviews(page); // نجلب الصفحة الجديدة من السيرفر
+  }
+}
+  nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.loadReviews(this.currentPage + 1);
+  }
+}
+
+prevPage() {
+  if (this.currentPage > 1) {
+    this.loadReviews(this.currentPage - 1);
+  }
+}
+
   goToPageInput(event:any){ const page = parseInt(event.target.value); if(!isNaN(page)) this.goToPage(page); }
 
   get showingRangeText(): string {

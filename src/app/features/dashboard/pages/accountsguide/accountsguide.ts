@@ -130,13 +130,7 @@ closeImportModal() {
 filterAccounts() {
   const text = (this.searchText || '').toLowerCase().trim();
 
-  if (!text) {
-    this.updateDisplayedData(); // لو البحث فاضي، نعرض البيانات الأصلية
-    return;
-  }
-
-  const filtered = this.allAccounts.filter(acc => {
-    // نتحقق لكل حقل أنه موجود قبل التحويل لـ lowercase أو string
+  this.displayedAccounts = this.displayedAccounts.filter(acc => {
     return (
       (acc.name?.toLowerCase().includes(text)) ||
       (acc.level?.toLowerCase().includes(text)) ||
@@ -149,8 +143,7 @@ filterAccounts() {
     );
   });
 
-  this.displayedAccounts = filtered;
-  this.totalItems = filtered.length;
+  this.totalItems = this.displayedAccounts.length;
   this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
   this.calculatePagination();
 }
@@ -162,37 +155,38 @@ filterAccounts() {
   t(key: keyof typeof EN | string): string {
   return (this.translations as any)[key] || key;
 }
-
-
-  loadAccounts() {
-  this.accountService.getAccountGuides().subscribe({
+loadAccounts(page: number = 1) {
+  this.accountService.getAccountGuides(page, this.itemsPerPage).subscribe({
     next: (res: any) => {
-      const dataArray: AccountGuide[] = res.data || []; // نجيب المصفوفة من المفتاح data
-      this.allAccounts = dataArray.map(a => ({
-  id: a.id,
-  name: a.accountName || '',
-  level: a.level,
-  number: a.accountNumber.toString(),
-  rules: a.rulesAndRegulations || '',
-  notes: a.disclosureNotes || '',
-  code: a.code1 || '',
-  objectiveCode : a.objectiveCode,
-  relatedObjectives : a.relatedObjectives,
-  selected: false
-}));
+      this.displayedAccounts = res.data.map((a: AccountGuide) => ({
+        id: a.id,
+        name: a.accountName || '',
+        level: a.level,
+        number: a.accountNumber.toString(),
+        rules: a.rulesAndRegulations || '',
+        notes: a.disclosureNotes || '',
+        code: a.code1 || '',
+        objectiveCode: a.objectiveCode,
+        relatedObjectives: a.relatedObjectives,
+        selected: false
+      }));
 
-// ⭐ ترتيب حسب level
-// this.allAccounts.sort((a, b) => Number(a.level) - Number(b.level));
+      this.currentPage = res.page;
+      this.itemsPerPage = res.limit;
+      this.totalItems = res.total;
+      this.totalPages = res.totalPages;
 
-this.totalItems = this.allAccounts.length;
-this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-this.updateDisplayedData();
-this.calculatePagination();
-
-    },
-    error: (err) => console.error('Error fetching accounts:', err)
+      this.calculatePagination();
+    }
   });
 }
+
+get showingRangeText(): string {
+  const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+  const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+  return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
+}
+
 sortAsc = true;
 
 // sortByLevel() {
@@ -230,7 +224,7 @@ deleteSelected() {
           next: () => {
             // إزالة الصف من الـ arrays
             this.allAccounts = this.allAccounts.filter(a => a.id !== acc.id);
-            this.updateDisplayedData();
+            // this.updateDisplayedData();
             this.calculatePagination();
           },
           error: (err) => console.error(`Error deleting account ${acc.id}:`, err)
@@ -242,44 +236,37 @@ deleteSelected() {
   });
 }
 
-  updateDisplayedData() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    this.displayedAccounts = this.allAccounts.slice(start, start + this.itemsPerPage);
+  // updateDisplayedData() {
+  //   const start = (this.currentPage - 1) * this.itemsPerPage;
+  //   this.displayedAccounts = this.allAccounts.slice(start, start + this.itemsPerPage);
+  // }
+goToPage(page: number | string) {
+  if (typeof page === 'string') return;
+  if (page >= 1 && page <= this.totalPages) {
+    this.loadAccounts(page); // بدل updateDisplayedData()
   }
+}
 
-  goToPage(page: number | string) {
-    if (typeof page === 'string') return;
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updateDisplayedData();
-      this.calculatePagination();
-    }
+nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.loadAccounts(this.currentPage + 1);
   }
+}
 
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updateDisplayedData();
-      this.calculatePagination();
-    }
+prevPage() {
+  if (this.currentPage > 1) {
+    this.loadAccounts(this.currentPage - 1);
   }
+}
 
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updateDisplayedData();
-      this.calculatePagination();
-    }
-  }
-
-  goToPageInput(e: any) {
-    const p = parseInt(e.target.value);
-    if (!isNaN(p)) this.goToPage(p);
-  }
+goToPageInput(e: any) {
+  const p = parseInt(e.target.value);
+  if (!isNaN(p) && p >= 1 && p <= this.totalPages) this.goToPage(p);
+}
 
   calculatePagination() {
-    const t = this.totalPages;
-    const c = this.currentPage;
+    const t = this.totalPages || 1;
+const c = this.currentPage || 1;
     const delta = 2;
     const range: number[] = [];
     const withDots: (number | string)[] = [];
@@ -313,11 +300,7 @@ toggleAll() {
   this.displayedAccounts.forEach(a => a.selected = !allSelected);
 }
 
-  get showingRangeText(): string {
-    const start = (this.currentPage - 1) * this.itemsPerPage + 1;
-    const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} ${this.t('showingRangeOf')} ${this.totalItems.toLocaleString()}`;
-  }
+
   nextStep() {
   const currentStepElement = document.querySelector(`.step-${this.currentStep}`);
 

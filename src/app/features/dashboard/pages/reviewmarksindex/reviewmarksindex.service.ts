@@ -27,11 +27,15 @@ export class ReviewmarksindexService {
 
   constructor(private http: HttpClient) {}
 
-  getReviewmarksindex(): Observable<Reviewmarksindex[]> {
-  return this.http.get<{data: Reviewmarksindex[]}>(this.apiUrl)
-    .pipe(
-      map(res => res.data) // نرجع فقط الـ data
-    );
+ getReviewmarksindex(
+  page: number,
+  limit: number,
+  search?: string
+): Observable<any> {
+  let params: any = { page, limit };
+  if (search) params.search = search;
+
+  return this.http.get<any>(this.apiUrl, { params });
 }
 
   deleteReviewmarksindex(id: number) {

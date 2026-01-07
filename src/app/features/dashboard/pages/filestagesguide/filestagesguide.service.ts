@@ -38,9 +38,21 @@ export class FilestagesguideService {
 
   constructor(private http: HttpClient) {}
 
-  getAccountGuides(): Observable<fileGuide[]> {
-    return this.http.get<fileGuide[]>(this.apiUrl);
-  }
+  getAccountGuides(
+  page: number,
+  limit: number,
+  search?: string
+): Observable<any> {
+  let params: any = {
+    page,
+    limit
+  };
+
+  if (search) params.search = search;
+
+  return this.http.get<any>(this.apiUrl, { params });
+}
+
   deleteAccountGuide(id: number) {
   return this.http.delete(`${this.apiUrl}/${id}`);
 }

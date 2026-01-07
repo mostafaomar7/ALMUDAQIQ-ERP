@@ -56,27 +56,33 @@ export class ReviewmarksindexComponent implements OnInit {
 
   ngOnInit() {
     this.lang.lang$.subscribe(l => this.loadTranslations(l));
-    this.loadMarks();
+    this.loadMarks(1);
   }
 
   loadTranslations(lang: 'en'|'ar') { this.translations = lang==='en'?EN:AR; }
   t(key: TranslationKey): string { return this.translations[key] || key; }
 
   // ---- API ----
-  loadMarks() {
-    this.svc.getReviewmarksindex().subscribe({
-      next: res => {
-        this.allMarks = res.map(r => ({ ...r, selected: false }));
-        this.totalItems = this.allMarks.length;
-        this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-        this.currentPage = 1;
-        this.updateDisplayedData();
-        this.initFilterOptions();
-        this.calculatePagination();
-      },
-      error: err => { console.error(err); Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error'); }
-    });
-  }
+  loadMarks(page: number = 1) {
+  this.svc.getReviewmarksindex(page, this.itemsPerPage, this.searchText).subscribe({
+    next: (res: any) => {
+      this.displayedMarks = res.data.map((r: any) => ({
+        ...r,
+        selected: false
+      }));
+
+      this.totalItems = res.meta.total;
+      this.totalPages = res.meta.pages;
+      this.currentPage = res.meta.page;
+
+      this.calculatePagination();
+    },
+    error: err => {
+      console.error(err);
+      Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+    }
+  });
+}
 
   initFilterOptions() {
     const stages = Array.from(new Set(this.allMarks.map(m => m.suggestedStage)));
@@ -105,9 +111,25 @@ export class ReviewmarksindexComponent implements OnInit {
     this.displayedMarks = this.allMarks.slice(start, start+this.itemsPerPage);
   }
 
-  goToPage(page:number|string) { if(typeof page==='number' && page>=1 && page<=this.totalPages){ this.currentPage=page; this.updateDisplayedData(); this.calculatePagination(); } }
-  nextPage() { if(this.currentPage<this.totalPages){ this.currentPage++; this.updateDisplayedData(); this.calculatePagination(); } }
-  prevPage() { if(this.currentPage>1){ this.currentPage--; this.updateDisplayedData(); this.calculatePagination(); } }
+  goToPage(page: number | string) {
+  if (typeof page === 'string') return;
+  if (page >= 1 && page <= this.totalPages) {
+    this.loadMarks(page);
+  }
+}
+
+nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.loadMarks(this.currentPage + 1);
+  }
+}
+
+prevPage() {
+  if (this.currentPage > 1) {
+    this.loadMarks(this.currentPage - 1);
+  }
+}
+
   goToPageInput(e:any){ const p=parseInt(e.target.value); if(!isNaN(p)) this.goToPage(p); }
 
   calculatePagination() {
@@ -139,17 +161,16 @@ toggleSelection(mark: Reviewmarksindex) {
     this.selectedMark = mark;
     this.displayedMarks.forEach(m => m.selected = m === mark);
   }
-
-  get showingRangeText() {
-    const start = (this.currentPage-1)*this.itemsPerPage+1;
-    const end = Math.min(this.currentPage*this.itemsPerPage, this.totalItems);
-    return `${start}-${end} ${this.t('page')} ${this.totalItems.toLocaleString()}`;
-  }
+get showingRangeText() {
+  const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+  const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+  return `${start}-${end} ${this.t('page')} ${this.totalItems}`;
+}
 
   // ---- Search ----
 applySearch() {
   this.selectedMark = null;
-
+  this.loadMarks(1);
   const text = this.searchText.trim().toLowerCase();
 
   // فلترة allMarks مباشرة بدون إعادة slice

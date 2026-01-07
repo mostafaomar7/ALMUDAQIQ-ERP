@@ -30,9 +30,10 @@ export class ReviewguideService {
 
   constructor(private http: HttpClient) {}
 
-  getAccountGuides(): Observable<reviewGuide[]> {
-    return this.http.get<reviewGuide[]>(this.apiUrl);
-  }
+  getAccountGuides(page: number = 1, limit: number = 10, search: string = ''): Observable<any> {
+  return this.http.get(`${this.apiUrl}?page=${page}&limit=${limit}&search=${search}`);
+}
+
   deleteAccountGuide(id: number) {
   return this.http.delete(`${this.apiUrl}/${id}`);
 }

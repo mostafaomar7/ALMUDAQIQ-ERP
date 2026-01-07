@@ -25,9 +25,9 @@ export class AccountguideService {
 
   constructor(private http: HttpClient) {}
 
-  getAccountGuides(): Observable<AccountGuide[]> {
-    return this.http.get<AccountGuide[]>(this.apiUrl);
-  }
+  getAccountGuides(page: number = 1, perPage: number = 10): Observable<any> {
+    return this.http.get(`${this.apiUrl}?page=${page}&limit=${perPage}`);
+}
   deleteAccountGuide(id: number) {
   return this.http.delete(`${this.apiUrl}/${id}`);
 }

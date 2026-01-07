@@ -32,10 +32,16 @@ export class ReviewobjectivesService {
   private apiUrl = `${environment.apiUrl}/review-objective-stages`;
 
   constructor(private http: HttpClient) {}
+getReviewObjectives(
+  page: number,
+  limit: number,
+  search?: string
+): Observable<any> {
+  let params: any = { page, limit };
+  if (search) params.search = search;
 
-  getReviewObjectives(): Observable<ReviewObjectives[]> {
-    return this.http.get<ReviewObjectives[]>(this.apiUrl);
-  }
+  return this.http.get<any>(this.apiUrl, { params });
+}
 
   deleteReviewObjectives(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);

@@ -58,7 +58,7 @@ export class Reviewobjectivesguide implements OnInit {
 
   ngOnInit() {
     this.lang.lang$.subscribe(l => this.loadTranslations(l));
-    this.loadGuides();
+    this.loadGuides(1);
   }
 
   loadTranslations(lang: 'en' | 'ar') {
@@ -70,24 +70,26 @@ export class Reviewobjectivesguide implements OnInit {
   }
 
   // ---- API ----
-  loadGuides() {
-    this.svc.getReviewObjectives().subscribe({
-      next: (res: any) => {
-        const arr: ReviewObjectives[] = (res && (res.data || res)) || [];
-        // ensure selected flag exists
-        this.allGuides = arr.map(a => ({ ...a, selected: false }));
-        this.totalItems = this.allGuides.length;
-        this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-        this.currentPage = 1;
-        this.updateDisplayedData();
-        this.calculatePagination();
-      },
-      error: err => {
-        console.error('Load error', err);
-        Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
-      }
-    });
-  }
+loadGuides(page: number = 1) {
+  this.svc.getReviewObjectives(page, this.itemsPerPage, this.searchText).subscribe({
+    next: (res: any) => {
+      this.displayedGuides = res.data.map((g: any) => ({
+        ...g,
+        selected: false
+      }));
+
+      this.totalItems = res.meta.total;
+      this.totalPages = res.meta.pages;
+      this.currentPage = res.meta.page;
+
+      this.calculatePagination();
+    },
+    error: err => {
+      console.error(err);
+      Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+    }
+  });
+}
 
   // ---- Search ----
   onSearchInput() {
@@ -109,7 +111,7 @@ export class Reviewobjectivesguide implements OnInit {
       (x.ifrs || '').toLowerCase().includes(text) ||
       (x.ias || '').toLowerCase().includes(text)
     );
-
+    this.loadGuides(1);
     this.displayedGuides = filtered;
     this.totalItems = filtered.length;
     this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
@@ -123,15 +125,24 @@ export class Reviewobjectivesguide implements OnInit {
   }
 
   goToPage(page: number | string) {
-    if (typeof page === 'string') return;
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updateDisplayedData();
-      this.calculatePagination();
-    }
+  if (typeof page === 'string') return;
+  if (page >= 1 && page <= this.totalPages) {
+    this.loadGuides(page);
   }
-  nextPage() { if (this.currentPage < this.totalPages) { this.currentPage++; this.updateDisplayedData(); this.calculatePagination(); } }
-  prevPage() { if (this.currentPage > 1) { this.currentPage--; this.updateDisplayedData(); this.calculatePagination(); } }
+}
+
+nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.loadGuides(this.currentPage + 1);
+  }
+}
+
+prevPage() {
+  if (this.currentPage > 1) {
+    this.loadGuides(this.currentPage - 1);
+  }
+}
+
   goToPageInput(e: any) { const p = parseInt(e.target.value); if (!isNaN(p)) this.goToPage(p); }
 
   calculatePagination() {

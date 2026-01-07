@@ -108,15 +108,14 @@
       </button>
 
       <ng-container *ngFor="let p of pagesArray">
-        <span *ngIf="p === '...'" class="dots">...</span>
-
-        <button *ngIf="p !== '...'"
-                class="page-btn"
-                [class.active]="p === currentPage"
-                (click)="goToPage(p)">
-          {{ p }}
-        </button>
-      </ng-container>
+  <span *ngIf="p === '...'" class="dots">...</span>
+  <button *ngIf="p !== '...'"
+          class="page-btn"
+          [class.active]="p === currentPage"
+          (click)="goToPage(p)">
+    {{ p }}
+  </button>
+</ng-container>
 
       <button class="page-btn next"
               (click)="nextPage()"
@@ -131,7 +130,7 @@
              [value]="currentPage"
              (change)="goToPageInput($event)"
              class="page-input">
-      <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span>
+      <!-- <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span> -->
     </div>
 
     <div class="items-count">
