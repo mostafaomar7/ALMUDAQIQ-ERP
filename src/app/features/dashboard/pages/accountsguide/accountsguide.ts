@@ -222,11 +222,14 @@ deleteSelected() {
       selectedAccounts.forEach(acc => {
         this.accountService.deleteAccountGuide(acc.id).subscribe({
           next: () => {
-            // إزالة الصف من الـ arrays
-            this.allAccounts = this.allAccounts.filter(a => a.id !== acc.id);
-            // this.updateDisplayedData();
-            this.calculatePagination();
-          },
+  this.displayedAccounts =
+    this.displayedAccounts.filter(a => a.id !== acc.id);
+
+  this.totalItems--;
+  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+  this.calculatePagination();
+}
+,
           error: (err) => console.error(`Error deleting account ${acc.id}:`, err)
         });
       });
@@ -293,8 +296,19 @@ const c = this.currentPage || 1;
   }
 
 toggleSelection(acc: DisplayAccount) {
-  acc.selected = !acc.selected; // تفعيل/إلغاء التحديد
+  acc.selected = !acc.selected;
+
+  const selected = this.displayedAccounts.filter(a => a.selected);
+
+  if (selected.length === 1) {
+    this.selectedAccount = selected[0];
+  } else {
+    // صفر أو أكتر من واحد → مفيش Edit
+    this.selectedAccount = null;
+  }
 }
+
+
 toggleAll() {
   const allSelected = this.displayedAccounts.every(a => a.selected);
   this.displayedAccounts.forEach(a => a.selected = !allSelected);
@@ -335,11 +349,10 @@ toggleAll() {
     }
   }
   selectForEdit(account: DisplayAccount) {
-  // إذا كنت تريد أن تسمح بتحديد صف واحد فقط:
-  this.displayedAccounts.forEach(a => a.selected = false);
-  account.selected = true;
   this.selectedAccount = account;
+  this.openAddModal(account);
 }
+
 submitNewAccount() {
   if (this.editingId) {
     // تحديث موجود

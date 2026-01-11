@@ -52,9 +52,9 @@
             <i class="fa-solid fa-minus"></i>
           </div>
         </th>
-        <th>{{ t('accountName') }}</th>
         <th >{{ t('level') }}</th>
         <th>{{ t('accountNumber') }}</th>
+                <th>{{ t('accountName') }}</th>
         <th>{{ t('rules') }}</th>
         <th>{{ t('notes') }}</th>
         <th>{{ t('code') }}</th>
@@ -73,14 +73,15 @@
         <td class="checkbox-col">
           <div class="custom-checkbox"
                [class.checked]="account.selected"
+               (click)="$event.stopPropagation()"
                (click)="toggleSelection(account)">
             <i *ngIf="account.selected" class="fa-solid fa-check"></i>
           </div>
         </td>
 
-        <td class="fw-bold">{{ account.name }}</td>
         <td>{{ account.level }}</td>
         <td>{{ account.number }}</td>
+                <td class="fw-bold">{{ account.name }}</td>
         <td>{{ account.rules }}</td>
         <td>{{ account.notes }}</td>
         <td>{{ account.code }}</td>

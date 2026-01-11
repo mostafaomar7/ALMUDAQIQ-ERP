@@ -6,9 +6,10 @@
 
     <div class="actions-group">
       <div class="edit-actions">
-        <button class="btn-text" [disabled]="!selectedReview" (click)="openAddModal(selectedReview || undefined)">
-          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
-        </button>
+<button class="btn-text" [disabled]="!selectedReview" (click)="openAddModal(selectedReview || undefined)">
+  <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+</button>
+
         <button class="btn-text" (click)="deleteSelectedItems()">
           <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
         </button>
@@ -68,8 +69,9 @@
       <tbody>
         <tr *ngFor="let item of displayedReviews"
     [class.selected-row]="item.selected"
-    (click)="selectForEdit(item)">
-  <td class="checkbox-col">
+    (click)="toggleSelection(item)"> <!-- فقط تحديد العنصر -->
+
+  <td class="checkbox-col" (click)="$event.stopPropagation(); toggleSelection(item)">
     <div class="custom-checkbox" [class.checked]="item.selected">
       <i *ngIf="item.selected" class="fa-solid fa-check"></i>
     </div>

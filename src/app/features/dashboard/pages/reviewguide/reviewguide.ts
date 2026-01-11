@@ -54,7 +54,7 @@ export class Reviewguide implements OnInit {
   isEditMode: boolean = false;
   editingId: number | null = null;
   newReview: Partial<ReviewItem> = {};
-  selectedReview: ReviewItem | null = null;
+  selectedReview?: ReviewItem;
 isImportModalOpen: boolean = false;
 selectedFile: File | null = null;
 uploadProgress: number = 0;
@@ -80,15 +80,17 @@ searchTerm: string = '';
   this.currentPage = 1;
   this.loadReviews(1);
 }
-
 loadReviews(page: number = 1) {
   this.reviewService
     .getAccountGuides(page, this.itemsPerPage, this.searchTerm)
     .subscribe((res: any) => {
-      this.displayedReviews = res.data.map((item: any) => ({
+      const reviewsWithSelection = res.data.map((item: any) => ({
         ...item,
         selected: false
       }));
+
+      this.allReviews = reviewsWithSelection;         // ✅ تحديث allReviews
+      this.displayedReviews = reviewsWithSelection;   // ✅ تحديث displayedReviews
 
       this.totalItems = res.total;
       this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
@@ -119,20 +121,45 @@ sortByLevel() {
 
   this.updateDisplayedData();
 }
+formatDateForInput(date: string | Date): string {
+  const d = new Date(date);
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+openAddModal(review?: ReviewItem) {
+  this.isModalOpen = true;
+  this.currentStep = 1;
 
-  openAddModal(review?: ReviewItem) {
-    this.isModalOpen = true;
-    this.currentStep = 1;
-    if (review) {
-      this.newReview = { ...review };
-      this.editingId = review.id;
-      this.isEditMode = true;
-    } else {
-      this.newReview = {};
-      this.editingId = null;
-      this.isEditMode = false;
-    }
+  if (review) {
+    this.isEditMode = true;
+    this.editingId = review.id;
+
+    this.newReview = {
+      ...review,
+      datePrepared: review.datePrepared ? this.formatDateForInput(review.datePrepared) : '',
+      dateReviewed: review.dateReviewed ? this.formatDateForInput(review.dateReviewed) : ''
+    };
+  } else {
+    this.isEditMode = false;
+    this.editingId = null;
+    this.newReview = {
+      level: '',
+      separator: '',
+      number: '',
+      statement: '',
+      purpose: '',
+      responsiblePerson: '',
+      conclusion: '',
+      attachments: '',
+      notes1: '',
+      notes2: '',
+      notes3: '',
+      datePrepared: '',
+      dateReviewed: ''
+    };
   }
+}
 
   prevStep() { if(this.currentStep>1) this.currentStep--; }
   nextStep() {
@@ -271,35 +298,52 @@ updateDisplayedData() {
     this.pagesArray = rangeWithDots;
   }
 
-  toggleSelection(item: ReviewItem){ item.selected=!item.selected; }
-  toggleAll(){ const allSelected = this.displayedReviews.every(i=>i.selected); this.displayedReviews.forEach(i=>i.selected=!allSelected);}
-selectForEdit(review: ReviewItem) {
-  // إلغاء تحديد أي صفوف أخرى
-  this.displayedReviews.forEach(r => r.selected = false);
-
-  // تحديد الصف الحالي
-  review.selected = true;
-  this.selectedReview = review;
+toggleSelection(item: ReviewItem) {
+  item.selected = !item.selected;
+  this.selectedReview = item.selected ? item : undefined;
 }
 
-  deleteSelectedItems() {
-    const selectedItems = this.allReviews.filter(i => i.selected);
-    if(!selectedItems.length){ Swal.fire('Info', 'No items selected', 'info'); return; }
-    Swal.fire({
-      title:'Are you sure?', text:`You are about to delete ${selectedItems.length} items.`, icon:'warning',
-      showCancelButton:true, confirmButtonText:'Yes, delete', cancelButtonText:'Cancel'
-    }).then(result=>{
-      if(result.isConfirmed){
-        selectedItems.forEach(item=>{
-          this.reviewService.deleteAccountGuide(item.id).subscribe(()=>{
-            this.allReviews = this.allReviews.filter(i=>i.id!==item.id);
-            this.updateDisplayedData();
-          });
-        });
-        Swal.fire('Deleted!', `${selectedItems.length} items deleted.`, 'success');
-      }
-    });
+  toggleAll(){ const allSelected = this.displayedReviews.every(i=>i.selected); this.displayedReviews.forEach(i=>i.selected=!allSelected);}
+selectForEdit(review: ReviewItem) {
+  this.selectedReview = review;
+  this.openAddModal(review); // هنا النوع متوافق
+}
+
+deleteSelectedItems() {
+  const selectedItems = this.displayedReviews.filter(i => i.selected);
+
+  if (!selectedItems.length) {
+    Swal.fire('Info', 'No items selected', 'info');
+    return;
   }
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `You are about to delete ${selectedItems.length} items.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete',
+    cancelButtonText: 'Cancel'
+  }).then(result => {
+    if (result.isConfirmed) {
+
+      selectedItems.forEach(item => {
+        this.reviewService.deleteAccountGuide(item.id).subscribe(() => {
+
+          // 🔥 احذف من المعروض مباشرة
+          this.displayedReviews =
+            this.displayedReviews.filter(r => r.id !== item.id);
+
+          this.totalItems--;
+          this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+          this.calculatePagination();
+        });
+      });
+
+      Swal.fire('Deleted!', `${selectedItems.length} items deleted.`, 'success');
+    }
+  });
+}
 
 goToPage(page: number|string) {
   if (typeof page === 'string') return;

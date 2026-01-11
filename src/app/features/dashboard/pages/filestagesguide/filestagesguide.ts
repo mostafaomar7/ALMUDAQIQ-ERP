@@ -49,7 +49,7 @@ export class Filestagesguide implements OnInit {
   selectedExportOption: 'pdf' | 'excel' | null = null;
 
   // selection
-  selectedStage: fileGuide | null = null;
+selectedStage: fileGuide | undefined;
 
   constructor(
     private lang: TranslateService,
@@ -177,8 +177,14 @@ prevPage() {
 
   // ---- Selection & edit ----
   toggleSelection(stage: fileGuide) {
-    (stage as any).selected = !(stage as any).selected;
-  }
+  (stage as any).selected = !(stage as any).selected;
+
+  const selected = this.displayedStages.filter(s => (s as any).selected);
+
+  // Edit يعمل فقط لو واحد
+  this.selectedStage = selected.length === 1 ? selected[0] : undefined;
+}
+
   toggleAll() {
     const allSelected = this.displayedStages.every(s => (s as any).selected);
     this.displayedStages.forEach(s => (s as any).selected = !allSelected);
@@ -192,18 +198,22 @@ prevPage() {
   }
 
   openAddModal(stage?: fileGuide) {
-    this.isModalOpen = true;
-    this.currentStep = 1;
-    if (stage) {
-      this.newStage = { ...stage };
-      this.isEditMode = true;
-      this.editingId = (stage as any).id || null;
-    } else {
-      this.newStage = {};
-      this.isEditMode = false;
-      this.editingId = null;
-    }
+  if (!stage && this.selectedStage) stage = this.selectedStage;
+
+  this.isModalOpen = true;
+  this.currentStep = 1;
+
+  if (stage) {
+    this.newStage = { ...stage };
+    this.isEditMode = true;
+    this.editingId = (stage as any).id || null;
+  } else {
+    this.newStage = {};
+    this.isEditMode = false;
+    this.editingId = null;
   }
+}
+
   prevStep() { if (this.currentStep > 1) this.currentStep--; }
   nextStep() {
   if (!this.validateStep()) return;
@@ -297,36 +307,46 @@ validateStep(): boolean {
     this.editingId = null;
     this.isEditMode = false;
   }
+deleteSelected() {
+  const selected = this.displayedStages.filter(s => (s as any).selected);
 
-  // ---- Delete selected ----
-  deleteSelected() {
-    const selected = this.allStages.filter(s => (s as any).selected);
-    if (selected.length === 0) { Swal.fire(this.t('info'), this.t('noSelection') || 'No selection', 'info'); return; }
-
-    Swal.fire({
-      title: this.t('confirmDelete'),
-      text: `${this.t('areYouSureDelete')} ${selected.length} ${this.t('items') || ''}`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: this.t('yesDelete') || 'Yes, delete',
-      cancelButtonText: this.t('cancel') || 'Cancel'
-    }).then(result => {
-      if (result.isConfirmed) {
-        selected.forEach(s => {
-          const id = (s as any).id;
-          if (!id) return;
-          this.svc.deleteAccountGuide(id).subscribe({
-            next: () => {
-              this.allStages = this.allStages.filter(x => (x as any).id !== id);
-              this.updateDisplayedData();
-            },
-            error: (err) => console.error('Delete error', err)
-          });
-        });
-        Swal.fire(this.t('deleted') || 'Deleted', this.t('itemDeletedSuccess') || 'Deleted', 'success');
-      }
-    });
+  if (selected.length === 0) {
+    Swal.fire(this.t('info'), this.t('noSelection') || 'No selection', 'info');
+    return;
   }
+
+  Swal.fire({
+    title: this.t('confirmDelete'),
+    text: `${this.t('areYouSureDelete')} ${selected.length} ${this.t('items') || ''}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: this.t('yesDelete') || 'Yes, delete',
+    cancelButtonText: this.t('cancel') || 'Cancel'
+  }).then(result => {
+    if (result.isConfirmed) {
+
+      selected.forEach(stage => {
+        const id = (stage as any).id;
+        if (!id) return;
+
+        this.svc.deleteAccountGuide(id).subscribe({
+          next: () => {
+            // 🔥 احذف من المعروض فورًا
+            this.displayedStages =
+              this.displayedStages.filter(s => (s as any).id !== id);
+
+            this.totalItems--;
+            this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+            this.calculatePagination();
+          },
+          error: err => console.error('Delete error', err)
+        });
+      });
+
+      Swal.fire(this.t('deleted') || 'Deleted', this.t('itemDeletedSuccess') || 'Deleted', 'success');
+    }
+  });
+}
 
   // ---- Import / Export ----
   openImportModal() { this.isImportModalOpen = true; }

@@ -9,10 +9,11 @@
           <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
         </button>
         <button class="btn-text"
-        [disabled]="!hasSelection"
-        (click)="openAddModal(selectedGuide)">
+        [disabled]="!selectedGuideItem"
+        (click)="openAddModal(selectedGuideItem)">
   <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
 </button>
+
       </div>
 
       <div class="search-wrapper">

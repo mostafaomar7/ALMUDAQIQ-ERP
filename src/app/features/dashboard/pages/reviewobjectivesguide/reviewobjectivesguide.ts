@@ -23,6 +23,7 @@ export class Reviewobjectivesguide implements OnInit {
   // data
   allGuides: ReviewObjectives[] = [];
   displayedGuides: ReviewObjectives[] = [];
+selectedGuideItem?: ReviewObjectives;
 
   // pagination & search
   currentPage = 1;
@@ -170,10 +171,15 @@ prevPage() {
   }
 
   // ---- Selection ----
-  toggleSelection(item: ReviewObjectives) {
-    item.selected = !item.selected;
-    this.selectedAny = this.allGuides.some(x => x.selected);
-  }
+ toggleSelection(item: ReviewObjectives) {
+  // إلغاء اختيار الكل
+  this.displayedGuides.forEach(g => g.selected = false);
+
+  // اختيار عنصر واحد
+  item.selected = true;
+
+  this.selectedGuideItem = item;
+}
 
   toggleAll() {
     const allSelected = this.displayedGuides.every(d => d.selected);
@@ -290,32 +296,44 @@ validateStep(): boolean {
 
   // ---- Delete selected ----
   deleteSelected() {
-    const selected = this.allGuides.filter(g => g.selected);
-    if (!selected.length) { Swal.fire(this.t('info'), this.t('noSelection') || 'No selection','info'); return; }
+  const selected = this.displayedGuides.filter(g => g.selected);
 
-    Swal.fire({
-      title: this.t('confirmDelete'),
-      text: `${this.t('areYouSureDelete')} ${selected.length}`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: this.t('yesDelete') || 'Yes, delete',
-      cancelButtonText: this.t('cancel') || 'Cancel'
-    }).then(result => {
-      if (result.isConfirmed) {
-        selected.forEach(s => {
-          if (!s.id) return;
-          this.svc.deleteReviewObjectives(s.id).subscribe({
-            next: () => {
-              this.allGuides = this.allGuides.filter(x => x.id !== s.id);
-              this.updateDisplayedData();
-            },
-            error: err => console.error('Delete err', err)
-          });
-        });
-        Swal.fire(this.t('deleted') || 'Deleted', this.t('itemDeletedSuccess') || 'Deleted', 'success');
-      }
-    });
+  if (!selected.length) {
+    Swal.fire(this.t('info'), this.t('noSelection') || 'No selection', 'info');
+    return;
   }
+
+  Swal.fire({
+    title: this.t('confirmDelete'),
+    text: `${this.t('areYouSureDelete')} ${selected.length}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: this.t('yesDelete') || 'Yes, delete',
+    cancelButtonText: this.t('cancel') || 'Cancel'
+  }).then(result => {
+    if (result.isConfirmed) {
+
+      selected.forEach(item => {
+        if (!item.id) return;
+
+        this.svc.deleteReviewObjectives(item.id).subscribe({
+          next: () => {
+            // 🔥 حذف فوري من الجدول
+            this.displayedGuides =
+              this.displayedGuides.filter(g => g.id !== item.id);
+
+            this.totalItems--;
+            this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+            this.calculatePagination();
+          },
+          error: err => console.error('Delete err', err)
+        });
+      });
+
+      Swal.fire(this.t('deleted') || 'Deleted', this.t('itemDeletedSuccess') || 'Deleted', 'success');
+    }
+  });
+}
 
   // ---- Import / Export ----
   openImportModal() { this.isImportModalOpen = true; }

@@ -5,9 +5,10 @@
 
     <div class="actions-group">
       <div class="edit-actions">
-        <button class="btn-text" [disabled]="!selectedStage" (click)="openAddModal(selectedStage || undefined)">
-          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
-        </button>
+<button class="btn-text" [disabled]="!selectedStage" (click)="openAddModal(selectedStage)">
+  <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+</button>
+
         <button class="btn-text" (click)="deleteSelected()">
           <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
         </button>
