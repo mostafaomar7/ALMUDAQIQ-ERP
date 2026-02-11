@@ -25,9 +25,16 @@ export class AccountguideService {
 
   constructor(private http: HttpClient) {}
 
-  getAccountGuides(page: number = 1, perPage: number = 10): Observable<any> {
-    return this.http.get(`${this.apiUrl}?page=${page}&limit=${perPage}`);
+ getAccountGuides(
+  page: number = 1,
+  perPage: number = 10,
+  search: string = ''
+): Observable<any> {
+  return this.http.get(
+    `${this.apiUrl}?page=${page}&limit=${perPage}&search=${encodeURIComponent(search)}`
+  );
 }
+
   deleteAccountGuide(id: number) {
   return this.http.delete(`${this.apiUrl}/${id}`);
 }

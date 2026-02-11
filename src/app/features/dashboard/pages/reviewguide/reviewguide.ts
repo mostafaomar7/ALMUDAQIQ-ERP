@@ -76,10 +76,12 @@ searchTerm: string = '';
   t(key: TranslationKey): string {
     return this.translations[key] || key;
   }
-  applySearch() {
+applySearch() {
+  console.log('searchTerm:', this.searchTerm);
   this.currentPage = 1;
   this.loadReviews(1);
 }
+
 loadReviews(page: number = 1) {
   this.reviewService
     .getAccountGuides(page, this.itemsPerPage, this.searchTerm)
@@ -119,7 +121,7 @@ sortByLevel() {
     return this.sortAsc ? A - B : B - A;
   });
 
-  this.updateDisplayedData();
+  // this.updateDisplayedData();
 }
 formatDateForInput(date: string | Date): string {
   const d = new Date(date);
@@ -202,9 +204,27 @@ openAddModal(review?: ReviewItem) {
         this.loadReviews();
       },
       error: (err) => {
-        console.error(err); // لعرض الخطأ في الكونسل
-        Swal.fire('خطأ', 'فشل تعديل البيان', 'error');
-      }
+  let message = 'فشل تعديل البيان';
+
+  if (err?.error) {
+    message =
+      err.error.message ||
+      err.error.error ||
+      err.error ||
+      message;
+  }
+
+ // @ts-ignore
+Swal.fire({
+  title: 'خطأ',
+  text: message,
+  icon: 'error',
+  confirmButtonText: 'حسناً',
+  appendTo: document.body
+});
+
+}
+
     });
   } else {
     // إنشاء جديد
@@ -231,9 +251,31 @@ openAddModal(review?: ReviewItem) {
         this.loadReviews();
       },
       error: (err) => {
-        console.error(err);
-        Swal.fire('خطأ', 'فشل إضافة البيان', 'error');
-      }
+  let message = 'فشل إضافة البيان';
+
+  if (err?.error) {
+    message =
+      err.error.message ||
+      err.error.error ||
+      err.error ||
+      message;
+  }
+
+  this.closeModal(); // مهم جدًا
+
+  setTimeout(() => {
+    // @ts-ignore
+Swal.fire({
+  title: 'خطأ',
+  text: message,
+  icon: 'error',
+  confirmButtonText: 'حسناً',
+  appendTo: document.body
+});
+
+  }, 0);
+}
+
     });
   }
 }
@@ -252,34 +294,34 @@ formatDate(date?: string | Date | null): string | null {
     this.currentStep = 1;
     this.editingId = null;
   }
-updateDisplayedData() {
-  const term = this.searchTerm.toLowerCase();
+// updateDisplayedData() {
+//   const term = this.searchTerm.toLowerCase();
 
-  const filtered = this.allReviews.filter(item =>
-    item.level.toLowerCase().includes(term) ||
-    item.separator.toLowerCase().includes(term) ||
-    item.number.toLowerCase().includes(term) ||
-    item.statement.toLowerCase().includes(term) ||
-    item.purpose.toLowerCase().includes(term) ||
-    item.responsiblePerson.toLowerCase().includes(term) ||
-    (item.datePrepared && item.datePrepared.toString().toLowerCase().includes(term)) ||
-    (item.dateReviewed && item.dateReviewed.toString().toLowerCase().includes(term)) ||
-    item.conclusion.toLowerCase().includes(term) ||
-    item.attachments.toLowerCase().includes(term) ||
-    item.notes1.toLowerCase().includes(term) ||
-    item.notes2.toLowerCase().includes(term) ||
-    item.notes3.toLowerCase().includes(term)
-  );
+//   const filtered = this.allReviews.filter(item =>
+//     item.level.toLowerCase().includes(term) ||
+//     item.separator.toLowerCase().includes(term) ||
+//     item.number.toLowerCase().includes(term) ||
+//     item.statement.toLowerCase().includes(term) ||
+//     item.purpose.toLowerCase().includes(term) ||
+//     item.responsiblePerson.toLowerCase().includes(term) ||
+//     (item.datePrepared && item.datePrepared.toString().toLowerCase().includes(term)) ||
+//     (item.dateReviewed && item.dateReviewed.toString().toLowerCase().includes(term)) ||
+//     item.conclusion.toLowerCase().includes(term) ||
+//     item.attachments.toLowerCase().includes(term) ||
+//     item.notes1.toLowerCase().includes(term) ||
+//     item.notes2.toLowerCase().includes(term) ||
+//     item.notes3.toLowerCase().includes(term)
+//   );
 
-  this.totalItems = filtered.length;
-  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+//   this.totalItems = filtered.length;
+//   this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
 
-  const start = (this.currentPage - 1) * this.itemsPerPage;
-  const end = start + this.itemsPerPage;
-  this.displayedReviews = filtered.slice(start, end);
+//   const start = (this.currentPage - 1) * this.itemsPerPage;
+//   const end = start + this.itemsPerPage;
+//   this.displayedReviews = filtered.slice(start, end);
 
-  this.calculatePagination();
-}
+//   this.calculatePagination();
+// }
 
   calculatePagination() {
     const total = this.totalPages;
@@ -324,23 +366,32 @@ deleteSelectedItems() {
     showCancelButton: true,
     confirmButtonText: 'Yes, delete',
     cancelButtonText: 'Cancel'
-  }).then(result => {
-    if (result.isConfirmed) {
+  }).then(async result => {
+    if (!result.isConfirmed) return;
 
-      selectedItems.forEach(item => {
-        this.reviewService.deleteAccountGuide(item.id).subscribe(() => {
+    try {
+      // 🔥 نفذ كل الحذف الأول
+      await Promise.all(
+        selectedItems.map(item =>
+          this.reviewService.deleteAccountGuide(item.id).toPromise()
+        )
+      );
 
-          // 🔥 احذف من المعروض مباشرة
-          this.displayedReviews =
-            this.displayedReviews.filter(r => r.id !== item.id);
+      // 🧠 لو الصفحة فضيت → نرجع صفحة
+      if (selectedItems.length === this.displayedReviews.length) {
+        if (this.currentPage > 1) {
+          this.currentPage--;
+        }
+      }
 
-          this.totalItems--;
-          this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-          this.calculatePagination();
-        });
-      });
+      // ✅ إعادة تحميل من السيرفر
+      this.loadReviews(this.currentPage);
 
       Swal.fire('Deleted!', `${selectedItems.length} items deleted.`, 'success');
+
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error', 'Failed to delete items', 'error');
     }
   });
 }

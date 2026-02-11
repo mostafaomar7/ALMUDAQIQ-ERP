@@ -1,0 +1,53 @@
+<aside [class.collapsed]="collapsed" class="sidebar border-end d-flex flex-column">
+
+  <div class="sidebar-header d-flex align-items-center px-3 py-2 position-relative">
+    <img src="Logo.png" alt="">
+    <span class="logo fw-bold mx-2">ALMUDAQIQ</span>
+  </div>
+
+  <ul class="menu list-unstyled mt-3 flex-grow-1">
+    <li *ngFor="let item of menuItems">
+      <ng-container *ngIf="item.subMenu; else regularLink">
+        <a class="d-flex align-items-center text-decoration-none "
+           [class.active-route]="isSettingsOpen"
+           (click)="toggleSettingsDropdown()">
+          <i [class]="item.icon + ' me-2'"></i>
+          <span class="label" *ngIf="!collapsed">{{ t(item.key) }}</span>
+          <i class="fas" [class]="isSettingsOpen ? 'fa-chevron-up' : 'fa-chevron-down'" *ngIf="!collapsed"></i>
+        </a>
+
+        <ul *ngIf="isSettingsOpen" class="submenu list-unstyled" [class.collapsed-submenu]="collapsed">
+          <li *ngFor="let subItem of item.subMenu">
+            <a [routerLink]="subItem.route"
+               routerLinkActive="active-route"
+               [routerLinkActiveOptions]="{ exact: true }"
+               class="d-flex align-items-center text-decoration-none sub-link">
+              <span class="sub-indicator"></span> <span class="label" *ngIf="!collapsed">{{ t(subItem.key) }}</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
+      <ng-template #regularLink>
+        <a [routerLink]="item.route"
+           routerLinkActive="active-route"
+           [routerLinkActiveOptions]="{ exact: true }"
+           class="d-flex align-items-center text-decoration-none">
+
+          <i [class]="item.icon + ' me-2'"></i>
+          <span class="label" *ngIf="!collapsed">{{ t(item.key) }}</span>
+        </a>
+      </ng-template>
+    </li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <li class="btn btn-sm d-flex align-items-center" (click)="logout()">
+  <i class="fas fa-sign-out-alt mx-2"></i>
+  <a href="#" class="text-decoration-none text-muted fs-6" (click)="$event.preventDefault(); logout()">
+    {{ t('logout') }}
+  </a>
+</li>
+  </div>
+
+</aside>

@@ -165,19 +165,6 @@
     <div class="modal-body">
       <div class="step step-1" *ngIf="currentStep === 1">
 
-  <!-- accountName -->
-  <label>{{ t('accountName') }}</label>
-  <input type="text"
-         name="accountName"
-         [(ngModel)]="newAccount.accountName"
-         #accountName="ngModel"
-         required
-         class="form-control"
-         [placeholder]="t('enterAccountName')">
-
-  <div class="text-danger" *ngIf="accountName.invalid && accountName.touched">
-    <small *ngIf="accountName.errors?.['required']">هذا الحقل مطلوب</small>
-  </div>
 
   <!-- level -->
   <label>{{ t('level') }}</label>
@@ -216,6 +203,19 @@
   </small>
 </div>
 
+<!-- accountName -->
+  <label>{{ t('accountName') }}</label>
+  <input type="text"
+         name="accountName"
+         [(ngModel)]="newAccount.accountName"
+         #accountName="ngModel"
+         required
+         class="form-control"
+         [placeholder]="t('enterAccountName')">
+
+  <div class="text-danger" *ngIf="accountName.invalid && accountName.touched">
+    <small *ngIf="accountName.errors?.['required']">هذا الحقل مطلوب</small>
+  </div>
 
   <!-- objectiveCode -->
   <label>{{ t('objectiveCode') }}</label>
@@ -234,18 +234,7 @@
   </div>
 
   <!-- relatedObjectives -->
-  <label>{{ t('relatedObjectives') }}</label>
-  <input type="text"
-         name="relatedObjectives"
-         [(ngModel)]="newAccount.relatedObjectives"
-         #relatedObjectives="ngModel"
-         required
-         class="form-control"
-         [placeholder]="t('enterRelatedObjectives')">
 
-  <div class="text-danger" *ngIf="relatedObjectives.invalid && relatedObjectives.touched">
-    <small *ngIf="relatedObjectives.errors?.['required']">هذا الحقل مطلوب</small>
-  </div>
 
 </div>
 
@@ -298,7 +287,18 @@
   <div class="text-danger" *ngIf="code1.invalid && code1.touched">
     <small>هذا الحقل مطلوب</small>
   </div>
+ <label>{{ t('relatedObjectives') }}</label>
+  <input type="text"
+         name="relatedObjectives"
+         [(ngModel)]="newAccount.relatedObjectives"
+         #relatedObjectives="ngModel"
+         required
+         class="form-control"
+         [placeholder]="t('relatedObjectives')">
 
+  <div class="text-danger" *ngIf="relatedObjectives.invalid && relatedObjectives.touched">
+    <small *ngIf="relatedObjectives.errors?.['required']">هذا الحقل مطلوب</small>
+  </div>
 </div>
 
     </div>

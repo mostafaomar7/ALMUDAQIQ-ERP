@@ -172,13 +172,7 @@ prevPage() {
 
   // ---- Selection ----
  toggleSelection(item: ReviewObjectives) {
-  // إلغاء اختيار الكل
-  this.displayedGuides.forEach(g => g.selected = false);
-
-  // اختيار عنصر واحد
-  item.selected = true;
-
-  this.selectedGuideItem = item;
+  item.selected = !item.selected;
 }
 
   toggleAll() {
@@ -295,7 +289,7 @@ validateStep(): boolean {
   }
 
   // ---- Delete selected ----
-  deleteSelected() {
+ deleteSelected() {
   const selected = this.displayedGuides.filter(g => g.selected);
 
   if (!selected.length) {
@@ -310,27 +304,33 @@ validateStep(): boolean {
     showCancelButton: true,
     confirmButtonText: this.t('yesDelete') || 'Yes, delete',
     cancelButtonText: this.t('cancel') || 'Cancel'
-  }).then(result => {
-    if (result.isConfirmed) {
+  }).then(async result => {
+    if (!result.isConfirmed) return;
 
-      selected.forEach(item => {
-        if (!item.id) return;
+    try {
+      await Promise.all(
+        selected.map(item =>
+          this.svc.deleteReviewObjectives(item.id!).toPromise()
+        )
+      );
 
-        this.svc.deleteReviewObjectives(item.id).subscribe({
-          next: () => {
-            // 🔥 حذف فوري من الجدول
-            this.displayedGuides =
-              this.displayedGuides.filter(g => g.id !== item.id);
+      // 🧠 لو الصفحة فضيت نرجع صفحة
+      if (selected.length === this.displayedGuides.length && this.currentPage > 1) {
+        this.currentPage--;
+      }
 
-            this.totalItems--;
-            this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-            this.calculatePagination();
-          },
-          error: err => console.error('Delete err', err)
-        });
-      });
+      // ✅ reload من السيرفر
+      this.loadGuides(this.currentPage);
 
-      Swal.fire(this.t('deleted') || 'Deleted', this.t('itemDeletedSuccess') || 'Deleted', 'success');
+      Swal.fire(
+        this.t('deleted') || 'Deleted',
+        this.t('itemDeletedSuccess') || 'Deleted successfully',
+        'success'
+      );
+
+    } catch (err) {
+      console.error(err);
+      Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
     }
   });
 }

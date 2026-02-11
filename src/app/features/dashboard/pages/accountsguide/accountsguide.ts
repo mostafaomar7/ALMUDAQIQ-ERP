@@ -37,7 +37,8 @@ export class Accountsguide implements OnInit {
 isEditMode: boolean = false;
 editingAccountId: number | null = null;
 
-  allAccounts: DisplayAccount[] = [];
+  // allAccounts: DisplayAccount[] = [];
+// filteredAccounts: DisplayAccount[] = [];
   displayedAccounts: DisplayAccount[] = [];
 selectedAccount: DisplayAccount | null = null;
   currentPage = 1;
@@ -128,24 +129,8 @@ closeImportModal() {
     this.currentStep = 1;
   }
 filterAccounts() {
-  const text = (this.searchText || '').toLowerCase().trim();
-
-  this.displayedAccounts = this.displayedAccounts.filter(acc => {
-    return (
-      (acc.name?.toLowerCase().includes(text)) ||
-      (acc.level?.toLowerCase().includes(text)) ||
-      (acc.number?.toString().includes(text)) ||
-      (acc.rules?.toLowerCase().includes(text)) ||
-      (acc.notes?.toLowerCase().includes(text)) ||
-      (acc.code?.toLowerCase().includes(text)) ||
-      (acc.objectiveCode?.toLowerCase().includes(text)) ||
-      (acc.relatedObjectives?.toLowerCase().includes(text))
-    );
-  });
-
-  this.totalItems = this.displayedAccounts.length;
-  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-  this.calculatePagination();
+  this.currentPage = 1;
+  this.loadAccounts(1);
 }
 
   loadTranslations(lang: 'en' | 'ar') {
@@ -156,30 +141,44 @@ filterAccounts() {
   return (this.translations as any)[key] || key;
 }
 loadAccounts(page: number = 1) {
-  this.accountService.getAccountGuides(page, this.itemsPerPage).subscribe({
-    next: (res: any) => {
-      this.displayedAccounts = res.data.map((a: AccountGuide) => ({
-        id: a.id,
-        name: a.accountName || '',
-        level: a.level,
-        number: a.accountNumber.toString(),
-        rules: a.rulesAndRegulations || '',
-        notes: a.disclosureNotes || '',
-        code: a.code1 || '',
-        objectiveCode: a.objectiveCode,
-        relatedObjectives: a.relatedObjectives,
-        selected: false
-      }));
+  this.accountService
+    .getAccountGuides(page, this.itemsPerPage, this.searchText)
+    .subscribe({
+      next: (res: any) => {
+        this.displayedAccounts = res.data.map((a: AccountGuide) => ({
+          id: a.id,
+          name: a.accountName || '',
+          level: a.level,
+          number: a.accountNumber.toString(),
+          rules: a.rulesAndRegulations || '',
+          notes: a.disclosureNotes || '',
+          code: a.code1 || '',
+          objectiveCode: a.objectiveCode,
+          relatedObjectives: a.relatedObjectives,
+          selected: false
+        }));
 
-      this.currentPage = res.page;
-      this.itemsPerPage = res.limit;
-      this.totalItems = res.total;
-      this.totalPages = res.totalPages;
+        this.currentPage = res.page;
+        this.itemsPerPage = res.limit;
+        this.totalItems = res.total;
+        this.totalPages = res.totalPages;
 
-      this.calculatePagination();
-    }
-  });
+        this.calculatePagination();
+      }
+    });
 }
+
+// updateDisplayedAccounts() {
+//   const start = (this.currentPage - 1) * this.itemsPerPage;
+//   const end = start + this.itemsPerPage;
+
+//   this.displayedAccounts = this.filteredAccounts.slice(start, end);
+
+//   this.totalItems = this.filteredAccounts.length;
+//   this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+
+//   this.calculatePagination();
+// }
 
 get showingRangeText(): string {
   const start = (this.currentPage - 1) * this.itemsPerPage + 1;
@@ -200,7 +199,6 @@ sortAsc = true;
 
 //   this.updateDisplayedData();
 // }
-
 deleteSelected() {
   const selectedAccounts = this.displayedAccounts.filter(a => a.selected);
 
@@ -217,25 +215,30 @@ deleteSelected() {
     confirmButtonText: 'Yes, delete',
     cancelButtonText: 'Cancel'
   }).then((result) => {
-    if (result.isConfirmed) {
-      // تنفيذ الحذف
-      selectedAccounts.forEach(acc => {
-        this.accountService.deleteAccountGuide(acc.id).subscribe({
-          next: () => {
-  this.displayedAccounts =
-    this.displayedAccounts.filter(a => a.id !== acc.id);
+    if (!result.isConfirmed) return;
 
-  this.totalItems--;
-  this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-  this.calculatePagination();
-}
-,
-          error: (err) => console.error(`Error deleting account ${acc.id}:`, err)
-        });
+    const deleteRequests = selectedAccounts.map(acc =>
+      this.accountService.deleteAccountGuide(acc.id)
+    );
+
+    // نفذ كل عمليات الحذف
+    Promise.all(deleteRequests.map(req => req.toPromise()))
+      .then(() => {
+        // 👇 لو الصفحة فضيت بعد الحذف
+        if (selectedAccounts.length === this.displayedAccounts.length) {
+          if (this.currentPage > 1) {
+            this.currentPage--;
+          }
+        }
+
+        this.loadAccounts(this.currentPage);
+
+        Swal.fire('Deleted!', 'Selected account(s) have been deleted.', 'success');
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire('Error', 'Failed to delete some accounts', 'error');
       });
-
-      Swal.fire('Deleted!', 'Selected account(s) have been deleted.', 'success');
-    }
   });
 }
 
@@ -245,8 +248,9 @@ deleteSelected() {
   // }
 goToPage(page: number | string) {
   if (typeof page === 'string') return;
+
   if (page >= 1 && page <= this.totalPages) {
-    this.loadAccounts(page); // بدل updateDisplayedData()
+    this.loadAccounts(page);
   }
 }
 
@@ -365,15 +369,37 @@ submitNewAccount() {
       error: (err) => Swal.fire('خطأ', 'فشل تعديل الحساب', 'error')
     });
   } else {
-    // إنشاء جديد
     this.accountService.createAccountGuide(this.newAccount).subscribe({
-      next: (res) => {
-        Swal.fire('تم الإنشاء', 'تم إضافة الحساب بنجاح!', 'success');
-        this.closeModal();
-        this.loadAccounts(); // إعادة تحميل البيانات بعد الإضافة
-      },
-      error: (err) => Swal.fire('خطأ', 'فشل إنشاء الحساب', 'error')
-    });
+  next: (res) => {
+    Swal.fire('تم الإنشاء', 'تم إضافة الحساب بنجاح!', 'success');
+    this.closeModal();
+    this.loadAccounts();
+  },
+  error: (err) => {
+    let message = 'فشل إنشاء الحساب';
+
+    if (err?.error) {
+      message =
+        err.error.message ||
+        err.error.error ||
+        err.error ||
+        message;
+    }
+
+    // اقفل المودال الأول (اختياري)
+    this.closeModal();
+
+    setTimeout(() => {
+      Swal.fire({
+        title: 'خطأ',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'حسناً'
+      });
+    }, 0);
+  }
+});
+
   }
 }
 onDragOver(event: DragEvent) {

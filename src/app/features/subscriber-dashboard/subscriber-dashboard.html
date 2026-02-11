@@ -1,0 +1,11 @@
+<div class="dashboard-container d-flex">
+  <app-subscriber-sidebar></app-subscriber-sidebar>
+
+  <div class="main-content flex-fill d-flex flex-column">
+    <app-subscriber-header></app-subscriber-header>
+
+    <div class="content flex-fill p-4" [class.rtl]="isRtl">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

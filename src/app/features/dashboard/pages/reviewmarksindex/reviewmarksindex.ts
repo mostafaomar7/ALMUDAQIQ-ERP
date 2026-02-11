@@ -110,12 +110,9 @@ export class ReviewmarksindexComponent implements OnInit {
     const start = (this.currentPage-1)*this.itemsPerPage;
     this.displayedMarks = this.allMarks.slice(start, start+this.itemsPerPage);
   }
-
-  goToPage(page: number | string) {
+goToPage(page: number | string) {
   if (typeof page === 'string') return;
-  if (page >= 1 && page <= this.totalPages) {
-    this.loadMarks(page);
-  }
+  this.loadMarks(page);
 }
 
 nextPage() {
@@ -142,20 +139,52 @@ prevPage() {
   // ---- Selection ----
 toggleSelection(mark: Reviewmarksindex) {
   mark.selected = !mark.selected;
-
-  if (mark.selected) {
-    this.selectedMark = mark;
-    this.displayedMarks.forEach(m => {
-      if (m !== mark) m.selected = false;
-    });
-  } else {
-    this.selectedMark = null;
-  }
 }
-  toggleAll() {
-    const allSelected = this.displayedMarks.every(m => m.selected);
-    this.displayedMarks.forEach(m => m.selected = !allSelected);
+
+toggleAll() {
+  const allSelected = this.displayedMarks.every(m => m.selected);
+  this.displayedMarks.forEach(m => m.selected = !allSelected);
+}
+
+deleteSelected() {
+  const selected = this.displayedMarks.filter(m => m.selected);
+
+  if (!selected.length) {
+    Swal.fire('No selected items', 'info');
+    return;
   }
+
+  Swal.fire({
+    title: this.t('confirmDelete'),
+    text: `Delete ${selected.length} item(s)?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: this.t('yesDelete'),
+    cancelButtonText: this.t('cancel')
+  }).then(async result => {
+    if (!result.isConfirmed) return;
+
+    try {
+      await Promise.all(
+        selected.map(m =>
+          this.svc.deleteReviewmarksindex(m.id!).toPromise()
+        )
+      );
+
+      // لو الصفحة فضيت
+      if (selected.length === this.displayedMarks.length && this.currentPage > 1) {
+        this.currentPage--;
+      }
+
+      // reload من السيرفر
+      this.loadMarks(this.currentPage);
+
+      Swal.fire(this.t('success'), this.t('deleted'), 'success');
+    } catch {
+      Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+    }
+  });
+}
 
   selectMark(mark: Reviewmarksindex) {
     this.selectedMark = mark;

@@ -51,7 +51,7 @@ export const AR = {
   costNotBilled: 'تكاليف لم تتم فوترتها بعد',
   recognizedMonthly: 'يتم إثباته شهرياً',
   annualProvision: 'مخصص سنوي',
-  relatedObjectives : 'الأهداف ذات الصلة',
+  relatedObjectives : 'تعليق',
   objectiveCode : 'الايضاح المطلوب - IFRS الكاملة',
     enterCode: 'ادخال الكود',
   submit: 'اضافة',

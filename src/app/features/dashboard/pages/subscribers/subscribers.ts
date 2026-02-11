@@ -1051,6 +1051,19 @@ exportToPDF() {
     }
   });
 }
+// Select / Unselect all renewal rows
+toggleAllRenSelection(event: Event) {
+  const checked = (event.target as HTMLInputElement).checked;
+  this.renDisplayedItems.forEach(user => user.selected = checked);
+}
+
+// Check if all selected
+get allRenSelected(): boolean {
+  return (
+    this.renDisplayedItems.length > 0 &&
+    this.renDisplayedItems.every(user => user.selected)
+  );
+}
 
 
 }

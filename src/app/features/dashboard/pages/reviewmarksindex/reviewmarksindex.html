@@ -12,7 +12,7 @@
           <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
         </button>
 
-        <button class="btn-text" [disabled]="!selectedMark" (click)="selectedMark && deleteMark(selectedMark)">
+        <button class="btn-text" [disabled]="!selectedMark" (click)="selectedMark && deleteSelected()">
           <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
         </button>
       </div>

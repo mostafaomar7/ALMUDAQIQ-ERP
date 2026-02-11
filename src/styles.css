@@ -552,4 +552,7 @@ body.dark-mode .reminder{
   padding: 10px 22px;
   border-radius: 6px;
 }
+.swal2-container {
+  z-index: 99999 !important;
+}
 

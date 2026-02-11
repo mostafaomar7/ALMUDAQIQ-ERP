@@ -51,7 +51,7 @@ export const EN = {
   costNotBilled: 'Costs not yet billed',
   recognizedMonthly: 'Recognized monthly',
   annualProvision: 'Annual provision',
-  relatedObjectives : 'related Objectives',
+  relatedObjectives : 'Comment',
   objectiveCode : 'الايضاح المطلوب - IFRS الكاملة',
     enterCode: 'Enter Code',
   submit: 'Submit',

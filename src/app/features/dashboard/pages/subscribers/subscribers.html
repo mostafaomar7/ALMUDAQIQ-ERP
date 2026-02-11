@@ -275,7 +275,11 @@
           <thead class="bg-light">
             <tr class="text-muted small text-uppercase">
               <th scope="col" style="width: 50px;">
-                <input type="checkbox" [checked]="allSelected" (change)="toggleAllSelection($event)">
+<input
+  type="checkbox"
+  [checked]="allRenSelected"
+  (change)="toggleAllRenSelection($event)"
+>
               </th>
               <th scope="col">{{ t('name') }}</th>
               <th scope="col">{{ t('email') }}</th>
@@ -286,7 +290,7 @@
               <th scope="col">{{ t('subscriptionEnd') }}</th>
               <th scope="col">{{ t('lastrenewal') }}</th>
               <th scope="col">{{ t('Status') }}</th>
-              <th scope="col">{{ t('Actions') }}</th>
+              <!-- <th scope="col">{{ t('Actions') }}</th> -->
             </tr>
           </thead>
           <tbody>
@@ -309,9 +313,9 @@
     <td class="text-muted">{{ user.startDate }}</td>
     <td class="text-muted">{{ user.renewalStatus }}</td>
     <td>
-      <button class="btn btn-success btn-sm">
+      <!-- <button class="btn btn-success btn-sm">
         {{ t('reminder') }}
-      </button>
+      </button> -->
   </tr>
           </tbody>
         </table>

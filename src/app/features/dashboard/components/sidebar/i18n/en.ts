@@ -12,4 +12,6 @@ export const EN = {
   fileStagesGuide: 'File Stages Guide',
   reviewObjectivesGuide: 'Review Objectives Guide',
   reviewMarksIndex: 'Review Marks Index',
+  Branches : 'Branches',
+  users : 'Users'
 };

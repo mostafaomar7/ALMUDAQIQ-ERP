@@ -93,39 +93,16 @@ selectedStage: fileGuide | undefined;
 
   // ---- Search / Filter ----
   onSearchInput() {
-    const text = (this.searchText || '').toLowerCase().trim();
-    if (!text) {
-      this.totalItems = this.allStages.length;
-      this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-      this.currentPage = 1;
-      this.updateDisplayedData();
-      this.calculatePagination();
-      return;
-    }
+  this.currentPage = 1;
+  this.loadStages(1);
+}
 
-    const filtered = this.allStages.filter(s => {
-      // check a few representative fields; extend as needed
-      return (
-        (s.stageCode || '').toLowerCase().includes(text) ||
-        (s.stage || '').toLowerCase().includes(text) ||
-        (s.entityType || '').toLowerCase().includes(text) ||
-        (s.economicSector || '').toLowerCase().includes(text) ||
-        (s.procedure || '').toLowerCase().includes(text) ||
-        (s.responsibleAuthority || '').toLowerCase().includes(text)
-      );
-    });
-
-    this.displayedStages = filtered;
-    this.totalItems = filtered.length;
-    this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-    this.calculatePagination();
-  }
 
   // ---- Pagination ----
-  updateDisplayedData() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    this.displayedStages = this.allStages.slice(start, start + this.itemsPerPage);
-  }
+  // updateDisplayedData() {
+  //   const start = (this.currentPage - 1) * this.itemsPerPage;
+  //   this.displayedStages = this.allStages.slice(start, start + this.itemsPerPage);
+  // }
 
   goToPage(page: number | string) {
   if (typeof page === 'string') return;
@@ -310,7 +287,7 @@ validateStep(): boolean {
 deleteSelected() {
   const selected = this.displayedStages.filter(s => (s as any).selected);
 
-  if (selected.length === 0) {
+  if (!selected.length) {
     Swal.fire(this.t('info'), this.t('noSelection') || 'No selection', 'info');
     return;
   }
@@ -322,28 +299,37 @@ deleteSelected() {
     showCancelButton: true,
     confirmButtonText: this.t('yesDelete') || 'Yes, delete',
     cancelButtonText: this.t('cancel') || 'Cancel'
-  }).then(result => {
-    if (result.isConfirmed) {
+  }).then(async result => {
+    if (!result.isConfirmed) return;
 
-      selected.forEach(stage => {
-        const id = (stage as any).id;
-        if (!id) return;
+    try {
+      // 🔥 نفذ كل عمليات الحذف
+      await Promise.all(
+        selected.map(stage => {
+          const id = (stage as any).id;
+          return this.svc.deleteAccountGuide(id).toPromise();
+        })
+      );
 
-        this.svc.deleteAccountGuide(id).subscribe({
-          next: () => {
-            // 🔥 احذف من المعروض فورًا
-            this.displayedStages =
-              this.displayedStages.filter(s => (s as any).id !== id);
+      // 🧠 لو الصفحة الحالية فضيت → نرجع صفحة
+      if (selected.length === this.displayedStages.length) {
+        if (this.currentPage > 1) {
+          this.currentPage--;
+        }
+      }
 
-            this.totalItems--;
-            this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-            this.calculatePagination();
-          },
-          error: err => console.error('Delete error', err)
-        });
-      });
+      // ✅ إعادة تحميل من السيرفر
+      this.loadStages(this.currentPage);
 
-      Swal.fire(this.t('deleted') || 'Deleted', this.t('itemDeletedSuccess') || 'Deleted', 'success');
+      Swal.fire(
+        this.t('deleted') || 'Deleted',
+        this.t('itemDeletedSuccess') || 'Deleted successfully',
+        'success'
+      );
+
+    } catch (err) {
+      console.error('Delete error', err);
+      Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
     }
   });
 }

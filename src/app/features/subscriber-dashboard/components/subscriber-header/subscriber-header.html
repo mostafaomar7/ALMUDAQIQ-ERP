@@ -1,0 +1,65 @@
+<header class="app-header">
+  <div class="header-title">
+    <h1>Dashboard</h1>
+  </div>
+
+  <div class="header-actions">
+    <div class="action-icons">
+
+      <button mat-icon-button style="padding: calc(calc(var(--mat-icon-button-state-layer-size, 27px) - var(--mat-icon-button-icon-size, 24px)) / 2);" class="icon-btn" (click)="toggleLang()">
+        <i class="fa-solid fa-globe"></i>
+      </button>
+
+      <button mat-icon-button class="icon-btn" (click)="toggleTheme()" style="padding: calc(calc(var(--mat-icon-button-state-layer-size, 27px) - var(--mat-icon-button-icon-size, 24px)) / 2);" class="icon-btn">
+        <i class="fa-solid" [ngClass]="themeService.isDark() ? 'fa-sun' : 'fa-circle-half-stroke'"></i>
+      </button>
+
+      <button mat-icon-button class="icon-btn" [matMenuTriggerFor]="notificationsMenu" style="padding: calc(calc(var(--mat-icon-button-state-layer-size, 27px) - var(--mat-icon-button-icon-size, 24px)) / 2);" class="icon-btn">
+        <div class="badge-dot"></div> <i class="fa-solid fa-bell"></i>
+      </button>
+
+      <mat-menu #notificationsMenu="matMenu" xPosition="before" class="notification-menu-panel">
+        <div class="notif-container" (click)="$event.stopPropagation()">
+
+          <div class="notif-header">
+            <div class="tab-item" [class.active]="activeTab === 'All'" (click)="selectTab('All', $event)">
+              All <span class="badge-count">2</span>
+            </div>
+            <div class="tab-item" [class.active]="activeTab === 'Unread'" (click)="selectTab('Unread', $event)">Unread</div>
+            <div class="tab-item" [class.active]="activeTab === 'System'" (click)="selectTab('System', $event)">System Errors</div>
+          </div>
+
+          <div class="notif-list">
+            <div class="notif-item" *ngFor="let item of notifications">
+
+              <div class="notif-icon-box" [ngClass]="item.type">
+                <i class="fa-solid" [ngClass]="item.icon"></i>
+              </div>
+
+              <div class="notif-content">
+                <div class="d-flex justify-content-between">
+                  <span class="notif-title">{{ item.title }}</span>
+                  <span *ngIf="!item.read" class="unread-dot"></span>
+                </div>
+                <p class="notif-desc">{{ item.desc }}</p>
+                <span class="notif-time">{{ item.time }}</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </mat-menu>
+
+    </div>
+
+    <div class="user-profile">
+      <img [src]="userAvatar" [alt]="userName" class="avatar">
+      <div class="user-details">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-email">{{ userEmail }}</span>
+      </div>
+    </div>
+
+  </div>
+</header>

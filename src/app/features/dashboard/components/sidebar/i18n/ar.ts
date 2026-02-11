@@ -12,4 +12,7 @@ export const AR = {
   fileStagesGuide: 'دليل مراحل الملف',
   reviewObjectivesGuide: 'دليل أهداف المراجعة',
   reviewMarksIndex: 'مؤشر علامات المراجعة',
+  Branches : 'الفروع' ,
+  users : 'المستخدمين'
+
 };
