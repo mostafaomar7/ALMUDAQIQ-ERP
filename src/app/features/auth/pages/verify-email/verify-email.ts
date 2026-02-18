@@ -23,7 +23,7 @@ export class VerifyEmail {
   error: string | null = null;
   successMsg: string | null = null;
 
-  email: string = 'admin@erp.com'; // يمكن تحديثها من السيرفر أو الاستقبال من السابق
+email: string = localStorage.getItem('resetEmail') || '';
 
   // الحقول الستة للـ OTP
   @ViewChild('otp1') otp1!: ElementRef<HTMLInputElement>;
@@ -51,7 +51,7 @@ export class VerifyEmail {
   t(key: TranslationKeys) {
     return this.translations[key] || key;
   }
-
+  
   onInput(event: Event, nextInput: HTMLInputElement | null) {
     const input = event.target as HTMLInputElement;
     if (!/^[0-9]$/.test(input.value)) input.value = '';

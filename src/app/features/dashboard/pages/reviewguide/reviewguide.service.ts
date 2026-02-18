@@ -26,7 +26,7 @@ export interface reviewGuide {
   providedIn: 'root',
 })
 export class ReviewguideService {
-  private apiUrl = `${environment.apiUrl}/review-guides`;
+  private apiUrl = `${environment.apiUrl}/review-guide-templates`;
 
   constructor(private http: HttpClient) {}
 

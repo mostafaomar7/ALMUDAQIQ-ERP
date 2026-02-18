@@ -1,0 +1,216 @@
+:host {
+  display: block;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f8f9fa; /* Page background */
+  min-height: 100vh;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* --- Header Section --- */
+.header {
+  max-width: 1100px;
+  margin: 0 auto 40px auto;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* --- Cards Container --- */
+.cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  flex-wrap: wrap; /* Stack on mobile */
+}
+
+/* --- Card Base Styles (Default White Card) --- */
+.card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 40px 32px;
+  flex: 1;
+  width: 300px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s;
+  color: #1f2937;
+}
+
+.plan-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.price-container {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.currency {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.amount {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.period {
+  display: block;
+  font-size: 14px;
+  margin-top: 4px;
+  margin-bottom: 24px;
+  opacity: 0.8;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 32px;
+  opacity: 0.7;
+}
+
+/* Features List */
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Icons */
+.icon-check {
+  display: flex;
+  color: #047857; /* Green checkmark for white card */
+}
+
+/* Button */
+.btn-action {
+  width: 100%;
+  padding: 14px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  /* Default Button Colors */
+  background-color: #047857;
+  color: white;
+}
+
+.btn-action:hover {
+  opacity: 0.9;
+}
+
+/* --- Highlighted Card (Green Background) --- */
+.card.highlighted {
+  background-color: #047857; /* Dark Emerald Green */
+  color: white;
+  transform: scale(1.02); /* Slightly larger */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.card.highlighted .period,
+.card.highlighted .description {
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 1;
+}
+
+.card.highlighted .icon-check {
+  color: white; /* White checkmark for green card */
+}
+
+.card.highlighted .btn-action {
+  background-color: white;
+  color: #047857; /* Green text for white button */
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .cards-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .card.highlighted {
+    transform: scale(1);
+  }
+}
+.app-toast{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+
+  /* خليها أعلى حاجة */
+  z-index: 2147483647;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+
+  pointer-events: none;
+}
+
+.app-toast.success { background: #16a34a; }
+.app-toast.error { background: #dc2626; }
+
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

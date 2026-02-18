@@ -1,3 +1,5 @@
+import { AuthGuard } from '../dashboard/guard/auth.guard';
+import { ChangePassword } from './pages/change-password/change-password';
 import { Routes } from '@angular/router';
 // import { Login } from './pages/login/login';
 // import { ForgotRequest } from './pages/forgot-request/forgot-request';
@@ -17,6 +19,12 @@ export const AUTH_ROUTES: Routes = [
       import('./pages/forgot-request/forgot-request')
         .then(c => c.ForgotRequest)
   },
+ {
+  path: 'change-password',
+  canActivate: [AuthGuard],
+  loadComponent: () => import('./pages/change-password/change-password').then(m => m.ChangePassword)
+}
+,
   {
     path: 'reset-password',
     loadComponent: () =>

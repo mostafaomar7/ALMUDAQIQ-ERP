@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 interface Branch {
   id: number;
@@ -14,7 +15,7 @@ interface Branch {
 @Component({
   selector: 'app-subscriber-branches',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule , RouterLink],
   templateUrl: './subscriber-branches.html',
   styleUrls: ['./subscriber-branches.css'], // تأكد من الاسم الصحيح للملف
 })

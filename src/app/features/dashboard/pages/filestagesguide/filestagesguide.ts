@@ -70,23 +70,43 @@ selectedStage: fileGuide | undefined;
   }
 
   // ---- API ----
-  loadStages(page: number = 1) {
+loadStages(page: number = 1) {
   this.svc.getAccountGuides(page, this.itemsPerPage, this.searchText).subscribe({
     next: (res: any) => {
-      this.displayedStages = res.data.map((d: any) => ({
+      // ✅ list ممكن يبقى: res (Array) أو res.data
+      const list = Array.isArray(res) ? res : (res?.data ?? []);
+
+      this.displayedStages = list.map((d: any) => ({
         ...d,
         selected: false
       }));
 
-      this.totalItems = res.meta.total;
-      this.totalPages = res.meta.pages;
-      this.currentPage = res.meta.page;
+      // ✅ Pagination meta ممكن تكون في res.meta أو res مباشرة
+      const total =
+        res?.meta?.total ?? res?.total ?? list.length;
+
+      const pages =
+        res?.meta?.pages ?? res?.totalPages ?? Math.max(1, Math.ceil(total / this.itemsPerPage));
+
+      const current =
+        res?.meta?.page ?? res?.page ?? page;
+
+      this.totalItems = total;
+      this.totalPages = pages;
+      this.currentPage = current;
 
       this.calculatePagination();
     },
     error: err => {
       console.error(err);
       Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+
+      // عشان الـ UI ما ينهارش
+      this.displayedStages = [];
+      this.totalItems = 0;
+      this.totalPages = 1;
+      this.currentPage = page;
+      this.calculatePagination();
     }
   });
 }

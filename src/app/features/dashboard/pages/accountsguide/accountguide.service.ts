@@ -21,7 +21,7 @@ export interface AccountGuide {
   providedIn: 'root',
 })
 export class AccountguideService {
-  private apiUrl = `${environment.apiUrl}/account-guides`;
+  private apiUrl = `${environment.apiUrl}/account-guide-templates`;
 
   constructor(private http: HttpClient) {}
 

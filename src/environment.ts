@@ -6,7 +6,8 @@ export const environment = {
     // apiUrl: 'https://api.mudqiq.com' //dev
 
     // apiUrl: 'http://localhost:4000/api/v1'
-    apiUrl: 'http://192.168.1.125:4000'
+    apiUrl: 'http://192.168.1.16:4000',
+  defaultTenant: 'bayomyv-1'
 
     // apiUrl: ''
 

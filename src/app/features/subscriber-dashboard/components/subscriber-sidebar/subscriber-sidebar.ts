@@ -38,9 +38,12 @@ export class SubscriberSidebar {
   isSettingsOpen = false;
 
   menuItems: MenuItem[] = [
-    { key: 'dashboard', icon: 'fa-brands fa-gg', route: '/subscriber' },
+    { key: 'KPIS', icon: 'fa-brands fa-gg', route: '/subscriber' },
+        { key: 'reports', icon: 'fa-brands fa-gg', route: '/subscriber' },
+        { key: 'Financial', icon: 'fa-brands fa-gg', route: '/subscriber' },
     { key: 'Branches', icon: 'fa-solid fa-users', route: '/subscriber/branches' },
     { key: 'users', icon: 'fa-solid fa-users', route: '/subscriber/users' },
+    { key: 'Support', icon: 'fa-solid fa-users', route: '/subscriber/users' },
 
     {
       key: 'settings',
@@ -54,7 +57,9 @@ export class SubscriberSidebar {
         { key: 'reviewObjectivesGuide', route: '/dashboard/settings/review-objectives-guide' },
         { key: 'reviewMarksIndex', route: '/dashboard/settings/review-marks-index' }
       ]
-    }
+    },
+    { key: 'profile', icon: 'fa-solid fa-users', route: '/subscriber/profile' },
+
   ];
 
 

@@ -1,0 +1,208 @@
+<div class="page-container">
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <!-- Card 1: Company -->
+  <div class="card">
+    <div class="card-header">
+      <div class="title-group">
+        <div class="icon-box green-icon"> ... </div>
+        <h2>Company Information</h2>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Company Name</label>
+        <div class="read-only-field">{{ companyInfo.name }}</div>
+      </div>
+      <div class="form-group">
+        <label>Company Email</label>
+        <div class="read-only-field">{{ companyInfo.email }}</div>
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <div class="read-only-field">{{ companyInfo.country }}</div>
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <div class="read-only-field">{{ companyInfo.city }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: License -->
+  <div class="card">
+    <div class="card-header">
+      <div class="title-group">
+        <div class="icon-box green-icon"> ... </div>
+        <h2>License Information</h2>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>License Name</label>
+        <div class="read-only-field">{{ licenseInfo.name }}</div>
+      </div>
+      <div class="form-group">
+        <label>License Type</label>
+        <div class="read-only-field">{{ licenseInfo.type }}</div>
+      </div>
+      <div class="form-group">
+        <label>License Number</label>
+        <div class="read-only-field">{{ licenseInfo.number }}</div>
+      </div>
+      <div class="form-group">
+        <label>License Date</label>
+        <div class="read-only-field">{{ licenseInfo.date }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Subscription -->
+  <div class="card">
+    <div class="card-header">
+      <div class="title-group">
+        <div class="icon-box green-icon"> ... </div>
+        <h2>Subscription Details</h2>
+      </div>
+      <a [routerLink]="'/subscriber/upgrade'"><button class="btn-upgrade" >Upgrade Plan</button></a>
+    </div>
+
+    <div class="details-grid">
+      <div class="detail-item">
+        <label>Current plan</label>
+        <span class="detail-value">{{ subscriptionDetails.currentPlan }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Status</label>
+        <span class="detail-value">{{ subscriptionDetails.status }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Start Date</label>
+        <span class="detail-value">{{ subscriptionDetails.startDate }}</span>
+      </div>
+      <div class="detail-item">
+        <label>End Date</label>
+        <span class="detail-value">{{ subscriptionDetails.endDate }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Paid Fees</label>
+        <span class="detail-value">{{ subscriptionDetails.paidFees }} SAR</span>
+      </div>
+      <div class="detail-item">
+        <label>Remaining Days</label>
+        <span class="detail-value">{{ subscriptionDetails.remainingDays }}</span>
+      </div>
+    </div>
+
+    <div class="usage-grid">
+      <!-- Users -->
+      <div class="usage-item">
+        <div class="usage-header"><label>Users</label></div>
+        <div class="usage-value">
+          {{ subscriptionDetails.usageBars.users.current }}/{{ subscriptionDetails.usageBars.users.max }}
+          ({{ subscriptionDetails.usageBars.users.pct }}%)
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"
+               [style.width]="calculateWidth(subscriptionDetails.usageBars.users.current, subscriptionDetails.usageBars.users.max)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Branches -->
+      <div class="usage-item">
+        <div class="usage-header"><label>Branches</label></div>
+        <div class="usage-value">
+          {{ subscriptionDetails.usageBars.branches.current }}/{{ subscriptionDetails.usageBars.branches.max }}
+          ({{ subscriptionDetails.usageBars.branches.pct }}%)
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"
+               [style.width]="calculateWidth(subscriptionDetails.usageBars.branches.current, subscriptionDetails.usageBars.branches.max)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Clients -->
+      <div class="usage-item">
+        <div class="usage-header"><label>Clients</label></div>
+        <div class="usage-value">
+          {{ subscriptionDetails.usageBars.clients.current }}/{{ subscriptionDetails.usageBars.clients.max }}
+          ({{ subscriptionDetails.usageBars.clients.pct }}%)
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"
+               [style.width]="calculateWidth(subscriptionDetails.usageBars.clients.current, subscriptionDetails.usageBars.clients.max)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage -->
+      <div class="usage-item">
+        <div class="usage-header"><label>Storage</label></div>
+        <div class="usage-value">
+          {{ subscriptionDetails.usageBars.storage.current }} {{ subscriptionDetails.usageBars.storage.label }}
+          / {{ subscriptionDetails.usageBars.storage.max }} {{ subscriptionDetails.usageBars.storage.label }}
+          ({{ subscriptionDetails.usageBars.storage.pct }}%)
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"
+               [style.width]="calculateWidth(subscriptionDetails.usageBars.storage.current, subscriptionDetails.usageBars.storage.max)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plan-description">
+      <label>Plan Description</label>
+      <p>{{ subscriptionDetails.description }}</p>
+    </div>
+  </div>
+
+  <!-- Card 4: Links -->
+  <div class="card">
+    <div class="card-header">
+      <div class="title-group">
+        <div class="icon-box green-icon"> ... </div>
+        <h2>Official Government & Association Links</h2>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>CPA</label>
+        <div class="read-only-field link-text">
+          <a *ngIf="authorityLinks.cpa" [href]="authorityLinks.cpa" target="_blank" rel="noopener">
+            {{ authorityLinks.cpa }}
+          </a>
+          <span *ngIf="!authorityLinks.cpa">—</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tax (ZATCA)</label>
+        <div class="read-only-field link-text">
+          <a *ngIf="authorityLinks.tax" [href]="authorityLinks.tax" target="_blank" rel="noopener">
+            {{ authorityLinks.tax }}
+          </a>
+          <span *ngIf="!authorityLinks.tax">—</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Ministry of Commerce</label>
+        <div class="read-only-field link-text">
+          <a *ngIf="authorityLinks.ministry" [href]="authorityLinks.ministry" target="_blank" rel="noopener">
+            {{ authorityLinks.ministry }}
+          </a>
+          <span *ngIf="!authorityLinks.ministry">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

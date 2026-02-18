@@ -68,10 +68,24 @@ export class Login implements OnInit {
           return of(null);
         })
       )
-      .subscribe(res => {
-        this.loading = false;
-        if (res) this.router.navigate(['/dashboard']);
-      });
+.subscribe(res => {
+  this.loading = false;
+  if (!res) return;
+
+  const role = res?.user?.role;
+  const mustChangePassword = !!res?.mustChangePassword;
+
+  // لو subscriber ولازم يغير باسورد → ودّيه على صفحة التغيير
+  if (role !== 'ADMIN' && mustChangePassword) {
+    this.router.navigate(['/auth/change-password']);
+    return;
+  }
+
+  // غير كده التوجيه الطبيعي
+  if (role === 'ADMIN') this.router.navigate(['/dashboard']);
+  else this.router.navigate(['/subscriber']);
+});
+
   }
   showPassword: boolean = false;
 

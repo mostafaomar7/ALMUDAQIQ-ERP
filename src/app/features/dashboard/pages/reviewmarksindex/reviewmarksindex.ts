@@ -63,23 +63,39 @@ export class ReviewmarksindexComponent implements OnInit {
   t(key: TranslationKey): string { return this.translations[key] || key; }
 
   // ---- API ----
-  loadMarks(page: number = 1) {
+loadMarks(page: number = 1) {
   this.svc.getReviewmarksindex(page, this.itemsPerPage, this.searchText).subscribe({
     next: (res: any) => {
-      this.displayedMarks = res.data.map((r: any) => ({
+      // ✅ يدعم Array مباشر أو {data}
+      const list = Array.isArray(res) ? res : (res?.data ?? []);
+
+      this.displayedMarks = list.map((r: any) => ({
         ...r,
         selected: false
       }));
 
-      this.totalItems = res.meta.total;
-      this.totalPages = res.meta.pages;
-      this.currentPage = res.meta.page;
+      // ✅ يدعم meta أو قيم مباشرة أو حساب تلقائي
+      const total = res?.meta?.total ?? res?.total ?? list.length;
+      const pages =
+        res?.meta?.pages ?? res?.totalPages ?? Math.max(1, Math.ceil(total / this.itemsPerPage));
+      const current = res?.meta?.page ?? res?.page ?? page;
+
+      this.totalItems = total;
+      this.totalPages = pages;
+      this.currentPage = current;
 
       this.calculatePagination();
     },
     error: err => {
       console.error(err);
       Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+
+      // ✅ حماية للـ UI
+      this.displayedMarks = [];
+      this.totalItems = 0;
+      this.totalPages = 1;
+      this.currentPage = page;
+      this.calculatePagination();
     }
   });
 }

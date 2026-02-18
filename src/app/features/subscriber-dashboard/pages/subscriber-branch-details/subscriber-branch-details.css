@@ -1,0 +1,247 @@
+:host {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1f2937;
+  padding: 20px;
+  background-color: #f9fafb;
+}
+
+/* Page Layout */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Card Styling */
+.section-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Titles & Icons */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.section-title h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.green-box {
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px 40px;
+}
+
+.info-item label {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.info-item .value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Stats Cards */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.stat-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: #ecfdf5;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tables */
+.table-header-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+thead th {
+  text-align: left;
+  padding: 12px 16px;
+  color: #6b7280;
+  font-weight: 500;
+  border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+.font-bold { font-weight: 600; color: #111827; }
+.text-gray { color: #6b7280; }
+.text-right { text-align: right; }
+
+/* Checkbox & Controls */
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+.minus-box {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #10b981;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.dot { margin-right: 4px; font-size: 10px; }
+.badge-active { background-color: #d1fae5; color: #047857; }
+.badge-active .dot { color: #10b981; }
+.badge-inactive { background-color: #fee2e2; color: #b91c1c; }
+.badge-inactive .dot { color: #ef4444; }
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.view-all {
+  text-align: center;
+  color: #10b981;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding-top: 16px;
+  cursor: pointer;
+}
+
+/* Links Section */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.link-item label {
+  display: block;
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.link-box {
+  background-color: #f9fafb;
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+/* ... (الكود السابق نفسه، فقط أضف هذه الأسطر في النهاية) ... */
+
+/* تفاعلات الماوس */
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none; /* يمنع تحديد النص عند النقر المتكرر */
+}
+
+/* تأثير عند المرور على العناوين للترتيب */
+.hover-bg:hover {
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}
+
+/* حالة الـ Checkbox عند التحديد */
+.checkbox.checked {
+  background-color: #10b981;
+  border-color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* حالة زر الناقص (Select All) */
+.minus-box.active-select {
+  /* يمكنك تغيير الستايل هنا ليدل على أنه تم اختيار الكل، مثلا حدود خضراء */
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}

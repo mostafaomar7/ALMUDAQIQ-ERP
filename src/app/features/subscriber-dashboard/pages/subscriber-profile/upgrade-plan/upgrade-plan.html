@@ -1,0 +1,60 @@
+
+<div class="page-container">
+
+<div
+  class="app-toast"
+  *ngIf="showToast"
+  [class.success]="toastType === 'success'"
+  [class.error]="toastType === 'error'">
+  {{ toastMessage }}
+</div>
+
+  <div class="header">
+<a href="#" class="back-link" (click)="$event.preventDefault()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Back
+    </a>
+    <h1>Upgrade Your Plan</h1>
+    <p class="subtitle">Select the plan that fits your company's needs best.</p>
+  </div>
+
+
+  <div *ngIf="loading">Loading plans...</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <div class="cards-container" *ngIf="!loading">
+    <div
+      class="card"
+      *ngFor="let plan of plans"
+      [class.highlighted]="plan.isHighlighted">
+
+      <div class="card-content">
+        <h3 class="plan-name">{{ plan.name }}</h3>
+
+        <div class="price-container">
+          <span class="currency">{{ plan.currency }}</span>
+          <span class="amount">{{ plan.price }}</span>
+        </div>
+        <span class="period">{{ plan.period }}</span>
+
+        <p class="description">{{ plan.description }}</p>
+
+        <ul class="features-list">
+          <li *ngFor="let feature of plan.features">
+            <span class="icon-check">
+              <!-- check icon -->
+            </span>
+            {{ feature }}
+          </li>
+        </ul>
+      </div>
+
+      <button class="btn-action"
+              [disabled]="upgradingId === plan.id"
+              (click)="onUpgrade(plan.id)">
+        {{ upgradingId === plan.id ? 'Upgrading...' : 'Get Started' }}
+      </button>
+    </div>
+  </div>
+
+</div>

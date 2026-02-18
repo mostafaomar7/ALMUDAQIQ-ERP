@@ -23,7 +23,7 @@ export interface Reviewmarksindex {
 
 @Injectable({ providedIn: 'root' })
 export class ReviewmarksindexService {
-  private apiUrl = `${environment.apiUrl}/review-marks-index`;
+  private apiUrl = `${environment.apiUrl}/review-mark-index-templates`;
 
   constructor(private http: HttpClient) {}
 

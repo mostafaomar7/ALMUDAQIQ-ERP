@@ -78,8 +78,9 @@ constructor(private fb: FormBuilder, private auth: AuthService, private router: 
       console.log('OTP response:', res); // <--- هنا يتم طباعة الرد في الكونsole
       if (res) {
         this.successMsg = this.t('forgotSuccess');
+          localStorage.setItem('resetEmail', this.form.value.email);
         // التوجيه بعد النجاح
-        this.router.navigate(['auth/verify-email']);
+       this.router.navigate(['/auth/verify-email']);
       }
     });
 }

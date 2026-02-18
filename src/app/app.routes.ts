@@ -16,14 +16,14 @@ export const routes: Routes = [
 
   {
     path: 'dashboard',
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import('./features/dashboard/dashboard.routes')
         .then(r => r.dashboardRoutes)
   },
   {
     path: 'subscriber',
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import('./features/subscriber-dashboard/subscriber.routes')
         .then(r => r.SubscriberRoutes)

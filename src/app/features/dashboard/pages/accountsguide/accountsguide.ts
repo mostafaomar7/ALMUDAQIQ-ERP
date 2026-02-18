@@ -144,27 +144,28 @@ loadAccounts(page: number = 1) {
   this.accountService
     .getAccountGuides(page, this.itemsPerPage, this.searchText)
     .subscribe({
-      next: (res: any) => {
-        this.displayedAccounts = res.data.map((a: AccountGuide) => ({
-          id: a.id,
-          name: a.accountName || '',
-          level: a.level,
-          number: a.accountNumber.toString(),
-          rules: a.rulesAndRegulations || '',
-          notes: a.disclosureNotes || '',
-          code: a.code1 || '',
-          objectiveCode: a.objectiveCode,
-          relatedObjectives: a.relatedObjectives,
-          selected: false
-        }));
+      next: (res: AccountGuide[] | { data: AccountGuide[] }) => {
+  const list = Array.isArray(res) ? res : (res.data ?? []);
 
-        this.currentPage = res.page;
-        this.itemsPerPage = res.limit;
-        this.totalItems = res.total;
-        this.totalPages = res.totalPages;
+  this.displayedAccounts = list.map((a: AccountGuide) => ({
+    id: a.id,
+    name: a.accountName || '',
+    level: a.level,
+    number: (a.accountNumber ?? '').toString(),
+    rules: a.rulesAndRegulations || '',
+    notes: a.disclosureNotes || '',
+    code: a.code1 || '',
+    objectiveCode: a.objectiveCode || '',
+    relatedObjectives: a.relatedObjectives || '',
+    selected: false
+  }));
 
-        this.calculatePagination();
-      }
+  this.currentPage = page;
+  this.totalItems = list.length;
+  this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
+  this.calculatePagination();
+}
+
     });
 }
 

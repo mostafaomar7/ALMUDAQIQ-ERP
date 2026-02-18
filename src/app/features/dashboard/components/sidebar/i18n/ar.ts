@@ -13,6 +13,10 @@ export const AR = {
   reviewObjectivesGuide: 'دليل أهداف المراجعة',
   reviewMarksIndex: 'مؤشر علامات المراجعة',
   Branches : 'الفروع' ,
-  users : 'المستخدمين'
-
+  users : 'ادارة المستخدمين',
+  profile : 'الملف الشخصي',
+KPIS : 'مؤشرات الأداء الرئيسية' ,
+  reports : 'تقارير' ,
+Financial : 'البيانات المالية',
+Support : 'دعم'
 };

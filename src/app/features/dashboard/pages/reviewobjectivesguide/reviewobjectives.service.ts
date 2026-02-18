@@ -29,7 +29,7 @@ export interface ReviewObjectives {
   providedIn: 'root',
 })
 export class ReviewobjectivesService {
-  private apiUrl = `${environment.apiUrl}/review-objective-stages`;
+  private apiUrl = `${environment.apiUrl}/review-objective-stage-templates`;
 
   constructor(private http: HttpClient) {}
 getReviewObjectives(

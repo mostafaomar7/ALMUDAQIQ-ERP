@@ -34,7 +34,7 @@ stageCode: string,
   providedIn: 'root',
 })
 export class FilestagesguideService {
-   private apiUrl = `${environment.apiUrl}/file-stages`;
+   private apiUrl = `${environment.apiUrl}/file-stage-templates`;
 
   constructor(private http: HttpClient) {}
 

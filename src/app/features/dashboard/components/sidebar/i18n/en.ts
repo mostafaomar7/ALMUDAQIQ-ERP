@@ -13,5 +13,11 @@ export const EN = {
   reviewObjectivesGuide: 'Review Objectives Guide',
   reviewMarksIndex: 'Review Marks Index',
   Branches : 'Branches',
-  users : 'Users'
+  users : 'Users Management',
+  profile : 'Profile',
+  KPIS : 'KPIS' ,
+  reports : 'Reports' ,
+Financial : 'Financial Statements' ,
+Support : 'Support'
+
 };

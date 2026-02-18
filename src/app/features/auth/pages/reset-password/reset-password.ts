@@ -25,7 +25,8 @@ export class ResetPassword implements OnInit {
   currentLang: 'en' | 'ar' = (localStorage.getItem('lang') as 'en' | 'ar') || 'en';
   translations: typeof EN = EN;
 
-  email = 'admin@erp.com'; // الايميل ثابت
+email = localStorage.getItem('resetEmail') || '';
+
   otp: string | null = null; // ممكن تجي من query param
 
   constructor(

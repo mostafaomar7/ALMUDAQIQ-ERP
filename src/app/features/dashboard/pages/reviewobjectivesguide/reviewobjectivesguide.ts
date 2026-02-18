@@ -74,20 +74,40 @@ selectedGuideItem?: ReviewObjectives;
 loadGuides(page: number = 1) {
   this.svc.getReviewObjectives(page, this.itemsPerPage, this.searchText).subscribe({
     next: (res: any) => {
-      this.displayedGuides = res.data.map((g: any) => ({
+      // ✅ list ممكن يبقى Array مباشر أو داخل data
+      const list = Array.isArray(res) ? res : (res?.data ?? []);
+
+      this.displayedGuides = list.map((g: any) => ({
         ...g,
         selected: false
       }));
 
-      this.totalItems = res.meta.total;
-      this.totalPages = res.meta.pages;
-      this.currentPage = res.meta.page;
+      // ✅ meta ممكن تكون موجودة أو لا
+      const total =
+        res?.meta?.total ?? res?.total ?? list.length;
+
+      const pages =
+        res?.meta?.pages ?? res?.totalPages ?? Math.max(1, Math.ceil(total / this.itemsPerPage));
+
+      const current =
+        res?.meta?.page ?? res?.page ?? page;
+
+      this.totalItems = total;
+      this.totalPages = pages;
+      this.currentPage = current;
 
       this.calculatePagination();
     },
     error: err => {
       console.error(err);
       Swal.fire(this.t('error'), this.t('somethingWentWrong'), 'error');
+
+      // ✅ حماية للـ UI
+      this.displayedGuides = [];
+      this.totalItems = 0;
+      this.totalPages = 1;
+      this.currentPage = page;
+      this.calculatePagination();
     }
   });
 }

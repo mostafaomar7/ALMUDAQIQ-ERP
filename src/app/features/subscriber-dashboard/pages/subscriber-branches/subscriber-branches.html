@@ -52,27 +52,38 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let branch of displayedBranches" [class.selected-row]="branch.selected">
-          <td>
-            <div class="custom-checkbox"
-                 [class.checked]="branch.selected"
-                 (click)="toggleRow(branch)">
-              <svg *ngIf="branch.selected" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-          </td>
-          <td class="font-medium">{{ branch.name }}</td>
-          <td class="text-gray">{{ branch.city }}</td>
-          <td class="text-gray">{{ branch.region }}</td>
-          <td>
-            <span class="badge" [ngClass]="branch.status === 'Active' ? 'badge-active' : 'badge-inactive'">
-              <span class="dot">●</span> {{ branch.status }}
-            </span>
-          </td>
-          <td class="text-right">
-            <button class="btn-icon">⋮</button>
-          </td>
-        </tr>
-      </tbody>
+<tr *ngFor="let branch of displayedBranches"
+    [routerLink]="['../branches-details']"
+    class="cursor-pointer">
+
+    <td>
+      <div class="custom-checkbox"
+           [class.checked]="branch.selected"
+           (click)="$event.stopPropagation(); toggleRow(branch)">
+        <svg *ngIf="branch.selected" viewBox="0 0 24 24" fill="none" stroke="white"
+             stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+    </td>
+
+    <td class="font-medium">{{ branch.name }}</td>
+    <td class="text-gray">{{ branch.city }}</td>
+    <td class="text-gray">{{ branch.region }}</td>
+
+    <td>
+      <span class="badge" [ngClass]="branch.status === 'Active' ? 'badge-active' : 'badge-inactive'">
+        <span class="dot">●</span> {{ branch.status }}
+      </span>
+    </td>
+
+    <td class="text-right">
+      <button class="btn-icon" (click)="$event.stopPropagation()">⋮</button>
+    </td>
+
+  </tr>
+</tbody>
+
     </table>
   </div>
 
