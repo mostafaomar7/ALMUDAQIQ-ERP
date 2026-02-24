@@ -1,39 +1,120 @@
 <div class="page-container">
 
-  <div class="section-card header-info">
-     <div class="section-title">
-        <div class="icon-box green-box">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M10 9a3 3 0 1 1-6 0"/><path d="M14 12v9"/><path d="M10 12v9"/></svg>
-        </div>
-        <h2>Branch Information</h2>
-      </div>
-
-      <div class="info-grid">
-        <div class="info-item"><label>Branch Name</label><div class="value">Cairo Branch</div></div>
-        <div class="info-item"><label>Contact Email</label><div class="value">cairo@almudaqiq.com</div></div>
-        <div class="info-item"><label>Contact Number</label><div class="value">+20 100 555 7890</div></div>
-        <div class="info-item"><label>Country</label><div class="value">Egypt</div></div>
-        <div class="info-item"><label>Address</label><div class="value">15 El Tahrir St, Cairo</div></div>
-      </div>
+  <!-- Branch Information -->
+ <div class="section-card header-info">
+  <div class="section-title">
+    <div class="icon-box green-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path>
+      </svg>
+    </div>
+    <h2>{{ t('branchInformation') }}</h2>
   </div>
 
-  <div class="stats-row">
-      <div class="stat-card" *ngFor="let stat of stats">
-        <div class="stat-content">
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
-        </div>
-        <div class="stat-icon-box">
-          <svg *ngIf="stat.icon === 'money'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          <svg *ngIf="stat.icon === 'users'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <svg *ngIf="stat.icon === 'file'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <svg *ngIf="stat.icon === 'users-group'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
+  <div class="info-grid three-cols">
+    <div class="info-item">
+      <label>{{ t('branchName') }}</label>
+      <div class="value">{{ branchInfo.name }}</div>
+    </div>
+
+    <div class="info-item">
+      <label>{{ t('city') }}</label>
+      <div class="value">{{ branchInfo.city }}</div>
+    </div>
+
+    <div class="info-item">
+      <label>{{ t('status') }}</label>
+      <div class="value">
+        <span class="status-badge active">
+          <span class="dot"></span> Active
+        </span>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-card header-info">
+  <div class="section-title">
+    <div class="icon-box green-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+    </div>
+    <h2>{{ t('branchManager') }}</h2>
   </div>
 
+  <div class="info-grid three-cols">
+    <div class="info-item">
+      <label>{{ t('branchManagerName') }}</label>
+      <div class="value">{{ managerInfo.name }}</div>
+    </div>
+
+    <div class="info-item">
+      <label>{{ t('jobTitle') }}</label>
+      <div class="value">{{ managerInfo.jobTitle }}</div>
+    </div>
+
+    <div class="info-item">
+      <label>{{ t('email') }}</label>
+      <div class="value">{{ managerInfo.email }}</div>
+    </div>
+
+    <div class="info-item">
+      <label>{{ t('phoneNumber') }}</label>
+      <div class="value">{{ managerInfo.phone }}</div>
+    </div>
+
+    <div class="info-item">
+      <label>{{ t('joinDate') }}</label>
+      <div class="value">{{ managerInfo.joinDate }}</div>
+    </div>
+  </div>
+</div> 
+
+  <!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card" *ngFor="let stat of stats">
+    <div class="stat-content">
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-label">{{ tAny(stat.labelKey) }}</div>
+    </div>
+
+    <div class="stat-icon-box">
+      <svg *ngIf="stat.icon === 'money'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+
+      <svg *ngIf="stat.icon === 'users'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+
+      <svg *ngIf="stat.icon === 'file'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+      </svg>
+
+      <svg *ngIf="stat.icon === 'users-group'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+  <!-- Employees -->
   <div class="section-card">
-    <div class="table-header-title">Employees</div>
+    <div class="table-header-title">{{ t('employees') }}</div>
+
     <div class="table-responsive">
       <table>
         <thead>
@@ -42,100 +123,137 @@
               <div class="minus-box cursor-pointer"
                    (click)="toggleAllEmployees()"
                    [class.active-select]="isAllEmployeesSelected">
-                <svg *ngIf="!isAllEmployeesSelected" width="12" height="2" viewBox="0 0 12 2" fill="none"><rect width="12" height="2" rx="1" fill="#10B981"/></svg>
-                <svg *ngIf="isAllEmployeesSelected" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <svg *ngIf="!isAllEmployeesSelected" width="12" height="2" viewBox="0 0 12 2" fill="none">
+                  <rect width="12" height="2" rx="1" fill="#10B981"/>
+                </svg>
+                <svg *ngIf="isAllEmployeesSelected" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
               </div>
             </th>
-            <th (click)="sortData('employees', 'name')" class="cursor-pointer hover-bg">Full Name ⌄</th>
-            <th (click)="sortData('employees', 'email')" class="cursor-pointer hover-bg">Email ⌄</th>
-            <th (click)="sortData('employees', 'role')" class="cursor-pointer hover-bg">Role ⌄</th>
-            <th (click)="sortData('employees', 'status')" class="cursor-pointer hover-bg">Status ⌄</th>
+
+            <th (click)="sortData('employees', 'name')" class="cursor-pointer hover-bg">{{ t('fullName') }} ⌄</th>
+            <th (click)="sortData('employees', 'email')" class="cursor-pointer hover-bg">{{ t('email') }} ⌄</th>
+            <th (click)="sortData('employees', 'role')" class="cursor-pointer hover-bg">{{ t('role') }} ⌄</th>
+            <th (click)="sortData('employees', 'status')" class="cursor-pointer hover-bg">{{ t('status') }} ⌄</th>
             <th class="w-action"></th>
           </tr>
         </thead>
+
         <tbody>
           <tr *ngFor="let emp of employees" [class.selected-row]="emp.selected">
             <td>
               <div class="checkbox cursor-pointer"
                    [class.checked]="emp.selected"
                    (click)="toggleEmployee(emp)">
-                   <svg *ngIf="emp.selected" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <svg *ngIf="emp.selected" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                     viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
               </div>
             </td>
+
             <td class="font-bold">{{ emp.name }}</td>
             <td class="text-gray">{{ emp.email }}</td>
             <td class="text-gray">{{ emp.role }}</td>
             <td>
               <span class="badge" [ngClass]="emp.status === 'Active' ? 'badge-active' : 'badge-inactive'">
-                <span class="dot">●</span> {{ emp.status }}
+                <span class="dot">●</span> {{ statusLabel(emp.status) }}
               </span>
             </td>
+
             <td class="text-right"><button class="btn-icon">⋮</button></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="view-all">View all</div>
+
+    <div class="view-all">{{ t('viewAll') }}</div>
   </div>
 
+  <!-- Clients -->
   <div class="section-card">
-    <div class="table-header-title">Clients</div>
+    <div class="table-header-title">{{ t('clients') }}</div>
+
     <div class="table-responsive">
       <table>
         <thead>
           <tr>
             <th class="w-checkbox">
-               <div class="minus-box cursor-pointer"
+              <div class="minus-box cursor-pointer"
                    (click)="toggleAllClients()"
                    [class.active-select]="isAllClientsSelected">
-                <svg *ngIf="!isAllClientsSelected" width="12" height="2" viewBox="0 0 12 2" fill="none"><rect width="12" height="2" rx="1" fill="#10B981"/></svg>
-                <svg *ngIf="isAllClientsSelected" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <svg *ngIf="!isAllClientsSelected" width="12" height="2" viewBox="0 0 12 2" fill="none">
+                  <rect width="12" height="2" rx="1" fill="#10B981"/>
+                </svg>
+                <svg *ngIf="isAllClientsSelected" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
               </div>
             </th>
-            <th (click)="sortData('clients', 'name')" class="cursor-pointer hover-bg">Client Name ⌄</th>
-            <th (click)="sortData('clients', 'type')" class="cursor-pointer hover-bg">Type ⌄</th>
-            <th (click)="sortData('clients', 'status')" class="cursor-pointer hover-bg">Contract Status ⌄</th>
+
+            <th (click)="sortData('clients', 'name')" class="cursor-pointer hover-bg">{{ t('clientName') }} ⌄</th>
+            <th (click)="sortData('clients', 'type')" class="cursor-pointer hover-bg">{{ t('type') }} ⌄</th>
+            <th (click)="sortData('clients', 'status')" class="cursor-pointer hover-bg">{{ t('contractStatus') }} ⌄</th>
             <th class="w-action"></th>
           </tr>
         </thead>
+
         <tbody>
           <tr *ngFor="let client of clients" [class.selected-row]="client.selected">
             <td>
               <div class="checkbox cursor-pointer"
                    [class.checked]="client.selected"
                    (click)="toggleClient(client)">
-                   <svg *ngIf="client.selected" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <svg *ngIf="client.selected" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                     viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
               </div>
             </td>
+
             <td class="font-bold">{{ client.name }}</td>
             <td class="text-gray">{{ client.type }}</td>
             <td>
               <span class="badge" [ngClass]="client.status === 'Active' ? 'badge-active' : 'badge-inactive'">
-                <span class="dot">●</span> {{ client.status }}
+                <span class="dot">●</span> {{ statusLabel(client.status) }}
               </span>
             </td>
+
             <td class="text-right"><button class="btn-icon">⋮</button></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="view-all">View all</div>
+
+    <div class="view-all">{{ t('viewAll') }}</div>
   </div>
 
+  <!-- Official Links -->
   <div class="section-card">
     <div class="section-title">
-        <div class="icon-box green-box">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        </div>
-        <h2>Official Government & Association Links</h2>
+      <div class="icon-box green-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
       </div>
+      <h2>{{ t('officialLinks') }}</h2>
+    </div>
 
-      <div class="links-grid">
-        <div class="link-item"><label>CPA</label><div class="link-box">https://socpa.org.sa</div></div>
-        <div class="link-item"><label>Zakat</label><div class="link-box">https://zatca.gov.sa</div></div>
-        <div class="link-item"><label>Ministry of Commerce</label><div class="link-box">https://mc.gov.sa</div></div>
-        <div class="link-item"><label>Taxis</label><div class="link-box">https://taxis.gov.sa</div></div>
-      </div>
+    <div class="links-grid">
+      <div class="link-item"><label>{{ t('cpa') }}</label><div class="link-box">https://socpa.org.sa</div></div>
+      <div class="link-item"><label>{{ t('zakat') }}</label><div class="link-box">https://zatca.gov.sa</div></div>
+      <div class="link-item"><label>{{ t('ministryOfCommerce') }}</label><div class="link-box">https://mc.gov.sa</div></div>
+      <div class="link-item"><label>{{ t('taxes') }}</label><div class="link-box">https://taxis.gov.sa</div></div>
+    </div>
   </div>
 
 </div>

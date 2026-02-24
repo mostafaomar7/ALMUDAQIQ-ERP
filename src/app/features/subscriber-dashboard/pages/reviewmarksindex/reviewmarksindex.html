@@ -1,0 +1,270 @@
+<div class="marks-container">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 class="page-title">{{ t('reviewMarksTitle') }}</h2>
+
+    <div class="actions-group">
+
+      <!-- Edit/Delete -->
+      <div class="edit-actions">
+        <button class="btn-text" [disabled]="!selectedMark" (click)="selectedMark && openAddEditModal(selectedMark)">
+          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+        </button>
+
+        <button class="btn-text" [disabled]="!selectedMark" (click)="selectedMark && deleteSelected()">
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" [(ngModel)]="searchText" (input)="applySearch()" [placeholder]="t('search')" class="search-input">
+      </div>
+
+      <!-- Import / Export / Add -->
+      <div class="file-actions">
+        <button class="btn-outline" (click)="openImportModal()">
+          <i class="fa-solid fa-file-import"></i> {{ t('import') }}
+        </button>
+
+        <button class="btn-outline" (click)="openExportModal()">
+          <i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}
+        </button>
+
+        <button class="btn-primary" (click)="openAddEditModal(null)">
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="marks-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <div class="custom-checkbox indeterminate" (click)="toggleAll()"><i class="fa-solid fa-minus"></i></div>
+          </th>
+          <th>{{ t('name') }}</th>
+          <th>{{ t('codeImage') }}</th>
+          <th>{{ t('shortDescription') }}</th>
+          <th>{{ t('suggestedStage') }}</th>
+          <th>{{ t('whenToUse') }}</th>
+          <th>{{ t('exampleShortForm') }}</th>
+          <th>{{ t('sectorTags') }}</th>
+          <th>{{ t('assertion') }}</th>
+          <th>{{ t('benchmark') }}</th>
+          <th>{{ t('scoreWeight') }}</th>
+          <th>{{ t('severityLevel') }}</th>
+          <th>{{ t('severityWeight') }}</th>
+          <th>{{ t('priorityRating') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mark of displayedMarks"
+            [class.selected-row]="mark.selected"
+            (click)="selectMark(mark)">
+          <td class="checkbox-col">
+            <div class="custom-checkbox" [class.checked]="mark.selected" (click)="toggleSelection(mark); $event.stopPropagation()">
+              <i *ngIf="mark.selected" class="fa-solid fa-check"></i>
+            </div>
+          </td>
+          <td>{{ mark.name }}</td>
+          <td>{{ mark.codeImage }}</td>
+          <td>{{ mark.shortDescription }}</td>
+          <td>{{ mark.suggestedStage }}</td>
+          <td>{{ mark.whenToUse }}</td>
+          <td>{{ mark.exampleShortForm }}</td>
+          <td>{{ mark.sectorTags }}</td>
+          <td>{{ mark.assertion }}</td>
+          <td>{{ mark.benchmark }}</td>
+          <td>{{ mark.scoreWeight }}</td>
+          <td>{{ mark.severityLevel }}</td>
+          <td>{{ mark.severityWeight }}</td>
+          <td>{{ mark.priorityRating }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-footer">
+    <div class="pagination-controls">
+      <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage===1">
+        <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
+      </button>
+
+      <ng-container *ngFor="let page of pagesArray">
+        <span *ngIf="page==='...'" class="dots">...</span>
+        <button *ngIf="page!=='...'" class="page-btn" [class.active]="page===currentPage" (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage===totalPages">
+        {{ t('next') }} <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="pagination-info">
+      <span>{{ t('page') }}</span>
+      <input type="number" [value]="currentPage" (change)="goToPageInput($event)" class="page-input">
+      <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span>
+    </div>
+
+    <div class="items-count">
+      {{ showingRangeText }}
+    </div>
+  </div>
+
+  <!-- ---- Export Modal ---- -->
+  <div class="modal-overlay" *ngIf="isExportModalOpen">
+    <div class="export-modal-container">
+      <div class="export-header">
+        <h3>{{ t('exportTitle') }}</h3>
+        <button class="close-btn" (click)="closeExportModal()">×</button>
+      </div>
+      <p class="export-subtitle">{{ t('selectFileType') }}</p>
+      <div class="export-options-grid">
+        <div class="export-option-card" [class.selected]="selectedExportOption==='pdf'" (click)="selectExportOption('pdf')">
+          <div class="file-icon green"><i class="fa-solid fa-file-pdf"></i></div>
+          <span>PDF file</span>
+        </div>
+        <div class="export-option-card" [class.selected]="selectedExportOption==='excel'" (click)="selectExportOption('excel')">
+          <div class="file-icon green"><i class="fa-solid fa-file-excel"></i></div>
+          <span>Excel file</span>
+        </div>
+      </div>
+      <div class="export-footer">
+        <button class="btn-primary download-btn" (click)="handleExport()">
+          <i class="fa-solid fa-download"></i> {{ t('download') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- Import Modal ---- -->
+  <div class="modal-overlay" *ngIf="isImportModalOpen">
+    <div class="import-modal-container">
+      <div class="export-header">
+        <h3>{{ t('importTitle') }}</h3>
+        <button class="close-btn" (click)="closeImportModal()">×</button>
+      </div>
+      <div class="import-body">
+        <div class="upload-area" (click)="fileInput.click()">
+          <input type="file" hidden #fileInput (change)="onFileSelected($event)">
+          <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+          <p class="upload-text">{{ t('dropFileHere') }}</p>
+          <p class="upload-hint">{{ t('fileTypesHint') }}</p>
+        </div>
+        <div class="file-progress-item" *ngIf="selectedFile">
+          <div class="file-icon-wrapper"><i class="fa-solid fa-file"></i></div>
+          <div class="file-info-wrapper">
+            <div class="file-header">
+              <span class="file-name">{{ selectedFile.name }}</span>
+              <button class="remove-file-btn" (click)="selectedFile=null; uploadProgress=0">×</button>
+            </div>
+            <div class="file-stats">
+              <span>{{ (selectedFile.size / 1024 / 1024) | number:'1.1-2' }} MB</span>
+              <span class="percentage">{{ uploadProgress }}%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="export-footer">
+        <button class="btn-primary download-btn" (click)="uploadFile()">{{ t('submit') }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- Add/Edit Modal ---- -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-container white-bg">
+    <h3>{{ isEditMode ? t('editMark') : t('addMark') }}</h3>
+    <form (ngSubmit)="submitMark()">
+
+      <!-- Step Indicators -->
+      <div class="steps-indicator">
+        <span [class.active]="currentStep===1">{{ t('step1') }}</span>
+        <span [class.active]="currentStep===2">{{ t('step2') }}</span>
+        <span [class.active]="currentStep===3">{{ t('step3') }}</span>
+      </div>
+
+      <!-- Step 1 -->
+      <div *ngIf="currentStep===1" class="form-step step-1">
+
+  <label>{{ t('name') }}</label>
+  <input type="text" [(ngModel)]="newMark.name" name="name" #name="ngModel" required class="form-control">
+  <span *ngIf="name.invalid && name.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('codeImage') }}</label>
+  <input type="text" [(ngModel)]="newMark.codeImage" name="codeImage" class="form-control">
+
+  <label>{{ t('shortDescription') }}</label>
+  <textarea [(ngModel)]="newMark.shortDescription" name="shortDescription" class="form-control"></textarea>
+
+</div>
+
+      <!-- Step 2 -->
+      <div *ngIf="currentStep===2" class="form-step step-2">
+
+  <label>{{ t('suggestedStage') }}</label>
+  <input type="text" [(ngModel)]="newMark.suggestedStage" name="suggestedStage" #suggestedStage="ngModel" required class="form-control">
+  <span *ngIf="suggestedStage.invalid && suggestedStage.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('whenToUse') }}</label>
+  <input type="text" [(ngModel)]="newMark.whenToUse" name="whenToUse" #whenToUse="ngModel" required class="form-control">
+  <span *ngIf="whenToUse.invalid && whenToUse.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('exampleShortForm') }}</label>
+  <input type="text" [(ngModel)]="newMark.exampleShortForm" name="exampleShortForm" class="form-control">
+
+  <label>{{ t('sectorTags') }}</label>
+  <input type="text" [(ngModel)]="newMark.sectorTags" name="sectorTags" class="form-control">
+
+</div>
+
+      <!-- Step 3 -->
+      <div *ngIf="currentStep===3" class="form-step step-3">
+
+  <label>{{ t('assertion') }}</label>
+  <input type="text" [(ngModel)]="newMark.assertion" name="assertion" #assertion="ngModel" required class="form-control">
+  <span *ngIf="assertion.invalid && assertion.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('benchmark') }}</label>
+  <input type="text" [(ngModel)]="newMark.benchmark" name="benchmark" #benchmark="ngModel" required class="form-control">
+  <span *ngIf="benchmark.invalid && benchmark.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('scoreWeight') }}</label>
+  <input type="number" [(ngModel)]="newMark.scoreWeight" name="scoreWeight" #scoreWeight="ngModel" required class="form-control">
+
+  <label>{{ t('severityLevel') }}</label>
+  <input type="number" [(ngModel)]="newMark.severityLevel" name="severityLevel" #severityLevel="ngModel" required class="form-control">
+
+  <label>{{ t('severityWeight') }}</label>
+  <input type="number" [(ngModel)]="newMark.severityWeight" name="severityWeight" #severityWeight="ngModel" required class="form-control">
+
+  <label>{{ t('priorityRating') }}</label>
+  <input type="text" [(ngModel)]="newMark.priorityRating" name="priorityRating" #priorityRating="ngModel" required class="form-control">
+
+</div>
+
+      <!-- Navigation Buttons -->
+      <div class="modal-buttons">
+        <button type="button" class="btn-secondary" (click)="prevStep()" [disabled]="currentStep===1">{{ t('back') }}</button>
+        <button type="button" class="btn-secondary" (click)="nextStep()" *ngIf="currentStep<3">{{ t('next') }}</button>
+        <button type="submit" class="btn-primary" *ngIf="currentStep===3">Submit</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">{{ t('cancel') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div>
+

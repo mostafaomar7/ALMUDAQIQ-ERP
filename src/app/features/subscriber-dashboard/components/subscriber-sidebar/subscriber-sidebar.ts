@@ -43,19 +43,19 @@ export class SubscriberSidebar {
         { key: 'Financial', icon: 'fa-brands fa-gg', route: '/subscriber' },
     { key: 'Branches', icon: 'fa-solid fa-users', route: '/subscriber/branches' },
     { key: 'users', icon: 'fa-solid fa-users', route: '/subscriber/users' },
-    { key: 'Support', icon: 'fa-solid fa-users', route: '/subscriber/users' },
+    { key: 'Support', icon: 'fa-solid fa-users', route: '/subscriber' },
 
     {
       key: 'settings',
       icon: 'fa-solid fa-cog',
       // لا يوجد route مباشر لعنصر Settings الرئيسي
       subMenu: [ // عناصر القائمة الفرعية
-        { key: 'domainSettings', route: '/dashboard/settings/domain' },
-        { key: 'accountsGuide', route: '/dashboard/settings/accounts-guide' },
-        { key: 'reviewGuide', route: '/dashboard/settings/review-guide' },
-        { key: 'fileStagesGuide', route: '/dashboard/settings/file-stages-guide' },
-        { key: 'reviewObjectivesGuide', route: '/dashboard/settings/review-objectives-guide' },
-        { key: 'reviewMarksIndex', route: '/dashboard/settings/review-marks-index' }
+        // { key: 'domainSettings', route: '/dashboard/settings/domain' },
+        { key: 'accountsGuide', route: '/subscriber/accountguide' },
+        { key: 'reviewGuide', route: '/subscriber/reviewguide' },
+        { key: 'fileStagesGuide', route: '/subscriber/filestage' },
+        { key: 'reviewObjectivesGuide', route: '/subscriber/reviewobjectivesguide' },
+        { key: 'reviewMarksIndex', route: '/subscriber/reviewmarksindex' }
       ]
     },
     { key: 'profile', icon: 'fa-solid fa-users', route: '/subscriber/profile' },

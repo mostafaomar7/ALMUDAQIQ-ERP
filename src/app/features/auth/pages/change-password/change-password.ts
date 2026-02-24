@@ -53,9 +53,14 @@ export class ChangePassword {
 
         this.success = 'Password changed successfully';
 localStorage.removeItem('mustChangePassword');
+localStorage.removeItem('accessToken');
+localStorage.removeItem('country');
+localStorage.removeItem('tenant');
+localStorage.removeItem('tenant');
+localStorage.removeItem('user');
 
         // بعد التغيير: ودّيه على subscriber dashboard
-        this.router.navigate(['/subscriber']);
+        this.router.navigate(['/auth/login']);
       });
   }
 }

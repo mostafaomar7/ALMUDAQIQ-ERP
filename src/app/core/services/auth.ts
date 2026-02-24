@@ -38,7 +38,7 @@ login(email: string, password: string): Observable<any> {
       if (res?.token) localStorage.setItem('accessToken', res.token);
       if (res?.user) localStorage.setItem('user', JSON.stringify(res.user));
         localStorage.setItem('mustChangePassword', String(!!res?.mustChangePassword));
-
+        localStorage.setItem('country', String(res.user.countryName));
     })
   );
 }
@@ -54,6 +54,7 @@ logout() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('user');
   localStorage.removeItem('tenant');
+  localStorage.removeItem('country');
   localStorage.removeItem('mustChangePassword'); // ✅
 }
 

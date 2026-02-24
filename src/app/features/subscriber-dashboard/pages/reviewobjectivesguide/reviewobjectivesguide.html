@@ -1,0 +1,275 @@
+<div class="objectives-container">
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 class="page-title">{{ t('reviewObjectivesGuideTitle') }}</h2>
+
+    <div class="actions-group">
+      <div class="edit-actions">
+        <button class="btn-text" (click)="deleteSelected()">
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
+        </button>
+        <button class="btn-text"
+        [disabled]="!selectedGuideItem"
+        (click)="openAddModal(selectedGuideItem)">
+  <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+</button>
+
+      </div>
+
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" class="search-input" [(ngModel)]="searchText" (input)="onSearchInput()" [placeholder]="t('search')">
+      </div>
+
+      <div class="file-actions">
+        <button class="btn-outline" (click)="openImportModal()">
+          <i class="fa-solid fa-file-import"></i> {{ t('import') }}
+        </button>
+        <button class="btn-outline" (click)="openExportModal()">
+          <i class="fa-solid fa-cloud-arrow-down"></i> {{ t('export') }}
+        </button>
+        <button class="btn-primary" (click)="openAddModal()">
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="objectives-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <div class="custom-checkbox indeterminate" (click)="toggleAll()">
+              <i class="fa-solid fa-minus"></i>
+            </div>
+          </th>
+          <th>{{ t('codesCollected') }}</th>
+          <th>{{ t('ethicalCompliancePercentage') }}</th>
+          <th>{{ t('professionalPlanningPercentage') }}</th>
+          <th>{{ t('internalControlPercentage') }}</th>
+          <th>{{ t('evidencePercentage') }}</th>
+          <th>{{ t('evaluationPercentage') }}</th>
+          <th>{{ t('documentationPercentage') }}</th>
+          <th>{{ t('implementationStatus') }}</th>
+          <th>{{ t('actualPerformance') }}</th>
+          <th>{{ t('codeOfEthics') }}</th>
+          <th>{{ t('policies') }}</th>
+          <th>{{ t('ifrs') }}</th>
+          <th>{{ t('ias') }}</th>
+          <th>{{ t('notes') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of displayedGuides" [class.selected-row]="item.selected">
+          <td class="checkbox-col">
+            <div class="custom-checkbox" [class.checked]="item.selected" (click)="toggleSelection(item)">
+              <i *ngIf="item.selected" class="fa-solid fa-check"></i>
+            </div>
+          </td>
+
+          <td class="fw-bold">{{ item.codesCollected }}</td>
+          <td>{{ item.ethicalCompliancePercentage }}</td>
+          <td>{{ item.professionalPlanningPercentage }}</td>
+          <td>{{ item.internalControlPercentage }}</td>
+          <td>{{ item.evidencePercentage }}</td>
+          <td>{{ item.evaluationPercentage }}</td>
+          <td>{{ item.documentationPercentage }}</td>
+          <td>{{ item.implementationStatus }}</td>
+          <td>{{ item.actualPerformance }}</td>
+          <td>{{ item.codeOfEthics }}</td>
+          <td>{{ item.policies }}</td>
+          <td>{{ item.ifrs }}</td>
+          <td>{{ item.ias }}</td>
+          <td>{{ item.notes }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="pagination-footer">
+    <div class="pagination-controls">
+      <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
+      </button>
+
+      <ng-container *ngFor="let page of pagesArray">
+        <span *ngIf="page === '...'" class="dots">...</span>
+        <button *ngIf="page !== '...'" class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+      </ng-container>
+
+      <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        {{ t('next') }} <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="pagination-info">
+      <span>{{ t('page') }}</span>
+      <input type="number" [value]="currentPage" (change)="goToPageInput($event)" class="page-input">
+      <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span>
+    </div>
+
+    <div class="items-count">
+      {{ showingRangeText }}
+    </div>
+  </div>
+</div>
+
+<!-- 3-STEP MODAL -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content bg-white p-3 rounded shadow-lg w-700 mx-auto">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? t('edit') : t('addNewGuide') }}</h3>
+      <button class="close-btn" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Step indicator -->
+      <div class="step-indicator-row">
+        <span>{{ t('step') }} {{ currentStep }} {{ t('of') }} 3</span>
+      </div>
+
+      <!-- STEP 1: Basic -->
+      <div *ngIf="currentStep === 1" class="step-1">
+
+  <label>{{ t('codesCollected') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.codesCollected" #codesCollected="ngModel" class="form-control">
+  <span *ngIf="codesCollected.invalid && codesCollected.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('implementationStatus') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.implementationStatus" #implementationStatus="ngModel" class="form-control">
+  <span *ngIf="implementationStatus.invalid && implementationStatus.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('actualPerformance') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.actualPerformance" #actualPerformance="ngModel" class="form-control">
+  <span *ngIf="actualPerformance.invalid && actualPerformance.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
+      <!-- STEP 2: Percentages -->
+      <div *ngIf="currentStep === 2" class="step-2">
+
+  <label>{{ t('ethicalCompliancePercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.ethicalCompliancePercentage" #ethical="ngModel" class="form-control">
+  <span *ngIf="ethical.invalid && ethical.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('professionalPlanningPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.professionalPlanningPercentage" #planning="ngModel" class="form-control">
+  <span *ngIf="planning.invalid && planning.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('internalControlPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.internalControlPercentage" #control="ngModel" class="form-control">
+  <span *ngIf="control.invalid && control.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('evidencePercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.evidencePercentage" #evidence="ngModel" class="form-control">
+  <span *ngIf="evidence.invalid && evidence.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('evaluationPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.evaluationPercentage" #evaluation="ngModel" class="form-control">
+  <span *ngIf="evaluation.invalid && evaluation.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('documentationPercentage') }}</label>
+  <input type="number" required [(ngModel)]="newGuide.documentationPercentage" #documentation="ngModel" class="form-control">
+  <span *ngIf="documentation.invalid && documentation.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
+      <!-- STEP 3: Codes / Policies -->
+      <div *ngIf="currentStep === 3" class="step-3">
+
+  <label>{{ t('codeOfEthics') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.codeOfEthics" #codeOfEthics="ngModel" class="form-control">
+  <span *ngIf="codeOfEthics.invalid && codeOfEthics.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('policies') }}</label>
+  <textarea required [(ngModel)]="newGuide.policies" #policies="ngModel" class="form-control"></textarea>
+  <span *ngIf="policies.invalid && policies.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('ifrs') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.ifrs" #ifrs="ngModel" class="form-control">
+  <span *ngIf="ifrs.invalid && ifrs.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('ias') }}</label>
+  <input type="text" required [(ngModel)]="newGuide.ias" #ias="ngModel" class="form-control">
+  <span *ngIf="ias.invalid && ias.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('notes') }}</label>
+  <textarea required [(ngModel)]="newGuide.notes" #notes="ngModel" class="form-control"></textarea>
+  <span *ngIf="notes.invalid && notes.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="prevStep()" *ngIf="currentStep>1">{{ t('back') }}</button>
+      <button class="btn-primary" (click)="nextStep()" *ngIf="currentStep<3">{{ t('next') }}</button>
+      <button class="btn-primary" (click)="submitGuide()" *ngIf="currentStep===3">{{ t('submit') }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT Modal -->
+<div class="modal-overlay" *ngIf="isImportModalOpen">
+  <div class="import-modal-container">
+    <div class="export-header">
+      <h3>{{ t('importTitle') }}</h3>
+      <button class="close-btn" (click)="closeImportModal()">×</button>
+    </div>
+
+    <div class="import-body">
+      <div class="upload-area" (drop)="onFileDropped($event)" (dragover)="onDragOver($event)">
+        <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+        <p class="upload-text">{{ t('dropFileHere') }}</p>
+        <p class="upload-hint">{{ t('fileTypesHint') }}</p>
+        <input type="file" (change)="onFileSelected($event)" hidden #fileInput>
+        <button class="btn-outline" (click)="fileInput.click()">{{ t('browse') }}</button>
+      </div>
+
+      <div *ngIf="selectedFile" class="file-progress-item">
+        <div class="file-header">
+          <span class="file-name">{{ selectedFile.name }}</span>
+          <button class="remove-file-btn" (click)="removeFile()">×</button>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+        </div>
+        <span *ngIf="isUploading">{{ uploadProgress }}%</span>
+      </div>
+
+      <div class="export-footer">
+        <button class="btn-primary" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">{{ t('import') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT Modal -->
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+  <div class="export-modal-container">
+    <div class="export-header">
+      <h3>{{ t('exportTitle') }}</h3>
+      <button class="close-btn" (click)="closeExportModal()">×</button>
+    </div>
+
+    <p class="export-subtitle">{{ t('selectFileType') }}</p>
+
+    <div class="export-options-grid">
+      <div class="export-option-card" [class.selected]="selectedExportOption==='excel'" (click)="selectExportOption('excel')">
+        <div class="file-icon green"><i class="fa-solid fa-file-excel"></i></div>
+        <span>Excel file</span>
+      </div>
+      <div class="export-option-card" [class.selected]="selectedExportOption==='pdf'" (click)="selectExportOption('pdf')">
+        <div class="file-icon red"><i class="fa-solid fa-file-pdf"></i></div>
+        <span>PDF file</span>
+      </div>
+    </div>
+
+    <div class="export-footer">
+      <button class="btn-primary" (click)="handleExport()"><i class="fa-solid fa-download"></i> {{ t('download') }}</button>
+    </div>
+  </div>
+</div>

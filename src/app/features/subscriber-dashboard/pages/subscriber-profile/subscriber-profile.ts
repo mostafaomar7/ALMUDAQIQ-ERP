@@ -5,16 +5,30 @@ import { ProfileService } from './profile.service';
 import { SubscriberProfileResponse } from './profile.model';
 import { RouterLink } from '@angular/router';
 
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
 type UsageBar = { current: number; max: number; pct: number; label?: string };
+type TranslationKey = keyof typeof EN;
 
 @Component({
   selector: 'app-subscriber-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule , RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './subscriber-profile.html',
   styleUrls: ['./subscriber-profile.css'],
 })
 export class SubscriberProfile implements OnInit {
+  // i18n
+  translations: typeof EN = EN;
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+
   loading = false;
   errorMsg = '';
 
@@ -25,7 +39,6 @@ export class SubscriberProfile implements OnInit {
     email: '',
   };
 
-  // Card 2
   licenseInfo = {
     name: '',
     type: '',
@@ -33,7 +46,6 @@ export class SubscriberProfile implements OnInit {
     date: '',
   };
 
-  // Card 3
   subscriptionDetails = {
     currentPlan: '',
     description: '',
@@ -50,16 +62,19 @@ export class SubscriberProfile implements OnInit {
     },
   };
 
-  // Card 4 (من الريسبونس)
   authorityLinks = {
     cpa: '',
     ministry: '',
     tax: '',
   };
 
-  constructor(private profileService: ProfileService) {}
+  constructor(
+    private profileService: ProfileService,
+    private lang: TranslateService
+  ) {}
 
   ngOnInit(): void {
+    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
     this.loadProfile();
   }
 
@@ -77,18 +92,17 @@ export class SubscriberProfile implements OnInit {
       next: (res: SubscriberProfileResponse) => {
         const d = res?.data;
 
-        // Company (حسب الريسبونس المتاح)
-        this.companyInfo.name = d?.license?.name ?? '';
-        this.companyInfo.country = d?.location?.country ?? '';
-        this.companyInfo.city = d?.location?.city ?? '';
+// Company
+this.companyInfo.name = d?.license?.name ?? '';
+this.companyInfo.country = d?.location?.country ?? '';
+this.companyInfo.city = d?.location?.city ?? '';
+this.companyInfo.email = ''; // ✅ لأن الـ model مفيهوش email // لو موجودة بأي مكان
 
-        // License
         this.licenseInfo.name = d?.license?.name ?? '';
         this.licenseInfo.type = d?.license?.type ?? '';
         this.licenseInfo.number = d?.license?.number ?? '';
         this.licenseInfo.date = this.formatDate(d?.license?.date);
 
-        // Subscription / Plan
         this.subscriptionDetails.currentPlan = d?.plan?.name ?? '';
         this.subscriptionDetails.description = d?.plan?.description ?? '';
         this.subscriptionDetails.startDate = this.formatDate(d?.plan?.subscriptionStart);
@@ -97,7 +111,6 @@ export class SubscriberProfile implements OnInit {
         this.subscriptionDetails.status = d?.plan?.status ?? '';
         this.subscriptionDetails.remainingDays = d?.plan?.usage?.subscription?.remainingDays ?? 0;
 
-        // Usage mapping (زي الريسبونس)
         const u = d?.plan?.usage;
 
         const usersUsed = u?.users?.used ?? 0;
@@ -134,10 +147,9 @@ export class SubscriberProfile implements OnInit {
           current: storageUsed,
           max: storageLimit,
           pct: u?.storage?.percentage ?? this.safePct(storageUsed, storageLimit),
-          label: 'MB',
+          label: this.t('mb'), // لو عايزها تترجم
         };
 
-        // Authority Links
         this.authorityLinks = {
           cpa: d?.location?.authorityLinks?.cpa ?? '',
           ministry: d?.location?.authorityLinks?.ministry ?? '',
@@ -148,7 +160,7 @@ export class SubscriberProfile implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err?.error?.message ?? 'Failed to load profile';
+        this.errorMsg = err?.error?.message ?? this.t('failedToLoadProfile');
       },
     });
   }

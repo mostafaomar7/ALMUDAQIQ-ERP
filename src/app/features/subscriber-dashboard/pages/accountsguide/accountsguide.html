@@ -1,0 +1,425 @@
+<div class="guide-container">
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 class="page-title">{{ t('accountsGuideTitle') }}</h2>
+
+    <div class="actions-group">
+      <div class="edit-actions">
+        <button class="btn-text"
+                [disabled]="!selectedAccount"
+                (click)="openAddModal(selectedAccount)">
+          <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+        </button>
+
+        <button class="btn-text" (click)="deleteSelected()">
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
+        </button>
+      </div>
+
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          (input)="filterAccounts()"
+          [placeholder]="t('search')"
+          class="search-input">
+      </div>
+
+      <div class="file-actions">
+        <button class="btn-outline" (click)="openImportModal()">
+          <i class="fa-solid fa-file-import"></i> {{ t('import') }}
+        </button>
+
+        <button class="btn-outline" (click)="openExportModal()">
+          <i class="fa-solid fa-file-export"></i> {{ t('export') }}
+        </button>
+
+        <button class="btn-primary" (click)="openAddModal()">
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="accounts-table">
+      <thead>
+      <tr>
+        <th class="checkbox-col">
+          <div class="custom-checkbox indeterminate" (click)="toggleAll()">
+            <i class="fa-solid fa-minus"></i>
+          </div>
+        </th>
+        <th >{{ t('level') }}</th>
+        <th>{{ t('accountNumber') }}</th>
+                <th>{{ t('accountName') }}</th>
+        <th>{{ t('rules') }}</th>
+        <th>{{ t('notes') }}</th>
+        <th>{{ t('code') }}</th>
+        <th>{{ t('objectiveCode') }}</th>
+        <th>{{ t('relatedObjectives') }}</th>
+        <!-- <th>Actions</th> -->
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let account of displayedAccounts"
+          [class.selected-row]="account.selected"
+          (click)="selectForEdit(account)">
+
+
+        <td class="checkbox-col">
+          <div class="custom-checkbox"
+               [class.checked]="account.selected"
+               (click)="$event.stopPropagation()"
+               (click)="toggleSelection(account)">
+            <i *ngIf="account.selected" class="fa-solid fa-check"></i>
+          </div>
+        </td>
+
+        <td>{{ account.level }}</td>
+        <td>{{ account.number }}</td>
+                <td class="fw-bold">{{ account.name }}</td>
+        <td>{{ account.rules }}</td>
+        <td>{{ account.notes }}</td>
+        <td>{{ account.code }}</td>
+        <td>{{ account.objectiveCode }}</td>
+        <td>{{ account.relatedObjectives }}</td>
+
+        <!-- <td>
+          <button class="btn-text" (click)="openAddModal(account)">
+            <i class="fa-regular fa-pen-to-square"></i> Edit
+          </button>
+        </td> -->
+
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-footer">
+    <div class="pagination-controls">
+      <button class="page-btn prev"
+              (click)="prevPage()"
+              [disabled]="currentPage === 1">
+        <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
+      </button>
+
+      <ng-container *ngFor="let p of pagesArray">
+  <span *ngIf="p === '...'" class="dots">...</span>
+  <button *ngIf="p !== '...'"
+          class="page-btn"
+          [class.active]="p === currentPage"
+          (click)="goToPage(p)">
+    {{ p }}
+  </button>
+</ng-container>
+
+      <button class="page-btn next"
+              (click)="nextPage()"
+              [disabled]="currentPage === totalPages">
+        {{ t('next') }} <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="pagination-info">
+      <span>{{ t('page') }}</span>
+      <input type="number"
+             [value]="currentPage"
+             (change)="goToPageInput($event)"
+             class="page-input">
+      <!-- <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span> -->
+    </div>
+
+    <div class="items-count">
+      {{ showingRangeText }}
+    </div>
+  </div>
+</div> <!-- END guide-container -->
+
+
+<!-- ------------- MODALS (PLACED OUTSIDE ✔️) ------------- -->
+
+
+<!-- ADD Modal -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content ">
+
+    <div class="modal-header">
+      <h2>
+        {{ currentStep === 1 ? t('basicInfo')
+            : currentStep === 2 ? t('regulations')
+            : t('basicInfo') }}
+      </h2>
+
+      <span class="step-indicator">
+        {{ t('step') }} {{ currentStep }} {{ t('of') }} 3
+      </span>
+
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="step step-1" *ngIf="currentStep === 1">
+
+
+  <!-- level -->
+  <label>{{ t('level') }}</label>
+  <input type="text"
+  disabled
+         name="level"
+         [(ngModel)]="newAccount.level"
+         #level="ngModel"
+         required
+         pattern="^[0-9]+$"
+         class="form-control"
+         [placeholder]="t('enterLevel')">
+
+  <div class="text-danger" *ngIf="level.invalid && level.touched">
+    <small *ngIf="level.errors?.['required']">هذا الحقل مطلوب</small>
+    <!-- <small *ngIf="level.errors?.['pattern']">يجب أن يكون رقمًا فقط</small> -->
+  </div>
+
+  <!-- accountNumber -->
+  <label>{{ t('accountNumber') }}</label>
+  <input
+  type="text"
+  name="accountNumber"
+  [(ngModel)]="newAccount.accountNumber"
+  (ngModelChange)="onAccountNumberChange()"
+  #accountNumber="ngModel"
+  required
+  maxlength="8"
+  class="form-control"
+/>
+
+<div class="text-danger"
+     *ngIf="accountNumber.invalid && accountNumber.touched">
+  <small *ngIf="accountNumber.errors?.['required']">
+    هذا الحقل مطلوب
+  </small>
+</div>
+
+<!-- accountName -->
+  <label>{{ t('accountName') }}</label>
+  <input type="text"
+         name="accountName"
+         [(ngModel)]="newAccount.accountName"
+         #accountName="ngModel"
+         required
+         class="form-control"
+         [placeholder]="t('enterAccountName')">
+
+  <div class="text-danger" *ngIf="accountName.invalid && accountName.touched">
+    <small *ngIf="accountName.errors?.['required']">هذا الحقل مطلوب</small>
+  </div>
+
+  <!-- objectiveCode -->
+  <label>{{ t('objectiveCode') }}</label>
+  <input type="text"
+         name="objectiveCode"
+         [(ngModel)]="newAccount.objectiveCode"
+         #objectiveCode="ngModel"
+         required
+         minlength="2"
+         class="form-control"
+         [placeholder]="t('enterObjectiveCode')">
+
+  <div class="text-danger" *ngIf="objectiveCode.invalid && objectiveCode.touched">
+    <small *ngIf="objectiveCode.errors?.['required']">هذا الحقل مطلوب</small>
+    <small *ngIf="objectiveCode.errors?.['minlength']">يجب إدخال على الأقل حرفين</small>
+  </div>
+
+  <!-- relatedObjectives -->
+
+
+</div>
+
+
+      <div class="step step-2" *ngIf="currentStep === 2">
+
+  <h3>{{ t('rulesAndRegulations') }}</h3>
+  <input type="text"
+         name="rulesAndRegulations"
+         required
+         [(ngModel)]="newAccount.rulesAndRegulations"
+         #rules="ngModel"
+         class="form-control"
+         [placeholder]="t('rulesAndRegulations')">
+
+  <div class="text-danger" *ngIf="rules.invalid && rules.touched">
+    <small>هذا الحقل مطلوب</small>
+  </div>
+
+  <h3>{{ t('disclosureNotes') }}</h3>
+  <textarea
+           name="disclosureNotes"
+           required
+           minlength="5"
+           [(ngModel)]="newAccount.disclosureNotes"
+           #notes="ngModel"
+           class="form-control large-textarea"
+           [placeholder]="t('enterDisclosureNotes')"></textarea>
+
+  <div class="text-danger" *ngIf="notes.invalid && notes.touched">
+    <small *ngIf="notes.errors?.['required']">هذا الحقل مطلوب</small>
+    <small *ngIf="notes.errors?.['minlength']">يجب إدخال 5 أحرف على الأقل</small>
+  </div>
+
+</div>
+
+
+      <div class="step step-3" *ngIf="currentStep === 3">
+
+  <label>Code 1</label>
+  <input type="text"
+         name="code1"
+         required
+         minlength="1"
+         [(ngModel)]="newAccount.code1"
+         #code1="ngModel"
+         class="form-control"
+         [placeholder]="t('enterCode') + ' 1'">
+
+  <div class="text-danger" *ngIf="code1.invalid && code1.touched">
+    <small>هذا الحقل مطلوب</small>
+  </div>
+ <label>{{ t('relatedObjectives') }}</label>
+  <input type="text"
+         name="relatedObjectives"
+         [(ngModel)]="newAccount.relatedObjectives"
+         #relatedObjectives="ngModel"
+         required
+         class="form-control"
+         [placeholder]="t('relatedObjectives')">
+
+  <div class="text-danger" *ngIf="relatedObjectives.invalid && relatedObjectives.touched">
+    <small *ngIf="relatedObjectives.errors?.['required']">هذا الحقل مطلوب</small>
+  </div>
+</div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary"
+              (click)="prevStep()"
+              *ngIf="currentStep > 1">
+        {{ t('back') }}
+      </button>
+
+      <button class="btn-primary"
+              (click)="nextStep()"
+              *ngIf="currentStep < 3">
+        {{ t('next') }}
+      </button>
+
+      <button class="btn-primary"
+              (click)="submitNewAccount()"
+              *ngIf="currentStep === 3">
+        {{ t('submit') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- IMPORT Modal -->
+<div class="modal-overlay" *ngIf="isImportModalOpen">
+  <div class="import-modal-container">
+
+    <div class="export-header">
+      <h3>{{ t('importTitle') }}</h3>
+      <button class="close-btn" (click)="closeImportModal()">×</button>
+    </div>
+
+    <div class="import-body">
+      <div class="upload-area"
+           (drop)="onFileDropped($event)"
+           (dragover)="onDragOver($event)">
+        <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+        <p class="upload-text">{{ t('dropFileHere') }}</p>
+        <p class="upload-hint">{{ t('fileTypesHint') }}</p>
+
+        <input type="file" (change)="onFileSelected($event)" hidden #fileInput>
+        <button class="btn-outline" (click)="fileInput.click()">Browse</button>
+      </div>
+
+      <div *ngIf="selectedFile" class="file-progress-item">
+        <div class="file-icon-wrapper"><i class="fa-solid fa-file-excel"></i></div>
+
+        <div class="file-info-wrapper">
+          <div class="file-header">
+            <span class="file-name">{{ selectedFile.name }}</span>
+            <button class="remove-file-btn" (click)="removeFile()">×</button>
+          </div>
+
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+
+          <span *ngIf="isUploading">{{ uploadProgress }}%</span>
+        </div>
+      </div>
+
+      <div class="export-footer">
+        <button class="btn-primary download-btn"
+                [disabled]="!selectedFile || isUploading"
+                (click)="uploadFile()">
+          {{ t('import') }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- EXPORT Modal -->
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+  <div class="export-modal-container">
+
+    <div class="export-header">
+      <h3>{{ t('exportTitle') }}</h3>
+      <button class="close-btn" (click)="closeExportModal()">×</button>
+    </div>
+
+    <p class="export-subtitle">{{ t('selectFileType') }}</p>
+
+
+      <div class="export-options-grid">
+
+  <!-- Excel -->
+  <div class="export-option-card"
+       [class.selected]="selectedExportOption==='excel'"
+       (click)="selectExportOption('excel')">
+    <div class="file-icon green">
+      <i class="fa-solid fa-file-excel"></i>
+    </div>
+    <span>Excel file</span>
+  </div>
+
+  <!-- PDF -->
+  <div class="export-option-card"
+       [class.selected]="selectedExportOption==='pdf'"
+       (click)="selectExportOption('pdf')">
+    <div class="file-icon red">
+      <i class="fa-solid fa-file-pdf"></i>
+    </div>
+    <span>PDF file</span>
+  </div>
+
+</div>
+
+
+    <div class="export-footer">
+      <button class="btn-primary download-btn" (click)="handleExport()">
+    <i class="fa-solid fa-download"></i> {{ t('download') }}
+</button>
+    </div>
+
+  </div>
+</div>

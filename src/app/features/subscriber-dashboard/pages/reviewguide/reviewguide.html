@@ -1,0 +1,300 @@
+<div class="review-container">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 class="page-title">{{ t('reviewGuideTitle') }}</h2>
+
+    <div class="actions-group">
+      <div class="edit-actions">
+<button class="btn-text" [disabled]="!selectedReview" (click)="openAddModal(selectedReview || undefined)">
+  <i class="fa-regular fa-pen-to-square"></i> {{ t('edit') }}
+</button>
+
+        <button class="btn-text" (click)="deleteSelectedItems()">
+          <i class="fa-regular fa-trash-can"></i> {{ t('delete') }}
+        </button>
+      </div>
+
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+<input type="text"
+       [(ngModel)]="searchTerm"
+       (input)="applySearch()"
+       [placeholder]="t('search')"
+       class="search-input">
+      </div>
+
+      <div class="file-actions">
+        <button class="btn-outline" (click)="openImportModal()">
+          <i class="fa-solid fa-file-import"></i> {{ t('import') }}
+        </button>
+
+        <button class="btn-outline" (click)="openExportModal()">
+          <i class="fa-solid fa-file-export"></i> {{ t('export') }}
+        </button>
+        <button class="btn-primary" (click)="openAddModal()">
+          <i class="fa-solid fa-plus"></i> {{ t('addNewGuide') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="review-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <div class="custom-checkbox indeterminate" (click)="toggleAll()">
+              <i class="fa-solid fa-minus"></i>
+            </div>
+          </th>
+          <th (click)="sortByLevel()" style="cursor: pointer;">
+  {{ t('level') }}
+</th>
+          <th>{{ t('separator') }}</th>
+          <th>{{ t('number') }}</th>
+          <th>{{ t('statement') }}</th>
+          <th>{{ t('purpose') }}</th>
+          <th>{{ t('responsibility') }}</th>
+          <th>{{ t('DatePrepared') }}</th>
+          <th>{{ t('DateReviewed') }}</th>
+          <th>{{ t('Conclusion') }}</th>
+          <th>{{ t('Attachments') }}</th>
+          <th>{{ t('Notes1') }}</th>
+          <th>{{ t('Notes2') }}</th>
+          <th>{{ t('Notes3') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of displayedReviews"
+    [class.selected-row]="item.selected"
+    (click)="toggleSelection(item)"> <!-- فقط تحديد العنصر -->
+
+  <td class="checkbox-col" (click)="$event.stopPropagation(); toggleSelection(item)">
+    <div class="custom-checkbox" [class.checked]="item.selected">
+      <i *ngIf="item.selected" class="fa-solid fa-check"></i>
+    </div>
+  </td>
+  <td>{{ item.level }}</td>
+  <td>{{ item.separator }}</td>
+  <td>{{ item.number }}</td>
+  <td>{{ item.statement }}</td>
+  <td>{{ item.purpose }}</td>
+  <td>{{ item.responsiblePerson }}</td>
+  <td>{{ item.datePrepared | date:'yyyy-MM-dd' }}</td>
+  <td>{{ item.dateReviewed | date:'yyyy-MM-dd' }}</td>
+  <td>{{ item.conclusion }}</td>
+  <td>{{ item.attachments }}</td>
+  <td>{{ item.notes1 }}</td>
+  <td>{{ item.notes2 }}</td>
+  <td>{{ item.notes3 }}</td>
+</tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="pagination-footer">
+    <div class="pagination-controls">
+      <button class="page-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-chevron-left"></i> {{ t('back') }}
+      </button>
+
+      <ng-container *ngFor="let page of pagesArray">
+        <span *ngIf="page === '...'" class="dots">...</span>
+        <button *ngIf="page !== '...'"
+                class="page-btn"
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <button class="page-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        {{ t('next') }} <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="pagination-info">
+      <span>{{ t('page') }}</span>
+      <input type="number" [value]="currentPage" (change)="goToPageInput($event)" class="page-input">
+      <!-- <span class="go-btn" (click)="updateDisplayedData()">{{ t('go') }}</span> -->
+    </div>
+
+    <div class="items-count">
+      {{ showingRangeText }}
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW GUIDE MODAL -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content bg-white p-3 rounded shadow-lg w-600 mx-auto">
+    <div class="modal-header">
+      <h2>
+        {{ currentStep === 1 ? t('basicInfo')
+           : currentStep === 2 ? t('details')
+           : t('Attachments') }}
+      </h2>
+
+      <span class="step-indicator">
+        {{ t('step') }} {{ currentStep }} {{ t('of') }} 3
+      </span>
+
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Step 1 -->
+      <div class="step step-1" *ngIf="currentStep === 1">
+
+  <label>{{ t('level') }}</label>
+  <input type="text" required [(ngModel)]="newReview.level" #level="ngModel" class="form-control">
+  <span *ngIf="level.invalid && level.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('separator') }}</label>
+  <input type="text" required [(ngModel)]="newReview.separator" #separator="ngModel" class="form-control">
+  <span *ngIf="separator.invalid && separator.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('number') }}</label>
+  <input type="text" required [(ngModel)]="newReview.number" #number="ngModel" class="form-control">
+  <span *ngIf="number.invalid && number.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('statement') }}</label>
+  <input type="text" required [(ngModel)]="newReview.statement" #statement="ngModel" class="form-control">
+  <span *ngIf="statement.invalid && statement.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('purpose') }}</label>
+  <input type="text" required [(ngModel)]="newReview.purpose" #purpose="ngModel" class="form-control">
+  <span *ngIf="purpose.invalid && purpose.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
+      <!-- Step 2 -->
+      <div class="step step-2" *ngIf="currentStep === 2">
+
+  <label>{{ t('responsibility') }}</label>
+  <input type="text" required [(ngModel)]="newReview.responsiblePerson" #responsiblePerson="ngModel" class="form-control">
+  <span *ngIf="responsiblePerson.invalid && responsiblePerson.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('DatePrepared') }}</label>
+  <input type="date" required [(ngModel)]="newReview.datePrepared" #datePrepared="ngModel" class="form-control">
+  <span *ngIf="datePrepared.invalid && datePrepared.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('DateReviewed') }}</label>
+  <input type="date" required [(ngModel)]="newReview.dateReviewed" #dateReviewed="ngModel" class="form-control">
+  <span *ngIf="dateReviewed.invalid && dateReviewed.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('Conclusion') }}</label>
+  <input type="text" required [(ngModel)]="newReview.conclusion" #conclusion="ngModel" class="form-control">
+  <span *ngIf="conclusion.invalid && conclusion.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('Notes1') }}</label>
+  <input type="text" required [(ngModel)]="newReview.notes1" #notes1="ngModel" class="form-control">
+  <span *ngIf="notes1.invalid && notes1.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('Notes2') }}</label>
+  <input type="text" required [(ngModel)]="newReview.notes2" #notes2="ngModel" class="form-control">
+  <span *ngIf="notes2.invalid && notes2.touched" class="error-text">هذا الحقل مطلوب</span>
+
+  <label>{{ t('Notes3') }}</label>
+  <input type="text" required [(ngModel)]="newReview.notes3" #notes3="ngModel" class="form-control">
+  <span *ngIf="notes3.invalid && notes3.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
+      <!-- Step 3 -->
+      <div class="step step-3" *ngIf="currentStep === 3">
+
+  <label>{{ t('Attachments') }}</label>
+  <input type="text" required [(ngModel)]="newReview.attachments" #attachments="ngModel" class="form-control">
+  <span *ngIf="attachments.invalid && attachments.touched" class="error-text">هذا الحقل مطلوب</span>
+
+</div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="prevStep()" *ngIf="currentStep > 1">
+        {{ t('back') }}
+      </button>
+
+      <button class="btn-primary mt-1" (click)="nextStep()" *ngIf="currentStep < 3">
+        {{ t('next') }}
+      </button>
+
+      <button class="btn-primary" (click)="submitReview()" *ngIf="currentStep === 3">
+        {{ t('submit') }}
+      </button>
+    </div>
+  </div>
+</div>
+<!-- IMPORT Modal -->
+<div class="modal-overlay" *ngIf="isImportModalOpen">
+  <div class="import-modal-container">
+    <div class="export-header">
+      <h3>{{ t('importTitle') }}</h3>
+      <button class="close-btn" (click)="closeImportModal()">×</button>
+    </div>
+
+    <div class="import-body">
+      <div class="upload-area" (drop)="onFileDropped($event)" (dragover)="onDragOver($event)">
+        <div class="upload-icon"><i class="fa-solid fa-file-circle-plus"></i></div>
+        <p class="upload-text">{{ t('dropFileHere') }}</p>
+        <p class="upload-hint">{{ t('fileTypesHint') }}</p>
+        <input type="file" (change)="onFileSelected($event)" hidden #fileInput>
+        <button class="btn-outline" (click)="fileInput.click()">Browse</button>
+      </div>
+
+      <div *ngIf="selectedFile" class="file-progress-item">
+        <div class="file-icon-wrapper"><i class="fa-solid fa-file-excel"></i></div>
+        <div class="file-info-wrapper">
+          <div class="file-header">
+            <span class="file-name">{{ selectedFile.name }}</span>
+            <button class="remove-file-btn" (click)="removeFile()">×</button>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+          <span *ngIf="isUploading">{{ uploadProgress }}%</span>
+        </div>
+      </div>
+
+      <div class="export-footer">
+        <button class="btn-primary download-btn" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">
+          {{ t('import') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT Modal -->
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+  <div class="export-modal-container">
+    <div class="export-header">
+      <h3>{{ t('exportTitle') }}</h3>
+      <button class="close-btn" (click)="closeExportModal()">×</button>
+    </div>
+
+    <p class="export-subtitle">{{ t('selectFileType') }}</p>
+    <div class="export-options-grid">
+      <div class="export-option-card" [class.selected]="selectedExportOption==='excel'" (click)="selectExportOption('excel')">
+        <div class="file-icon green"><i class="fa-solid fa-file-excel"></i></div>
+        <span>Excel file</span>
+      </div>
+      <div class="export-option-card" [class.selected]="selectedExportOption==='pdf'" (click)="selectExportOption('pdf')">
+        <div class="file-icon red"><i class="fa-solid fa-file-pdf"></i></div>
+        <span>PDF file</span>
+      </div>
+    </div>
+
+    <div class="export-footer">
+      <button class="btn-primary download-btn" (click)="handleExport()">
+        <i class="fa-solid fa-download"></i> {{ t('download') }}
+      </button>
+    </div>
+  </div>
+</div>

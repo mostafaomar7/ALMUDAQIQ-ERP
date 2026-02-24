@@ -55,6 +55,36 @@ export const SubscriberRoutes: Routes = [
         loadComponent: () =>
           import('./pages/subscriber-profile/upgrade-plan/upgrade-plan')
             .then(m => m.UpgradePlan)
+      },
+      {
+        path: 'accountguide',
+        loadComponent: () =>
+          import('./pages/accountsguide/accountsguide')
+            .then(m => m.Accountsguide)
+      },
+       {
+        path: 'reviewguide',
+        loadComponent: () =>
+          import('./pages/reviewguide/reviewguide')
+            .then(m => m.Reviewguide)
+      },
+      {
+        path: 'filestage',
+        loadComponent: () =>
+          import('./pages/filestagesguide/filestagesguide')
+            .then(m => m.Filestagesguide)
+      },
+       {
+        path: 'reviewobjectivesguide',
+        loadComponent: () =>
+          import('./pages/reviewobjectivesguide/reviewobjectivesguide')
+            .then(m => m.Reviewobjectivesguide)
+      },
+      {
+        path: 'reviewmarksindex',
+        loadComponent: () =>
+          import('./pages/reviewmarksindex/reviewmarksindex')
+            .then(m => m.ReviewmarksindexComponent)
       }
     ]
   }
