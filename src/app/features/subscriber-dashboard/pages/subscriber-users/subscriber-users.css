@@ -76,10 +76,12 @@
   left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af;
 }
 
-/* Table Styles */
+/* Table Styles - التعديل الجذري تم هنا */
 .table-container {
-  overflow-x: auto;
+  overflow: visible; /* تم تغييرها لتسمح بخروج القائمة من الجدول */
   margin-top: 10px;
+  min-height: 250px; /* ضمان وجود مساحة لفتح القائمة لو الجدول فيه صف واحد */
+  padding-bottom: 120px; /* مساحة من الأسفل لعدم قص القائمة */
 }
 
 table {
@@ -144,3 +146,234 @@ td {
 .page-jump input { width: 40px; height: 34px; text-align: center; border: 1px solid #e5e7eb; border-radius: 4px; }
 .go-btn { font-weight: 600; cursor: pointer; }
 .page-summary { color: #4b5563; font-size: 0.875rem; }
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Modal Box */
+.modal-container {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title-area h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.step-indicator {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #888;
+}
+
+/* Body & Inputs */
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.step-title {
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* Upload Area Mock */
+.upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  cursor: pointer;
+}
+.upload-area span { display: block; font-weight: 500; margin-bottom: 5px;}
+.upload-area small { font-size: 0.8rem; color: #999; }
+
+/* Assigned Devices Styling */
+.device-item {
+  margin-bottom: 12px;
+}
+.device-label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+.device-inputs {
+  display: flex;
+  gap: 10px;
+}
+.btn-delete-device {
+  background: none;
+  border: 1px solid #ffe6e6;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-delete-device:hover { background: #ffe6e6; }
+.btn-add-device {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 8px;
+}
+
+/* Footer Buttons */
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-back {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-next, .btn-submit {
+  background: #00796b;
+  color: #fff;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* تنسيق الـ Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #00796b;
+}
+
+/* تنسيقات الـ Validation */
+.required-star { color: #d33; margin-left: 2px; }
+.has-error { border-color: #d33 !important; background-color: #fff8f8; }
+.error-msg { color: #d33; font-size: 0.8rem; margin-top: 4px; display: block; }
+.btn-next:disabled { opacity: 0.5; cursor: not-allowed; background-color: #ccc; }
+
+/* -------------------------------------- */
+/* تنسيق قائمة الثلاث نقاط (Dropdown Menu) */
+/* -------------------------------------- */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* تكبير الظل للوضوح */
+  z-index: 99999; /* رفع الـ z-index لأقصى درجة */
+  min-width: 140px; /* تعريض القائمة قليلاً */
+  text-align: left;
+  padding: 4px 0;
+}
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f3f4f6;
+  color: #00796b;
+}
+
+/* جعل القائمة تفتح لأعلى في آخر صفوف لعدم تخطي الشاشة */
+tbody tr:nth-last-child(-n+2) .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 5px;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+}

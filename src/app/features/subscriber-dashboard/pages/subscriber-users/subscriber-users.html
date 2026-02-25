@@ -3,21 +3,12 @@
     <h1 class="title">{{ t('usersList') }}</h1>
 
     <div class="actions">
-      <button class="btn btn-text">
+      <button class="btn btn-text" (click)="openEditUserModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
         </svg>
         {{ t('edit') }}
-      </button>
-
-      <button class="btn btn-text">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"></polyline>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-        </svg>
-        {{ t('delete') }}
       </button>
 
       <div class="search-box">
@@ -31,27 +22,7 @@
         <input type="text" [placeholder]="t('search')" [(ngModel)]="searchTerm">
       </div>
 
-      <button class="btn btn-outline">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        {{ t('import') }}
-      </button>
-
-      <button class="btn btn-outline">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="17 8 12 3 7 8"></polyline>
-          <line x1="12" y1="3" x2="12" y2="15"></line>
-        </svg>
-        {{ t('export') }}
-      </button>
-
-      <button class="btn btn-primary">
+      <button class="btn btn-primary" (click)="openAddUserModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -61,28 +32,20 @@
       </button>
     </div>
   </div>
-
+ <div class="table-scroll">
   <div class="table-container">
     <table>
       <thead>
         <tr>
           <th class="w-checkbox">
-            <div
-              class="custom-checkbox"
-              [class.checked]="isAllSelected"
-              [class.indeterminate]="isPartiallySelected"
-              (click)="isAllSelected ? toggleAll({target:{checked:false}}) : toggleAll({target:{checked:true}})">
-              <svg *ngIf="isAllSelected" viewBox="0 0 24 24" fill="none" stroke="white"
-                   stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <svg *ngIf="isPartiallySelected" viewBox="0 0 24 24" fill="none" stroke="#10b981"
-                   stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
+            <div class="custom-checkbox"
+                 [class.checked]="isAllSelected"
+                 [class.indeterminate]="isPartiallySelected"
+                 (click)="isAllSelected ? toggleAll({target:{checked:false}}) : toggleAll({target:{checked:true}})">
+              <svg *ngIf="isAllSelected" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg *ngIf="isPartiallySelected" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </div>
           </th>
-
           <th>{{ t('fullName') }} <span class="sort-arrow">⌄</span></th>
           <th>{{ t('email') }} <span class="sort-arrow">⌄</span></th>
           <th>{{ t('role') }} <span class="sort-arrow">⌄</span></th>
@@ -95,73 +58,218 @@
       <tbody>
         <tr *ngFor="let user of displayedUsers" [class.selected-row]="user.selected">
           <td>
-            <div class="custom-checkbox"
-                 [class.checked]="user.selected"
-                 (click)="toggleRow(user)">
-              <svg *ngIf="user.selected" viewBox="0 0 24 24" fill="none" stroke="white"
-                   stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+            <div class="custom-checkbox" [class.checked]="user.selected" (click)="toggleRow(user)">
+              <svg *ngIf="user.selected" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
           </td>
-
           <td class="font-medium">{{ user.fullName }}</td>
           <td class="text-gray">{{ user.email }}</td>
           <td class="text-gray">{{ user.role }}</td>
           <td class="text-gray">{{ user.branch }}</td>
-
           <td>
             <span class="badge" [ngClass]="user.status === 'Active' ? 'badge-active' : 'badge-inactive'">
               <span class="dot">●</span> {{ statusLabel(user.status) }}
             </span>
           </td>
-
           <td class="text-right">
-            <button class="btn-icon">⋮</button>
+            <div class="dropdown-container">
+              <button class="btn-icon" (click)="toggleDropdown(user.id, $event)">⋮</button>
+
+              <div class="dropdown-menu" *ngIf="activeDropdown === user.id">
+                <button (click)="updateUserStatus(user, 'active')">Set Active</button>
+                <button (click)="updateUserStatus(user, 'inactive')">Set Inactive</button>
+              </div>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+ </div>
+
 
   <div class="pagination">
     <div class="page-controls">
-      <button class="btn-page text-only"
-              (click)="changePage(currentPage - 1)"
-              [disabled]="currentPage === 1"
-              [style.opacity]="currentPage === 1 ? '0.5' : '1'">
-        &lt; {{ t('back') }}
-      </button>
-
+      <button class="btn-page text-only" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" [style.opacity]="currentPage === 1 ? '0.5' : '1'">&lt; {{ t('back') }}</button>
       <ng-container *ngFor="let page of visiblePages">
         <span *ngIf="page === '...'" class="dots">...</span>
-        <button *ngIf="page !== '...'"
-                class="btn-page"
-                [class.active]="page === currentPage"
-                (click)="changePage(page)">
-          {{ page }}
-        </button>
+        <button *ngIf="page !== '...'" class="btn-page" [class.active]="page === currentPage" (click)="changePage(page)">{{ page }}</button>
       </ng-container>
-
-      <button class="btn-page text-only"
-              (click)="changePage(currentPage + 1)"
-              [disabled]="currentPage === totalPages"
-              [style.opacity]="currentPage === totalPages ? '0.5' : '1'">
-        {{ t('next') }} &gt;
-      </button>
+      <button class="btn-page text-only" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages" [style.opacity]="currentPage === totalPages ? '0.5' : '1'">{{ t('next') }} &gt;</button>
     </div>
-
     <div class="page-jump">
       <span>{{ t('page') }}</span>
       <input type="number" [(ngModel)]="paginationInput" (keyup.enter)="goToInputPage()">
       <span class="go-btn" (click)="goToInputPage()">{{ t('go') }}</span>
     </div>
-
     <div class="page-summary">
-      {{ (currentPage - 1) * itemsPerPage + 1 }}-
-      {{ currentPage * itemsPerPage > allUsers.length ? allUsers.length : currentPage * itemsPerPage }}
-      {{ t('of') }}
-      {{ allUsers.length | number }}
+      {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ currentPage * itemsPerPage > allUsers.length ? allUsers.length : currentPage * itemsPerPage }} {{ t('of') }} {{ allUsers.length | number }}
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-container">
+
+    <div class="modal-header">
+      <div class="title-area">
+        <h2>{{ isEditMode ? 'Edit User' : 'Add User' }}</h2>
+        <span class="step-indicator">Step {{ currentStep }} of 3</span>
+      </div>
+      <button class="btn-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-step" *ngIf="currentStep === 1">
+        <p class="step-title">Basic Data</p>
+
+        <div class="form-group">
+          <label>Full Name <span class="required-star">*</span></label>
+          <input type="text" name="fullName" placeholder="Enter Full Name"
+                 [(ngModel)]="newUser.fullName" required #fullName="ngModel"
+                 [ngClass]="{'has-error': fullName.invalid && (fullName.dirty || fullName.touched)}">
+          <small class="error-msg" *ngIf="fullName.invalid && (fullName.dirty || fullName.touched)">Full Name is required.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Username <span class="required-star">*</span></label>
+          <input type="text" name="username" placeholder="Enter Username"
+                 [(ngModel)]="newUser.username" required #username="ngModel"
+                 [ngClass]="{'has-error': username.invalid && (username.dirty || username.touched)}">
+          <small class="error-msg" *ngIf="username.invalid && (username.dirty || username.touched)">Username is required.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Role / Job Title <span class="required-star">*</span></label>
+          <select name="roleId" [(ngModel)]="newUser.roleId" required #roleId="ngModel"
+                  [ngClass]="{'has-error': roleId.invalid && (roleId.dirty || roleId.touched)}">
+            <option value="" disabled>Select Role</option>
+            <option *ngFor="let role of rolesList" [value]="role.id">{{ role.name }}</option>
+          </select>
+          <small class="error-msg" *ngIf="roleId.invalid && (roleId.dirty || roleId.touched)">Role is required.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Branch Name <span class="required-star">*</span></label>
+          <select name="branchId" [(ngModel)]="newUser.branchId" required #branchId="ngModel"
+                  [ngClass]="{'has-error': branchId.invalid && (branchId.dirty || branchId.touched)}">
+            <option value="" disabled>Select Branch Name</option>
+            <option *ngFor="let branch of branchesList" [value]="branch.id">{{ branch.name }}</option>
+          </select>
+          <small class="error-msg" *ngIf="branchId.invalid && (branchId.dirty || branchId.touched)">Branch is required.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Work Email <span class="required-star">*</span></label>
+          <input type="email" name="workEmail" placeholder="Enter Work Email"
+                 [(ngModel)]="newUser.workEmail" required email #workEmail="ngModel"
+                 [ngClass]="{'has-error': workEmail.invalid && (workEmail.dirty || workEmail.touched)}">
+          <small class="error-msg" *ngIf="workEmail.errors?.['required'] && (workEmail.dirty || workEmail.touched)">Email is required.</small>
+          <small class="error-msg" *ngIf="workEmail.errors?.['email'] && (workEmail.dirty || workEmail.touched)">Please enter a valid email format.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Work Mobile Number <span class="required-star">*</span></label>
+          <input type="tel" name="workMobile" placeholder="Enter Work Mobile Number"
+                 [(ngModel)]="newUser.workMobile" required pattern="^[0-9]+$" #workMobile="ngModel"
+                 [ngClass]="{'has-error': workMobile.invalid && (workMobile.dirty || workMobile.touched)}">
+          <small class="error-msg" *ngIf="workMobile.errors?.['required'] && (workMobile.dirty || workMobile.touched)">Mobile number is required.</small>
+          <small class="error-msg" *ngIf="workMobile.errors?.['pattern'] && (workMobile.dirty || workMobile.touched)">Numbers only are allowed.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Start Date <span class="required-star">*</span></label>
+          <input type="date" name="startDate" [(ngModel)]="newUser.startDate" required #startDate="ngModel"
+                 [ngClass]="{'has-error': startDate.invalid && (startDate.dirty || startDate.touched)}">
+          <small class="error-msg" *ngIf="startDate.invalid && (startDate.dirty || startDate.touched)">Start Date is required.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Status <span class="required-star">*</span></label>
+          <select name="status" [(ngModel)]="newUser.status" required #status="ngModel"
+                  [ngClass]="{'has-error': status.invalid && (status.dirty || status.touched)}">
+            <option value="" disabled>Select Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          <small class="error-msg" *ngIf="status.invalid && (status.dirty || status.touched)">Status is required.</small>
+        </div>
+      </div>
+
+      <div class="form-step" *ngIf="currentStep === 2">
+        <p class="step-title">Helpful Information (Optional)</p>
+        <div class="form-group">
+          <label>Profile Photo</label>
+          <input type="file" #fileInput style="display: none;" accept="image/png, image/jpeg" (change)="onFileSelected($event)">
+          <div class="upload-area" (click)="fileInput.click()">
+            <span *ngIf="!selectedFileName">🖼️ Click to upload image</span>
+            <span *ngIf="selectedFileName" style="color: #00796b; font-weight: bold;">✅ {{ selectedFileName }}</span>
+            <small>PNG, JPG up to 10MB</small>
+          </div>
+        </div>
+
+        <div class="form-group"><label>Employee ID</label><input type="text" placeholder="Enter Employee ID" [(ngModel)]="newUser.employeeId"></div>
+        <div class="form-group">
+          <label>Preferred Language</label>
+          <select [(ngModel)]="newUser.preferredLanguage">
+            <option value="">Select Preferred Language</option>
+            <option value="en">English</option>
+            <option value="arabic">Arabic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Time Zone</label>
+          <select [(ngModel)]="newUser.timeZone">
+            <option value="">Select Time Zone</option>
+            <option value="EET">EET</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Work Location</label>
+          <select [(ngModel)]="newUser.workLocation">
+            <option value="">Select Work Location</option>
+            <option value="Office">Office</option>
+            <option value="Remote">Remote</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Email Signature</label><input type="text" placeholder="Enter Email Signature" [(ngModel)]="newUser.emailSignature"></div>
+        <div class="form-group"><label>Emergency Contact</label><input type="text" placeholder="Enter Emergency Contact" [(ngModel)]="newUser.emergencyContact"></div>
+
+        <div class="form-group">
+          <label>Assigned Devices</label>
+          <div class="device-list" *ngIf="assignedDevices.length > 0">
+            <div class="device-item" *ngFor="let device of assignedDevices; let i = index">
+              <label class="device-label">Assigned Device ({{ i + 1 }})</label>
+              <div class="device-inputs">
+                <input type="text" placeholder="Enter Device Name" [(ngModel)]="device.name">
+                <input type="text" placeholder="Enter Serial Number" [(ngModel)]="device.serial">
+                <button class="btn-delete-device" (click)="removeDevice(i)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <button class="btn-add-device" (click)="addDevice()">+ Add Device</button>
+        </div>
+      </div>
+
+      <div class="form-step" *ngIf="currentStep === 3">
+        <p class="step-title">Security & Access</p>
+        <div class="form-group"><label>Recovery Email/Phone</label><input type="text" placeholder="Enter Recovery Email/Phone" [(ngModel)]="newUser.recoveryEmail"></div>
+        <div class="form-group"><label>Password Policy</label><input type="text" placeholder="Enter Password Policy" [(ngModel)]="newUser.passwordPolicy"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-back" *ngIf="currentStep > 1" (click)="prevStep()">Back</button>
+      <div style="flex-grow: 1;"></div>
+      <button class="btn-next" *ngIf="currentStep === 1" (click)="nextStep()" [disabled]="!isStep1Valid()">Next</button>
+      <button class="btn-next" *ngIf="currentStep === 2" (click)="nextStep()">Next</button>
+      <button class="btn-submit" *ngIf="currentStep === 3" (click)="submitNewUser()" [disabled]="isSubmitting">
+        <span *ngIf="!isSubmitting">Submit</span>
+        <span *ngIf="isSubmitting" class="spinner"></span>
+      </button>
+    </div>
+
   </div>
 </div>

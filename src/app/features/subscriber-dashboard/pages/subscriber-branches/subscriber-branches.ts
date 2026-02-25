@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
 import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';

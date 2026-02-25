@@ -21,4 +21,8 @@ export const AR = {
   page: 'صفحة',
   go: 'اذهب',
   of: 'من',
+  success : 'نجاح' ,
+  close : 'اغلاق' ,
+  error : 'خطأ',
+  ok : 'تم',
 };

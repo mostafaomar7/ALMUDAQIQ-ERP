@@ -21,4 +21,8 @@ export const EN = {
   page: 'Page',
   go: 'Go',
   of: 'of',
+  success : 'success',
+  close : 'Close' ,
+  error : 'error',
+  ok : 'ok',
 };
