@@ -7,7 +7,7 @@ export const environment = {
 
     // apiUrl: 'http://localhost:4000/api/v1'
     apiUrl: 'http://192.168.1.16:4000',
-  defaultTenant: 'bayomyv-3'  //local
+  defaultTenant: 'rrrrrrrr'  //local
   // defaultTenant: 'mostafa'  //dev
 
     // apiUrl: ''

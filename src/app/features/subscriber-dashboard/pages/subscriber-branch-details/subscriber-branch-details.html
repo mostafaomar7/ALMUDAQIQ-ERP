@@ -1,3 +1,5 @@
+<div *ngIf="loading">Loading...</div>
+<div *ngIf="errorMsg" class="text-red-500">{{ errorMsg }}</div>
 <div class="page-container">
 
   <!-- Branch Information -->
@@ -25,9 +27,9 @@
     <div class="info-item">
       <label>{{ t('status') }}</label>
       <div class="value">
-        <span class="status-badge active">
-          <span class="dot"></span> Active
-        </span>
+<span class="status-badge" [ngClass]="branchInfo.status === 'ACTIVE' ? 'active' : 'inactive'">
+  <span class="dot"></span> {{ branchInfo.status }}
+</span>
       </div>
     </div>
   </div>
@@ -69,7 +71,7 @@
       <div class="value">{{ managerInfo.joinDate }}</div>
     </div>
   </div>
-</div> 
+</div>
 
   <!-- Stats -->
 <div class="stats-row">
@@ -171,7 +173,7 @@
       </table>
     </div>
 
-    <div class="view-all">{{ t('viewAll') }}</div>
+    <div class="view-all" routerLink="/subscriber/users">{{ t('viewAll') }}</div>
   </div>
 
   <!-- Clients -->

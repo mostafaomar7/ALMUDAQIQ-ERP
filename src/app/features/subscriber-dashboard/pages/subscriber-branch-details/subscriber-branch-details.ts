@@ -1,22 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
-import { TranslateService } from '../../../../core/services/translate.service'; // عدّل المسار حسب مشروعك
+import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';
 
-// Interfaces
-interface Employee {
+import { BranchdetailsService, BranchDetailsResponse } from './branchdetails.service';
+
+interface EmployeeUI {
+  id: number;
   name: string;
   email: string;
   role: string;
-  status: 'Active' | 'Inactive';
-  selected: boolean;
-}
-
-interface Client {
-  name: string;
-  type: string;
   status: 'Active' | 'Inactive';
   selected: boolean;
 }
@@ -26,18 +23,56 @@ type TranslationKey = keyof typeof EN;
 @Component({
   selector: 'app-subscriber-branch-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule , RouterLink],
   templateUrl: './subscriber-branch-details.html',
   styleUrl: './subscriber-branch-details.css',
 })
-export class SubscriberBranchDetails implements OnInit {
-  // i18n
+export class SubscriberBranchDetails implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   translations: typeof EN = EN;
 
-  constructor(private lang: TranslateService) {}
+  loading = false;
+  errorMsg = '';
+
+  // هيتعبّوا من الـ API
+  branchInfo = { name: '', city: '', status: '' };
+  managerInfo = { name: '', jobTitle: '', email: '', phone: '', joinDate: '' };
+
+  // Stats (دلوقتي هنحسب موظفين من users)
+  stats = [
+    { labelKey: 'revenue', value: '-', icon: 'money' },
+    { labelKey: 'clients', value: '-', icon: 'users' },
+    { labelKey: 'activeContracts', value: '-', icon: 'file' },
+    { labelKey: 'employees', value: '0', icon: 'users-group' },
+  ] as const;
+
+  employees: EmployeeUI[] = [];
+  clients: any[] = []; // لحد ما يبقى عندك endpoint للـ clients
+
+  constructor(
+    private lang: TranslateService,
+    private route: ActivatedRoute,
+    private branchSrv: BranchdetailsService
+  ) {}
 
   ngOnInit(): void {
-    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
+    this.lang.lang$.pipe(takeUntil(this.destroy$)).subscribe(l => this.loadTranslations(l));
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const branchId = Number(idParam);
+
+    if (!branchId || Number.isNaN(branchId)) {
+      this.errorMsg = 'Invalid branch id';
+      return;
+    }
+
+    this.fetchBranchDetails(branchId);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadTranslations(lang: 'en' | 'ar') {
@@ -47,104 +82,99 @@ export class SubscriberBranchDetails implements OnInit {
   t(key: TranslationKey): string {
     return this.translations[key] || key;
   }
-tAny(key: string): string {
-  return (this.translations as any)[key] || key;
-}
-  // ✅ Branch Info (هنا ثابتة زي ما عندك، ولو بعدين هتجيبها من API هتبدّل القيم)
-branchInfo = {
-    name: 'Cairo Branch',
-    city: 'Cairo', // <-- أضفنا هذه
-    email: 'cairo@almudaqiq.com',
-    phone: '+20 100 555 7890',
-    country: 'Egypt',
-    address: '15 El Tahrir St, Cairo',
-  };
+  tAny(key: string): string {
+    return (this.translations as any)[key] || key;
+  }
 
-  // ✅ إضافة Manager Info
-  managerInfo = {
-    name: 'Ahmed Ali',
-    jobTitle: 'Branch Manager',
-    email: 'Ahmed@gmail.com',
-    phone: '01022809046',
-    joinDate: '2026-02-23'
-  }; 
+  fetchBranchDetails(id: number) {
+    this.loading = true;
+    this.errorMsg = '';
 
-  // Stats Data (بدل label نص ثابت نخليه key)
-  stats = [
-    { labelKey: 'revenue', value: '$12,400', icon: 'money' },
-    { labelKey: 'clients', value: '24', icon: 'users' },
-    { labelKey: 'activeContracts', value: '18', icon: 'file' },
-    { labelKey: 'employees', value: '7', icon: 'users-group' },
-  ] as const;
+    this.branchSrv.getBranchDetails(id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: BranchDetailsResponse) => {
+        // Branch header
+        this.branchInfo = {
+          name: res.name ?? '',
+          city: res.cityName ?? '',
+          status: (res.status ?? '').toUpperCase(),
+        };
 
-  // Employees
-  employees: Employee[] = [
-    { name: 'Ahmed Mohamed', email: 'ahmed@almudaqiq.com', role: 'Secretariat', status: 'Active', selected: false },
-    { name: 'Ahmed Saeed', email: 'ahmed@almudaqiq.com', role: 'Audit Manager', status: 'Active', selected: false },
-    { name: 'Mohamed Saeed', email: 'Mohamed@almudaqiq.com', role: 'Secretariat', status: 'Inactive', selected: false },
-    { name: 'Mohamed Omar', email: 'Mohamed@almudaqiq.com', role: 'Audit Manager', status: 'Inactive', selected: false },
-    { name: 'Ahmed Saeed', email: 'ahmed@almudaqiq.com', role: 'Secretariat', status: 'Active', selected: false },
-    { name: 'Omar Adel', email: 'Omar@almudaqiq.com', role: 'Technical Auditor', status: 'Active', selected: false },
-    { name: 'Mohamed Saeed', email: 'Mohamed@almudaqiq.com', role: 'Audit Manager', status: 'Inactive', selected: false },
-  ];
+        // Manager
+        const m = res.manager;
+        this.managerInfo = {
+          name: m?.fullName ?? '-',
+          jobTitle: m?.jobTitle ?? 'Branch Manager',
+          email: m?.email ?? '-',
+          phone: m?.phone ?? '-',
+          joinDate: m?.startDate ? m.startDate.slice(0, 10) : '-',
+        };
 
-  // Clients
-  clients: Client[] = [
-    { name: 'Al Noor Co.', type: 'ahmed@almudaqiq.com', status: 'Active', selected: false },
-    { name: 'Green Valley Ltd.', type: 'ahmed@almudaqiq.com', status: 'Active', selected: false },
-    { name: 'FutureTech', type: 'Mohamed@almudaqiq.com', status: 'Inactive', selected: false },
-    { name: 'FutureTech', type: 'Mohamed@almudaqiq.com', status: 'Inactive', selected: false },
-    { name: 'Green Valley Ltd.', type: 'ahmed@almudaqiq.com', status: 'Active', selected: false },
-  ];
+        // Employees table (من users)
+        const users = res.users ?? [];
+        this.employees = users.map(u => ({
+          id: u.id,
+          name: u.fullName,
+          email: u.email,
+          role: String(u.roleId ?? ''), // لو عندك role name endpoint بدّله
+          status: (String(u.status || '').toLowerCase() === 'active') ? 'Active' : 'Inactive',
+          selected: false,
+        }));
 
-  // Status label translated
+        // Stats
+        const empCount = this.employees.length;
+        (this.stats as any) = this.stats.map(s =>
+          s.labelKey === 'employees'
+            ? { ...s, value: String(empCount) }
+            : s
+        );
+
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMsg = err?.error?.message || 'Failed to load branch details';
+      },
+    });
+  }
+
   statusLabel(status: 'Active' | 'Inactive') {
     return status === 'Active' ? this.t('active') : this.t('inactive');
   }
 
-  // --- Employees Selection ---
   get isAllEmployeesSelected(): boolean {
-    return this.employees.length > 0 && this.employees.every((e) => e.selected);
+    return this.employees.length > 0 && this.employees.every(e => e.selected);
   }
-
   toggleAllEmployees() {
-    const currentState = this.isAllEmployeesSelected;
-    this.employees.forEach((e) => (e.selected = !currentState));
+    const current = this.isAllEmployeesSelected;
+    this.employees.forEach(e => (e.selected = !current));
   }
-
-  toggleEmployee(emp: Employee) {
+  toggleEmployee(emp: EmployeeUI) {
     emp.selected = !emp.selected;
   }
 
-  // --- Clients Selection ---
+  // Clients selection/sort (لو هتفضلهم ثابتين مؤقتًا)
   get isAllClientsSelected(): boolean {
-    return this.clients.length > 0 && this.clients.every((c) => c.selected);
+    return this.clients.length > 0 && this.clients.every((c: any) => c.selected);
   }
-
   toggleAllClients() {
-    const currentState = this.isAllClientsSelected;
-    this.clients.forEach((c) => (c.selected = !currentState));
+    const current = this.isAllClientsSelected;
+    this.clients.forEach((c: any) => (c.selected = !current));
   }
-
-  toggleClient(client: Client) {
+  toggleClient(client: any) {
     client.selected = !client.selected;
   }
 
-  // --- Sorting ---
   sortDirection: { [key: string]: 'asc' | 'desc' } = {};
-
   sortData(listType: 'employees' | 'clients', key: string) {
-    const data = listType === 'employees' ? this.employees : this.clients;
-
+    const data = listType === 'employees' ? (this.employees as any[]) : (this.clients as any[]);
     const direction = this.sortDirection[key] === 'asc' ? 'desc' : 'asc';
     this.sortDirection[key] = direction;
 
-    data.sort((a: any, b: any) => {
-      const valueA = String(a[key] ?? '').toLowerCase();
-      const valueB = String(b[key] ?? '').toLowerCase();
-
-      if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-      if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+    data.sort((a, b) => {
+      const A = String(a[key] ?? '').toLowerCase();
+      const B = String(b[key] ?? '').toLowerCase();
+      if (A < B) return direction === 'asc' ? -1 : 1;
+      if (A > B) return direction === 'asc' ? 1 : -1;
       return 0;
     });
   }

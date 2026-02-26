@@ -2,11 +2,13 @@ import { Component, OnInit, HostListener } from '@angular/core'; // تم إضا�
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from './i18n/en';
 import { AR } from './i18n/ar';
 import { UserService } from './user.service';
+import { RouterLink } from '@angular/router';
 
 interface User {
   id: number;
@@ -24,7 +26,7 @@ type TranslationKey = keyof typeof EN;
 @Component({
   selector: 'app-subscriber-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule ,RouterLink ],
   templateUrl: './subscriber-users.html',
   styleUrls: ['./subscriber-users.css'],
 })
@@ -75,7 +77,8 @@ export class SubscriberUsers implements OnInit {
 
   constructor(
     private lang: TranslateService,
-    private userService: UserService
+    private userService: UserService,
+      private router: Router
   ) {}
 
   ngOnInit() {
@@ -383,4 +386,15 @@ clickOutside(event: Event) {
 
   toggleRow(user: User) { user.selected = !user.selected; }
   statusLabel(status: User['status']) { return status === 'Active' ? this.t('active') : this.t('inactive'); }
+  goToUserDetails(user: User, event: MouseEvent) {
+  // لو المستخدم ضغط على checkbox/dropdown/button… متروحش للـ details
+  const target = event.target as HTMLElement;
+  if (target.closest('.custom-checkbox') || target.closest('.dropdown-container') || target.closest('button')) {
+    return;
+  }
+
+  // مهم: استخدم absolute route عشان نتفادى مشاكل ../
+  this.router.navigate(['/dashboard/users-details', user.id]);
+  // عدّل /dashboard حسب الـ base route عندك
+}
 }

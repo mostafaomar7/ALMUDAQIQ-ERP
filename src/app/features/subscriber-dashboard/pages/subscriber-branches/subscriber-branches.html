@@ -47,8 +47,9 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let branch of displayedBranches" [routerLink]="['../branches-details']" class="cursor-pointer">
-          <td>
+<tr *ngFor="let branch of displayedBranches"
+    [routerLink]="['../branches-details', branch.id]"
+    class="cursor-pointer">          <td>
             <div class="custom-checkbox" [class.checked]="branch.selected" (click)="$event.stopPropagation(); toggleRow(branch)">
               <svg *ngIf="branch.selected" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>

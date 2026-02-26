@@ -80,7 +80,6 @@
 
 /* Table Styles */
 .table-container {
-  overflow-x: auto;
   margin-top: 10px;
 }
 
@@ -293,7 +292,7 @@ td {
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0,0,0,.08);
   width: 140px;
-  z-index: 999;
+  z-index: 99999;
   padding: 6px;
 }
 
@@ -319,4 +318,7 @@ td {
 .menu-item:disabled{
   opacity: .6;
   cursor: not-allowed;
+}
+.cursor-pointer{
+  cursor: pointer;
 }

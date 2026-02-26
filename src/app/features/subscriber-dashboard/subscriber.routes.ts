@@ -33,17 +33,23 @@ export const SubscriberRoutes: Routes = [
             .then(m => m.SubscriberBranches)
       },
       {
-        path: 'branches-details',
-        loadComponent: () =>
-          import('./pages/subscriber-branch-details/subscriber-branch-details')
-            .then(m => m.SubscriberBranchDetails)
-      },
+  path: 'branches-details/:id',
+  loadComponent: () =>
+    import('./pages/subscriber-branch-details/subscriber-branch-details')
+      .then(m => m.SubscriberBranchDetails)
+},
       {
         path: 'users',
         loadComponent: () =>
           import('./pages/subscriber-users/subscriber-users')
             .then(m => m.SubscriberUsers)
       },
+       {
+  path: 'users-details/:id',
+  loadComponent: () =>
+    import('./pages/subscriber-user-details/subscriber-user-details')
+      .then(m => m.SubscriberUserDetails)
+}, 
         {
         path: 'profile',
         loadComponent: () =>

@@ -1,0 +1,213 @@
+<div class="page-container">
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="errorMsg" class="text-red-500">{{ errorMsg }}</div>
+
+  <!-- User Information -->
+  <div class="section-card header-info">
+    <div class="section-title">
+      <div class="icon-box green-box">
+        <!-- نفس أيقونة -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <h2>{{ t('userInformation') }}</h2>
+    </div>
+
+    <div class="info-grid three-cols">
+      <div class="info-item">
+        <label>{{ t('fullName') }}</label>
+        <div class="value">{{ userInfo.fullName }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('email') }}</label>
+        <div class="value">{{ userInfo.email }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('phoneNumber') }}</label>
+        <div class="value">{{ userInfo.phone }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('jobTitle') }}</label>
+        <div class="value">{{ userInfo.jobTitle }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('joinDate') }}</label>
+        <div class="value">{{ userInfo.joinDate }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('status') }}</label>
+        <div class="value">
+          <span class="badge" [ngClass]="userInfo.status === 'Active' ? 'badge-active' : 'badge-inactive'">
+            <span class="dot">●</span> {{ statusLabel(userInfo.status) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Branch Info (من response.branch) -->
+  <div class="section-card header-info">
+    <div class="section-title">
+      <div class="icon-box green-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+          <path d="M9 22v-4h6v4"></path>
+        </svg>
+      </div>
+      <h2>{{ t('branchInformation') }}</h2>
+    </div>
+
+    <div class="info-grid three-cols">
+      <div class="info-item">
+        <label>{{ t('branchName') }}</label>
+        <div class="value">{{ branchInfo.name }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('city') }}</label>
+        <div class="value">{{ branchInfo.city }}</div>
+      </div>
+
+      <div class="info-item">
+        <label>{{ t('status') }}</label>
+        <div class="value">{{ branchInfo.status }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-content">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-label">{{ tAny(stat.labelKey) }}</div>
+      </div>
+
+      <div class="stat-icon-box">
+        <!-- استخدم نفس الـ icons بتاعتك -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 8v8"></path>
+          <path d="M8 12h8"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permissions (لو موجودة) -->
+  <div class="section-card">
+    <div class="table-header-title">{{ t('permissions') }}</div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th class="w-checkbox">
+              <div class="minus-box cursor-pointer"
+                   (click)="toggleAllPermissions()"
+                   [class.active-select]="isAllPermissionsSelected">
+                <svg *ngIf="!isAllPermissionsSelected" width="12" height="2" viewBox="0 0 12 2" fill="none">
+                  <rect width="12" height="2" rx="1" fill="#10B981"/>
+                </svg>
+                <svg *ngIf="isAllPermissionsSelected" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </th>
+            <th>{{ t('permission') }}</th>
+            <th class="w-action"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of permissions" [class.selected-row]="p.selected">
+            <td>
+              <div class="checkbox cursor-pointer"
+                   [class.checked]="p.selected"
+                   (click)="togglePermission(p)">
+                <svg *ngIf="p.selected" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                     viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </td>
+            <td class="font-bold">{{ p.name }}</td>
+            <td class="text-right"><button class="btn-icon">⋮</button></td>
+          </tr>
+
+          <tr *ngIf="permissions.length === 0">
+            <td colspan="3" class="text-gray">{{ t('noData') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Assigned Devices (لو موجودة) -->
+  <div class="section-card">
+    <div class="table-header-title">{{ t('assignedDevices') }}</div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th class="w-checkbox">
+              <div class="minus-box cursor-pointer"
+                   (click)="toggleAllDevices()"
+                   [class.active-select]="isAllDevicesSelected">
+                <svg *ngIf="!isAllDevicesSelected" width="12" height="2" viewBox="0 0 12 2" fill="none">
+                  <rect width="12" height="2" rx="1" fill="#10B981"/>
+                </svg>
+                <svg *ngIf="isAllDevicesSelected" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </th>
+            <th>{{ t('device') }}</th>
+            <th class="w-action"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let d of assignedDevices" [class.selected-row]="d.selected">
+            <td>
+              <div class="checkbox cursor-pointer"
+                   [class.checked]="d.selected"
+                   (click)="toggleDevice(d)">
+                <svg *ngIf="d.selected" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                     viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </td>
+            <td class="font-bold">{{ d.name }}</td>
+            <td class="text-right"><button class="btn-icon">⋮</button></td>
+          </tr>
+
+          <tr *ngIf="assignedDevices.length === 0">
+            <td colspan="3" class="text-gray">{{ t('noData') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

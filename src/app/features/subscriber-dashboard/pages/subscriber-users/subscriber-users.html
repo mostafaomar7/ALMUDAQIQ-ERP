@@ -56,10 +56,13 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let user of displayedUsers" [class.selected-row]="user.selected">
-          <td>
-            <div class="custom-checkbox" [class.checked]="user.selected" (click)="toggleRow(user)">
-              <svg *ngIf="user.selected" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+<tr *ngFor="let user of displayedUsers" style="cursor: pointer;"
+    [routerLink]="['/subscriber/users-details', user.id]"
+    class="cursor-pointer"
+    [class.selected-row]="user.selected">      <td>
+<div class="custom-checkbox"
+     [class.checked]="user.selected"
+     (click)="$event.stopPropagation(); toggleRow(user)">              <svg *ngIf="user.selected" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
           </td>
           <td class="font-medium">{{ user.fullName }}</td>
