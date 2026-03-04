@@ -141,34 +141,35 @@ filterAccounts() {
   return (this.translations as any)[key] || key;
 }
 loadAccounts(page: number = 1) {
-  this.accountService
-    .getAccountGuides(page, this.itemsPerPage, this.searchText)
+  this.accountService.getAccountGuides(page, this.itemsPerPage, this.searchText)
     .subscribe({
-      next: (res: AccountGuide[] | { data: AccountGuide[] }) => {
-  const list = Array.isArray(res) ? res : (res.data ?? []);
+      next: (res) => {
+        const list = res.data ?? [];
 
-  this.displayedAccounts = list.map((a: AccountGuide) => ({
-    id: a.id,
-    name: a.accountName || '',
-    level: a.level,
-    number: (a.accountNumber ?? '').toString(),
-    rules: a.rulesAndRegulations || '',
-    notes: a.disclosureNotes || '',
-    code: a.code1 || '',
-    objectiveCode: a.objectiveCode || '',
-    relatedObjectives: a.relatedObjectives || '',
-    selected: false
-  }));
+        this.displayedAccounts = list.map((a: AccountGuide) => ({
+          id: a.id,
+          name: a.accountName || '',
+          level: a.level,
+          number: (a.accountNumber ?? '').toString(),
+          rules: a.rulesAndRegulations || '',
+          notes: a.disclosureNotes || '',
+          code: a.code1 || '',
+          objectiveCode: a.objectiveCode || '',
+          relatedObjectives: a.relatedObjectives || '',
+          selected: false
+        }));
 
-  this.currentPage = page;
-  this.totalItems = list.length;
-  this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-  this.calculatePagination();
-}
+        // ✅ خُد الأرقام من الباك
+        this.currentPage = res.page ?? page;
+        this.totalItems = res.total ?? list.length;
+        this.itemsPerPage = res.limit ?? this.itemsPerPage;
+        this.totalPages = res.totalPages ?? Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
 
+        this.calculatePagination();
+      },
+      error: (err) => console.error(err)
     });
 }
-
 // updateDisplayedAccounts() {
 //   const start = (this.currentPage - 1) * this.itemsPerPage;
 //   const end = start + this.itemsPerPage;

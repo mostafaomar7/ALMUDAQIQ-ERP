@@ -83,32 +83,30 @@ applySearch() {
 }
 
 loadReviews(page: number = 1) {
-  this.reviewService
-    .getAccountGuides(page, this.itemsPerPage, this.searchTerm)
+  this.reviewService.getAccountGuides(page, this.itemsPerPage, this.searchTerm)
     .subscribe({
-      next: (res: any) => {
-        const list = Array.isArray(res) ? res : (res?.data ?? []);
+      next: (res) => {
+        const list = res.data ?? [];
 
-        const reviewsWithSelection = list.map((item: any) => ({
+        this.displayedReviews = list.map((item: any) => ({
           ...item,
           selected: false
         }));
 
-        this.allReviews = reviewsWithSelection;
-        this.displayedReviews = reviewsWithSelection;
+        // ✅ اعتمد على أرقام السيرفر
+        this.currentPage = res.page ?? page;
+        this.totalItems = res.total ?? list.length;
 
-        // لو الباك بيرجع pagination metadata استخدمه
-        this.totalItems = res?.total ?? list.length;
-        this.totalPages = res?.totalPages ?? Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-        this.currentPage = res?.page ?? page;
+        // ✅ خليك متأكد إن limit متحد
+        this.itemsPerPage = res.limit ?? this.itemsPerPage;
+
+        this.totalPages = res.totalPages ?? Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
 
         this.calculatePagination();
       },
       error: (err) => {
         console.error(err);
         Swal.fire('Error', 'Failed to load reviews', 'error');
-        // عشان ما تقعش الـ UI
-        this.allReviews = [];
         this.displayedReviews = [];
         this.totalItems = 0;
         this.totalPages = 1;
@@ -117,7 +115,6 @@ loadReviews(page: number = 1) {
       }
     });
 }
-
 sortAsc: boolean = true;
 
 sortByLevel() {

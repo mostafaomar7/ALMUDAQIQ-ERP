@@ -2,6 +2,14 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environment';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
+export interface PagedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface reviewGuide {
   id: number;
   level: string;
@@ -30,8 +38,8 @@ export class ReviewguideService {
 
   constructor(private http: HttpClient) {}
 
- getAccountGuides(page = 1, limit = 10, search = '') {
-  return this.http.get(
+ getAccountGuides(page = 1, limit = 10, search = ''): Observable<PagedResponse<reviewGuide>> {
+  return this.http.get<PagedResponse<reviewGuide>>(
     `${this.apiUrl}?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
   );
 }

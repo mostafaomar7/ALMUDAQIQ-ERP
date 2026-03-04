@@ -529,8 +529,47 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label text-muted small">{{ t('licenseDate') }}</label>
-          <input type="date" class="form-control text-muted" [(ngModel)]="formData.licenseDate">
+         <label class="form-label text-muted small fw-bold mb-2">{{ t('licenseDate') }}</label>
+
+<div class="row g-2 align-items-end">
+  <!-- هجري -->
+  <div class="col-6">
+    <div class="input-wrapper">
+      <label class="x-small-label text-muted">هجري</label>
+      <mat-form-field appearance="outline" class="w-100" subscriptSizing="dynamic">
+        <input
+          matInput
+          [matDatepicker]="licensePickerHijri"
+          [(ngModel)]="formData.licenseDate"
+          (dateChange)="syncFromHijri('licenseDate', $event.value)"
+          placeholder="يوم/شهر/سنة"
+        />
+        <mat-datepicker-toggle matSuffix [for]="licensePickerHijri"></mat-datepicker-toggle>
+        <mat-datepicker #licensePickerHijri></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- ميلادي -->
+  <div class="col-6">
+    <div class="input-wrapper">
+      <label class="x-small-label text-muted">ميلادي</label>
+      <input
+        type="date"
+        class="form-control date-input-custom"
+        [ngModel]="convertToGregorian(formData.licenseDate)"
+        (ngModelChange)="syncFromGregorian('licenseDate', $event)"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- اسم اليوم (يتحدث تلقائيًا) -->
+<div class="mt-2">
+  <small class="text-muted">
+    <!-- اليوم: <span class="fw-bold">{{ getDayName(formData.licenseDate) }}</span> -->
+  </small>
+</div>
         </div>
 
         <div class="mb-3">
@@ -901,19 +940,18 @@
   <div><strong>Unified Number:</strong> {{ selectedSubscriber?.unifiedNumber }}</div>
   <div><strong>Fiscal Year:</strong> {{ selectedSubscriber?.fiscalYear | date:'yyyy-MM-dd' }}</div>
 
-  <div><strong>Subscription Start:</strong>
-       {{ selectedSubscriber?.subscriptionStartDate ? (selectedSubscriber.subscriptionStartDate | date:'yyyy-MM-dd') : '—' }}
-  </div>
-  <div><strong>Subscription End:</strong>
-       {{ selectedSubscriber?.subscriptionEndDate ? (selectedSubscriber.subscriptionEndDate | date:'yyyy-MM-dd') : '—' }}
-  </div>
+ <div><strong>Subscription Start:</strong>
+  {{ selectedSubscriber?.subscriptions?.[0]?.startDate ? (selectedSubscriber?.subscriptions?.[0]?.startDate | date:'yyyy-MM-dd') : '—' }}
+</div>
 
-  <div><strong>Status:</strong> {{ selectedSubscriber?.status }}</div>
-  <div><strong>Plan:</strong> {{ selectedSubscriber?.plan?.name }}</div>
-  <div><strong>Paid Fees:</strong> {{ selectedSubscriber?.plan?.paidFees || '—' }}</div>
-  <div><strong>Users Limit:</strong> {{ selectedSubscriber?.plan?.usersLimit || '—' }}</div>
-  <!-- <div><strong>Clients Limit:</strong> {{ selectedSubscriber?.plan?.clientsLimit || '—' }}</div> -->
-  <div><strong>Branches Limit:</strong> {{ selectedSubscriber?.plan?.branchesLimit || '—' }}</div>
+<div><strong>Subscription End:</strong>
+  {{ selectedSubscriber?.subscriptions?.[0]?.endDate ? (selectedSubscriber?.subscriptions?.[0]?.endDate | date:'yyyy-MM-dd') : '—' }}
+</div>
+
+<div><strong>Plan:</strong> {{ selectedSubscriber?.subscriptions?.[0]?.plan?.name || '—' }}</div>
+<div><strong>Paid Fees:</strong> {{ selectedSubscriber?.subscriptions?.[0]?.plan?.paidFees ?? '—' }}</div>
+<div><strong>Users Limit:</strong> {{ selectedSubscriber?.subscriptions?.[0]?.plan?.usersLimit ?? '—' }}</div>
+<div><strong>Branches Limit:</strong> {{ selectedSubscriber?.subscriptions?.[0]?.plan?.branchesLimit ?? '—' }}</div>
 
   <div><strong>Subdomain:</strong> {{ selectedSubscriber?.subdomain }}</div>
   <div><strong>Facility Link:</strong> {{ selectedSubscriber?.facilityLink || '—' }}</div>

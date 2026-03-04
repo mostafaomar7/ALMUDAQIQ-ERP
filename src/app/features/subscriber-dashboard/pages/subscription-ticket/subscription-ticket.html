@@ -1,0 +1,154 @@
+<div class="tickets-container">
+
+  <div class="card">
+    <h2 class="card-title">Create New Ticket</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" placeholder="Brief description of your issue">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <div class="select-wrapper">
+          <select>
+            <option value="" disabled selected>Select a category</option>
+            <option value="technical">Technical</option>
+            <option value="billing">Billing</option>
+          </select>
+          <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Message</label>
+      <textarea rows="4" placeholder="Please provide detailed information about your issue .."></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-outline">
+        <i class="fa-solid fa-paperclip"></i> Attach file
+      </button>
+      <button class="btn-primary">
+        <i class="fa-regular fa-paper-plane"></i> Send
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">My Tickets</h2>
+
+    <div class="table-responsive">
+      <table class="tickets-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Subject <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>Category <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>Date <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>Status <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td class="fw-bold">Problem with branch data</td>
+            <td class="text-muted">Technical</td>
+            <td class="text-muted">02-Nov</td>
+            <td>
+              <span class="badge badge-resolved">
+                <span class="dot"></span> Resolved
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="fw-bold">Billing issue</td>
+            <td class="text-muted">Billing</td>
+            <td class="text-muted">01-Nov</td>
+            <td>
+              <span class="badge badge-resolved">
+                <span class="dot"></span> Resolved
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="fw-bold">Cannot export reports</td>
+            <td class="text-muted">Technical</td>
+            <td class="text-muted">30-Oct</td>
+            <td>
+              <span class="badge badge-open">
+                <span class="dot"></span> Open
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td class="fw-bold">Account access problem</td>
+            <td class="text-muted">Technical</td>
+            <td class="text-muted">26-Oct</td>
+            <td>
+              <span class="badge badge-open">
+                <span class="dot"></span> Open
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td class="fw-bold">Problem with branch data</td>
+            <td class="text-muted">Technical</td>
+            <td class="text-muted">23-Oct</td>
+            <td>
+              <span class="badge badge-resolved">
+                <span class="dot"></span> Resolved
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td class="fw-bold">Cannot export reports</td>
+            <td class="text-muted">Technical</td>
+            <td class="text-muted">20-Oct</td>
+            <td>
+              <span class="badge badge-resolved">
+                <span class="dot"></span> Resolved
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td class="fw-bold">Billing issue</td>
+            <td class="text-muted">Billing</td>
+            <td class="text-muted">18-Oct</td>
+            <td>
+              <span class="badge badge-progress">
+                <span class="dot"></span> In progress
+              </span>
+            </td>
+            <td><button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-container">
+      <ul class="pagination">
+        <li><button class="page-btn text-muted"><i class="fa-solid fa-chevron-left icon-xs"></i> Back</button></li>
+        <li><button class="page-btn">1</button></li>
+        <li><button class="page-btn active">2</button></li>
+        <li><button class="page-btn">3</button></li>
+        <li><button class="page-btn text-muted">Next <i class="fa-solid fa-chevron-right icon-xs"></i></button></li>
+      </ul>
+    </div>
+  </div>
+
+</div>

@@ -28,6 +28,12 @@ export const routes: Routes = [
       import('./features/subscriber-dashboard/subscriber.routes')
         .then(r => r.SubscriberRoutes)
   },
-
+{
+    path: 'secretary',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./features/secretary-dashboard/secretary.routes')
+        .then(r => r.SecretaryRoutes)
+  },
   { path: '**', redirectTo: '' }
 ];

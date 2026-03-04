@@ -152,8 +152,7 @@ formData: any = {
   regionId: '',
   licenseName: '',
   licenseNumber: '',
-  licenseDate: '',
-  licenseType: '',
+  licenseDate: moment(),   licenseType: '',
   licenseCertificate: null,
   ownersNames: '',
   subscriberEmail: '',
@@ -330,14 +329,13 @@ validateStep(step: number): boolean {
              this.formData.commercialExpireDate;
 
     case 4:
-      return this.formData.subscriptionType &&
-            //  this.formData.subscriptionStartDate &&
-            //  this.formData.subscriptionEndDate &&
-             this.formData.numberOfUsers &&
-            //  this.formData.numberOfClients &&
-             this.formData.numberOfBranches;
-             this.formData.fileLimit;
-             this.formData.maxFileSizeMB;
+  return !!(
+    this.formData.planId &&
+    this.formData.numberOfUsers &&
+    this.formData.numberOfBranches &&
+    this.formData.fileLimit &&
+    this.formData.maxFileSizeMB
+  );
 
     case 5:
       return true; // الخطوة 5 اختيارية
@@ -418,7 +416,9 @@ submitNewUser() {
       key.toLowerCase().includes('date') ||
       key === 'commercialExpireDate' ||
       key === 'subscriptionStartDate' ||
-      key === 'subscriptionEndDate'
+      key === 'subscriptionEndDate' || 
+        key === 'fiscalYear'
+
     ) {
       value = formatMoment(value);
     }
@@ -713,20 +713,55 @@ updateSelectedUsers() {
   }
 
   const sub = selected[0];
-this.isEditMode = true;
-  // تمرير البيانات للفورم
-  this.formData = {
-    ...sub,
-    licenseCertificate: null,
-    taxCertificateFile: null,
-    // unifiedNumberFile: null,
-    commercialActivityFile: null,
-    factoryLogo: null
-  };
 
+  this.isEditMode = true;
   this.editingSubscriberId = sub.id;
 
-  // فتح الفورم
+  // ✅ آخر اشتراك (أو أول واحد لو عندك واحد بس)
+  const latestSubscription = sub?.subscriptions?.length
+    ? sub.subscriptions
+        .slice()
+        .sort((a: any, b: any) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0]
+    : null;
+
+  const plan = latestSubscription?.plan ?? null;
+
+  // ✅ مهم: جهّز cities قبل ما تعيّن cityId
+  // أنت جايب المدن داخل country.cities في onCountryChange
+  // فهنسخ نفس المنطق هنا بدون ما نصفر cityId
+  const countryId = Number(sub.countryId);
+  const country = this.countries.find(c => c.id === countryId);
+  this.cities = country?.cities || [];
+
+  // ✅ عبّي الفورم
+  this.formData = {
+    ...this.formData, // يحافظ على default types زي moment()
+    ...sub,
+
+    countryId: sub.countryId ?? '',
+    cityId: sub.cityId ?? '',
+
+    // ✅ التواريخ اللي مربوطه بـ input type="date" لازم YYYY-MM-DD
+    fiscalYear: sub.fiscalYear ? String(sub.fiscalYear).substring(0, 10) : '',
+    subscriptionStartDate: latestSubscription?.startDate ? String(latestSubscription.startDate).substring(0, 10) : '',
+    subscriptionEndDate: latestSubscription?.endDate ? String(latestSubscription.endDate).substring(0, 10) : '',
+
+    // ✅ الباكدج/الخطة
+    planId: plan?.id ?? '',
+    subscriptionType: plan?.name ?? '',
+    numberOfUsers: plan?.usersLimit ?? '',
+    numberOfBranches: plan?.branchesLimit ?? '',
+    fileLimit: plan?.fileLimit ?? '',
+    maxFileSizeMB: plan?.maxFileSizeMB ?? '',
+
+    // ✅ file inputs ماينفعش تتملي.. لازم تبقى null
+    licenseCertificate: null,
+    taxCertificateFile: null,
+    commercialActivityFile: null,
+    factoryLogo: null,
+  };
+
+  // ✅ افتح المودال
   this.showAddUserModal = true;
   this.currentStep = 1;
 }
@@ -1065,5 +1100,19 @@ get allRenSelected(): boolean {
   );
 }
 
+getDayName(val: any): string {
+  if (!val) return '';
 
+  // لو Moment جاهز
+  if (moment.isMoment(val) || val?._isAMomentObject) {
+    return val.clone().locale('ar').format('dddd'); // مثال: "الأحد"
+  }
+
+  // لو جالك string من input type="date"
+  if (typeof val === 'string') {
+    return moment(val, 'YYYY-MM-DD').locale('ar').format('dddd');
+  }
+
+  return '';
+}
 }

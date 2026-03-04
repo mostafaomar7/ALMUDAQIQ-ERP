@@ -16,7 +16,13 @@ export interface AccountGuide {
   createdAt: string;
   updatedAt: string;
 }
-
+export interface PagedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -29,8 +35,8 @@ export class AccountguideService {
   page: number = 1,
   perPage: number = 10,
   search: string = ''
-): Observable<any> {
-  return this.http.get(
+): Observable<PagedResponse<AccountGuide>> {
+  return this.http.get<PagedResponse<AccountGuide>>(
     `${this.apiUrl}?page=${page}&limit=${perPage}&search=${encodeURIComponent(search)}`
   );
 }

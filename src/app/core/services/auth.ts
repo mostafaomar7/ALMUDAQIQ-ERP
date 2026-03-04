@@ -9,145 +9,132 @@ import { TenantService } from './TenantService';
   providedIn: 'root'
 })
 export class AuthService {
-  // عدّل الـ baseApiUrl حسب الـ backend عندك
-    private baseUrl = environment.apiUrl;
+  private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient , private tenantSvc: TenantService) {}
+  constructor(private http: HttpClient, private tenantSvc: TenantService) {}
 
-login(email: string, password: string): Observable<any> {
-  const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
-
-  // tenant افتراضي للتيست
-  const tenant = isAdminEmail ? null : environment.defaultTenant;
-
-  let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-  if (tenant) {
-    headers = headers.set('x-tenant', tenant);
-    localStorage.setItem('tenant', tenant);
-  } else {
-    localStorage.removeItem('tenant'); // ✅ عشان interceptor مايبعتوش
+  private buildHeadersWithTenant(tenant: string | null): HttpHeaders {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    if (tenant) headers = headers.set('x-tenant', tenant);
+    return headers;
   }
 
-  return this.http.post<any>(
-    `${this.baseUrl}/auth/login`,
-    { email, password },
-    { headers }
-  ).pipe(
-    tap(res => {
-      if (res?.token) localStorage.setItem('accessToken', res.token);
-      if (res?.user) localStorage.setItem('user', JSON.stringify(res.user));
+  login(email: string, password: string): Observable<any> {
+    const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
+
+    // ✅ tenant من الـ URL
+    const tenant = isAdminEmail ? null : this.tenantSvc.getTenantFromUrl();
+
+    // headers
+    const headers = this.buildHeadersWithTenant(tenant);
+
+    // storage (عشان interceptor/باقي السيستم)
+    if (tenant) this.tenantSvc.setStoredTenant(tenant);
+    else this.tenantSvc.setStoredTenant(null); // ✅ عشان interceptor مايبعتوش
+
+    return this.http.post<any>(
+      `${this.baseUrl}/auth/login`,
+      { email, password },
+      { headers }
+    ).pipe(
+      tap(res => {
+        if (res?.token) localStorage.setItem('accessToken', res.token);
+        if (res?.user) localStorage.setItem('user', JSON.stringify(res.user));
         localStorage.setItem('mustChangePassword', String(!!res?.mustChangePassword));
-        localStorage.setItem('country', String(res.user.countryName));
-    })
-  );
-}
-getUser(): any | null {
-  const u = localStorage.getItem('user');
-  return u ? JSON.parse(u) : null;
-}
-
-mustChangePassword(): boolean {
-  return localStorage.getItem('mustChangePassword') === 'true';
-}
-logout() {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('user');
-  localStorage.removeItem('tenant');
-  localStorage.removeItem('country');
-  localStorage.removeItem('mustChangePassword'); // ✅
-}
-
-requestPasswordReset(email: string): Observable<any> {
-
-  const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
-
-  let headers = new HttpHeaders({
-    'Content-Type': 'application/json'
-  });
-
-  if (!isAdminEmail) {
-    headers = headers.set('x-tenant', environment.defaultTenant); // bayomyv-2
+        localStorage.setItem('country', String(res?.user?.countryName ?? ''));
+      })
+    );
   }
 
-  return this.http.post(
-    `${this.baseUrl}/auth/send-otp`,
-    { email },
-    { headers }
-  );
-}
-
-resetPassword(email: string, otp: string, newPassword: string): Observable<any> {
-
-  const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
-
-  let headers = new HttpHeaders({
-    'Content-Type': 'application/json'
-  });
-
-  if (!isAdminEmail) {
-    headers = headers.set('x-tenant', environment.defaultTenant);
+  getUser(): any | null {
+    const u = localStorage.getItem('user');
+    return u ? JSON.parse(u) : null;
   }
 
-  return this.http.post(
-    `${this.baseUrl}/auth/reset-password`,
-    { email, otp, newPassword },
-    { headers }
-  );
-}
-
-
-verifyEmailWithEmail(email: string, otp: string): Observable<any> {
-
-  const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
-
-  let headers = new HttpHeaders({
-    'Content-Type': 'application/json'
-  });
-
-  if (!isAdminEmail) {
-    headers = headers.set('x-tenant', environment.defaultTenant);
+  mustChangePassword(): boolean {
+    return localStorage.getItem('mustChangePassword') === 'true';
   }
 
-  return this.http.post(
-    `${this.baseUrl}/auth/verify-otp`,
-    { email, otp },
-    { headers }
-  );
-}
+  logout() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('country');
+    localStorage.removeItem('mustChangePassword');
+    this.tenantSvc.setStoredTenant(null); // ✅
+  }
+
+  requestPasswordReset(email: string): Observable<any> {
+    const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
+
+    // ✅ tenant من الـ URL لو مش admin
+    const tenant = isAdminEmail ? null : this.tenantSvc.getTenantFromUrl();
+    const headers = this.buildHeadersWithTenant(tenant);
+
+    return this.http.post(
+      `${this.baseUrl}/auth/send-otp`,
+      { email },
+      { headers }
+    );
+  }
+
+  resetPassword(email: string, otp: string, newPassword: string): Observable<any> {
+    const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
+
+    const tenant = isAdminEmail ? null : this.tenantSvc.getTenantFromUrl();
+    const headers = this.buildHeadersWithTenant(tenant);
+
+    return this.http.post(
+      `${this.baseUrl}/auth/reset-password`,
+      { email, otp, newPassword },
+      { headers }
+    );
+  }
+
+  verifyEmailWithEmail(email: string, otp: string): Observable<any> {
+    const isAdminEmail = email.toLowerCase().endsWith('@erp.com');
+
+    const tenant = isAdminEmail ? null : this.tenantSvc.getTenantFromUrl();
+    const headers = this.buildHeadersWithTenant(tenant);
+
+    return this.http.post(
+      `${this.baseUrl}/auth/verify-otp`,
+      { email, otp },
+      { headers }
+    );
+  }
 
   getToken(): string | null {
     return localStorage.getItem('accessToken');
   }
-getTenant(): string | null {
-  return localStorage.getItem('tenant');
-}
 
-  // optional: helper to know if logged in
-isLoggedIn(): boolean {
-  const token = this.getToken();
-  if (!token) return false;
+  getTenant(): string | null {
+    return this.tenantSvc.getStoredTenant();
+  }
 
-  try {
-    const decoded: any = jwtDecode(token);
-    const now = Math.floor(Date.now() / 1000);
+  isLoggedIn(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
 
-    if (decoded.exp < now) {
+    try {
+      const decoded: any = jwtDecode(token);
+      const now = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp < now) {
+        this.logout();
+        return false;
+      }
+
+      return true;
+    } catch (e) {
       this.logout();
       return false;
     }
-
-    return true;
-  } catch (e) {
-    this.logout();
-    return false;
   }
-}
-changePassword(oldPassword: string, newPassword: string): Observable<any> {
-  return this.http.post(`${this.baseUrl}/auth/change-password`, {
-    oldPassword,
-    newPassword
-  });
-}
 
+  changePassword(oldPassword: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/change-password`, {
+      oldPassword,
+      newPassword
+    });
+  }
 }

@@ -87,28 +87,34 @@ loadReviews(page: number = 1) {
     .getAccountGuides(page, this.itemsPerPage, this.searchTerm)
     .subscribe({
       next: (res: any) => {
-        const list = Array.isArray(res) ? res : (res?.data ?? []);
-
-        const reviewsWithSelection = list.map((item: any) => ({
+        const list: ReviewItem[] = (res?.data ?? []).map((item: any) => ({
           ...item,
           selected: false
         }));
 
-        this.allReviews = reviewsWithSelection;
-        this.displayedReviews = reviewsWithSelection;
+        this.displayedReviews = list;
 
-        // لو الباك بيرجع pagination metadata استخدمه
-        this.totalItems = res?.total ?? list.length;
-        this.totalPages = res?.totalPages ?? Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
-        this.currentPage = res?.page ?? page;
+        const meta = res?.meta ?? {};
+
+        this.currentPage = meta.page ?? page;
+        this.totalItems = meta.total ?? list.length;
+
+        // لو عايز تمشي بـ limit بتاع السيرفر
+        this.itemsPerPage = meta.limit ?? this.itemsPerPage;
+
+        this.totalPages =
+          meta.totalPages ?? Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
 
         this.calculatePagination();
+
+        // ✅ لو الصفحة الحالية بقت خارج النطاق بعد حذف/بحث
+        if (this.currentPage > this.totalPages) {
+          this.loadReviews(this.totalPages);
+        }
       },
       error: (err) => {
         console.error(err);
         Swal.fire('Error', 'Failed to load reviews', 'error');
-        // عشان ما تقعش الـ UI
-        this.allReviews = [];
         this.displayedReviews = [];
         this.totalItems = 0;
         this.totalPages = 1;
@@ -117,7 +123,6 @@ loadReviews(page: number = 1) {
       }
     });
 }
-
 sortAsc: boolean = true;
 
 sortByLevel() {
@@ -401,8 +406,15 @@ deleteSelectedItems() {
       }
 
       // ✅ إعادة تحميل من السيرفر
-      this.loadReviews(this.currentPage);
+// ✅ إعادة تحميل من السيرفر + تصحيح الصفحة لو بقت خارج النطاق
+this.loadReviews(this.currentPage);
 
+// بعد ما الريلود يخلص ويحسب totalPages، ممكن تكون currentPage بقت أكبر من totalPages
+setTimeout(() => {
+  if (this.currentPage > this.totalPages) {
+    this.loadReviews(this.totalPages);
+  }
+}, 0);
       Swal.fire('Deleted!', `${selectedItems.length} items deleted.`, 'success');
 
     } catch (err) {

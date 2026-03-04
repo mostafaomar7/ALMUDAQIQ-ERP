@@ -17,6 +17,6 @@ export const AR = {
   profile : 'الملف الشخصي',
 KPIS : 'مؤشرات الأداء الرئيسية' ,
   reports : 'تقارير' ,
-Financial : 'البيانات المالية',
+Financial : 'خدمات التعاقد',
 Support : 'دعم'
 };

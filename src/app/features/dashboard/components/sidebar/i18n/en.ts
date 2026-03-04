@@ -17,7 +17,6 @@ export const EN = {
   profile : 'Profile',
   KPIS : 'KPIS' ,
   reports : 'Reports' ,
-Financial : 'Financial Statements' ,
+Financial : 'Contract services' ,
 Support : 'Support'
-
 };

@@ -8,6 +8,7 @@ import { TranslateService } from '../../../../core/services/translate.service';
 import { EN } from '../../../dashboard/components/sidebar/i18n/en';
 import { AR } from '../../../dashboard/components/sidebar/i18n/ar';
 import { AuthService } from '../../../../core/services/auth';
+import { environment } from '../../../../../environment';
 type TranslationKey = keyof typeof EN;
 
 // تعريف هيكل لعنصر القائمة الفرعية
@@ -37,13 +38,16 @@ export class SubscriberSidebar {
   // متغير لتتبع حالة فتح قائمة "Settings"
   isSettingsOpen = false;
 
+  user: any = null;
+  logoUrl: string = '';
+  fallbackInitials: string = '';
   menuItems: MenuItem[] = [
-    { key: 'KPIS', icon: 'fa-brands fa-gg', route: '/subscriber' },
-        { key: 'reports', icon: 'fa-brands fa-gg', route: '/subscriber' },
-        { key: 'Financial', icon: 'fa-brands fa-gg', route: '/subscriber' },
-    { key: 'Branches', icon: 'fa-solid fa-users', route: '/subscriber/branches' },
-    { key: 'users', icon: 'fa-solid fa-users', route: '/subscriber/users' },
-    { key: 'Support', icon: 'fa-solid fa-users', route: '/subscriber' },
+    { key: 'KPIS', icon: 'fa-solid fa-chart-line', route: '/subscriber' },
+    // { key: 'reports', icon: 'fa-solid fa-file-contract', route: '/subscriber' },
+    { key: 'Financial', icon: 'fa-regular fa-money-bill-1', route: '/subscriber/subscriber-service' },
+    { key: 'Branches', icon: 'fa-regular fa-building', route: '/subscriber/branches' },
+    { key: 'users', icon: 'fa-solid fa-user-group', route: '/subscriber/users' },
+    { key: 'Support', icon: 'fa-solid fa-headset', route: '/subscriber/tickets' },
 
     {
       key: 'settings',
@@ -51,15 +55,14 @@ export class SubscriberSidebar {
       // لا يوجد route مباشر لعنصر Settings الرئيسي
       subMenu: [ // عناصر القائمة الفرعية
         // { key: 'domainSettings', route: '/dashboard/settings/domain' },
-        { key: 'accountsGuide', route: '/subscriber/accountguide' },
+       { key: 'accountsGuide', route: '/subscriber/accountguide' },
         { key: 'reviewGuide', route: '/subscriber/reviewguide' },
         { key: 'fileStagesGuide', route: '/subscriber/filestage' },
         { key: 'reviewObjectivesGuide', route: '/subscriber/reviewobjectivesguide' },
         { key: 'reviewMarksIndex', route: '/subscriber/reviewmarksindex' }
       ]
     },
-    { key: 'profile', icon: 'fa-solid fa-users', route: '/subscriber/profile' },
-
+{ key: 'profile', icon: 'fa-regular fa-user', route: '/subscriber/profile' },
   ];
 
 
@@ -74,8 +77,26 @@ export class SubscriberSidebar {
 
   ngOnInit(): void {
     this.languageService.lang$.subscribe(lang => this.loadTranslations(lang));
-  }
+        // ✅ اقرأ بيانات المستخدم من localStorage
+    this.user = this.auth.getUser();
+    this.fallbackInitials = this.getInitials(this.user?.fullName);
 
+    // ✅ جهّز رابط اللوجو (لو موجود)
+    // factoryLogo مثال: "uploads\\subscribers\\1772529833163-734591884.jpg"
+    // لازم نحول "\" لـ "/"
+    const path = (this.user?.factoryLogo || '').replaceAll('\\', '/');
+
+    // لو الـ API بيرجع path نسبي، اربطه بالـ apiUrl
+    // عدّل حسب عندك لو السيرفر أصلاً بيرجع URL كامل
+    this.logoUrl = path ? `${(environment as any).apiUrl}/${path}` : '';
+  }
+private getInitials(name?: string): string {
+    if (!name) return '';
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] ?? '';
+    const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
+    return (first + last).toUpperCase();
+  }
   loadTranslations(lang: 'en' | 'ar') {
     this.translations = lang === 'en' ? EN : AR;
     document.dir = lang === 'ar' ? 'rtl' : 'ltr';

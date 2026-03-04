@@ -1,16 +1,5 @@
 import { Routes } from '@angular/router';
-// import { Dashboard } from './dashboard';
-// import { Home } from './pages/home/home';
-// import { Subscribers } from './pages/subscribers/subscribers';
-// import { Complaints } from './pages/complaints/complaints';
-// import { Activitylog } from './pages/activitylog/activitylog';
-// import { Plansmanagement } from './pages/plansmanagement/plansmanagement';
-// import { Domainsettings } from './pages/domainsettings/domainsettings';
-// import { Accountsguide } from './pages/accountsguide/accountsguide';
-// import { Reviewguide } from './pages/reviewguide/reviewguide';
-// import { Filestagesguide } from './pages/filestagesguide/filestagesguide';
-// import { Reviewobjectivesguide } from './pages/reviewobjectivesguide/reviewobjectivesguide';
-// import { ReviewmarksindexComponent } from './pages/reviewmarksindex/reviewmarksindex';
+
 
 export const SubscriberRoutes: Routes = [
   {
@@ -44,12 +33,24 @@ export const SubscriberRoutes: Routes = [
           import('./pages/subscriber-users/subscriber-users')
             .then(m => m.SubscriberUsers)
       },
+      {
+        path: 'tickets',
+        loadComponent: () =>
+          import('./pages/subscription-ticket/subscription-ticket')
+            .then(m => m.SubscriptionTicket)
+      },
+       {
+        path: 'subscriber-service',
+        loadComponent: () =>
+          import('./pages/subscription-services/subscription-services')
+            .then(m => m.SubscriptionServices)
+      },
        {
   path: 'users-details/:id',
   loadComponent: () =>
     import('./pages/subscriber-user-details/subscriber-user-details')
       .then(m => m.SubscriberUserDetails)
-}, 
+},
         {
         path: 'profile',
         loadComponent: () =>
