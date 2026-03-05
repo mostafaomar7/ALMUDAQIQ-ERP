@@ -18,5 +18,7 @@ export const EN = {
   KPIS : 'KPIS' ,
   reports : 'Reports' ,
 Financial : 'Contract services' ,
-Support : 'Support'
+Support : 'Support',
+EngagementContract : 'Engagement Contract',
+FinancialStatements : 'Financial Statements'
 };

@@ -83,7 +83,10 @@ export class Login implements OnInit {
 
   // غير كده التوجيه الطبيعي
   if (role === 'ADMIN') this.router.navigate(['/dashboard']);
-  else this.router.navigate(['/subscriber']);
+  if (role === 'SUBSCRIBER_OWNER') this.router.navigate(['/subscriber']);
+  if (role === 'SECRETARY') this.router.navigate(['/secretary']);
+
+  // else this.router.navigate(['/subscriber']);
 });
 
   }

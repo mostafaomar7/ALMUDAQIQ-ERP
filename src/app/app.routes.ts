@@ -1,39 +1,47 @@
 import { Routes } from '@angular/router';
-// import { AUTH_ROUTES } from './features/auth/auth.routes';
-// import { dashboardRoutes } from './features/dashboard/dashboard.routes';
 import { AuthGuard } from './features/dashboard/guard/auth.guard';
 import { GuestGuard } from './features/auth/guard/guest.guard';
+import { HomeRedirectComponent } from './home-redirect.component';
+
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+
+  {
+    path: 'home',
+    canActivate: [AuthGuard],
+    component: HomeRedirectComponent,
+  },
 
   {
     path: 'auth',
     canActivate: [GuestGuard],
     loadChildren: () =>
-      import('./features/auth/auth.routes')
-        .then(r => r.AUTH_ROUTES)
+      import('./features/auth/auth.routes').then(r => r.AUTH_ROUTES),
   },
 
   {
     path: 'dashboard',
     canActivate: [AuthGuard],
+    data: { roles: ['ADMIN'] },
     loadChildren: () =>
-      import('./features/dashboard/dashboard.routes')
-        .then(r => r.dashboardRoutes)
+      import('./features/dashboard/dashboard.routes').then(r => r.dashboardRoutes),
   },
+
   {
     path: 'subscriber',
     canActivate: [AuthGuard],
+    data: { roles: ['SUBSCRIBER_OWNER'] },
     loadChildren: () =>
-      import('./features/subscriber-dashboard/subscriber.routes')
-        .then(r => r.SubscriberRoutes)
+      import('./features/subscriber-dashboard/subscriber.routes').then(r => r.SubscriberRoutes),
   },
-{
+
+  {
     path: 'secretary',
     canActivate: [AuthGuard],
+    data: { roles: ['SECRETARY'] },
     loadChildren: () =>
-      import('./features/secretary-dashboard/secretary.routes')
-        .then(r => r.SecretaryRoutes)
+      import('./features/secretary-dashboard/secretary.routes').then(r => r.SecretaryRoutes),
   },
-  { path: '**', redirectTo: '' }
+
+  { path: '**', redirectTo: 'home' },
 ];

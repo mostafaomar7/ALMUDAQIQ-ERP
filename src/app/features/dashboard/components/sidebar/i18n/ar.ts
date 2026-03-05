@@ -18,5 +18,8 @@ export const AR = {
 KPIS : 'مؤشرات الأداء الرئيسية' ,
   reports : 'تقارير' ,
 Financial : 'خدمات التعاقد',
-Support : 'دعم'
+Support : 'دعم',
+EngagementContract : 'عقد تعاقد',
+FinancialStatements : 'الحالات المالية'
+
 };

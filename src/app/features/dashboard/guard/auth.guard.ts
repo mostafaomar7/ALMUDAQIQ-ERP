@@ -7,36 +7,36 @@ export class AuthGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
-    // 1) لازم يكون logged in
     if (!this.auth.isLoggedIn()) {
       return this.router.createUrlTree(['/auth/login']);
     }
 
     const user = this.auth.getUser();
-    const role = user?.role; // 'ADMIN' أو 'SUBSCRIBER_OWNER'...
+    const role: string = user?.role;
     const mustChange = this.auth.mustChangePassword();
+    const url = state.url;
 
-    const url = state.url; // المسار اللي رايحله المستخدم
- 
-    // 2) لو subscriber لازم يغير باسورد: امنعه من أي route غير change-password
+    // لازم يغير باسورد (لغير ADMIN)
     if (role !== 'ADMIN' && mustChange) {
       if (!url.startsWith('/auth/change-password')) {
         return this.router.createUrlTree(['/auth/change-password']);
       }
-      return true; // مسموح فقط هنا
+      return true;
     }
 
-    // 3) توجيه حسب الدور (اختياري بس مفيد)
-    // لو Admin حاول يفتح subscriber → رجّعه dashboard
-    if (role === 'ADMIN' && url.startsWith('/subscriber')) {
-      return this.router.createUrlTree(['/dashboard']);
-    }
-
-    // لو Subscriber حاول يفتح dashboard → رجّعه subscriber
-    if (role !== 'ADMIN' && url.startsWith('/dashboard')) {
-      return this.router.createUrlTree(['/subscriber']);
+    // منع الدخول حسب roles في data
+    const allowedRoles: string[] = route.data?.['roles'] ?? [];
+    if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+      return this.router.createUrlTree([this.getHomeByRole(role)]);
     }
 
     return true;
+  }
+
+  private getHomeByRole(role: string): string {
+    if (role === 'ADMIN') return '/dashboard';
+    if (role === 'SUBSCRIBER_OWNER') return '/subscriber';
+    if (role === 'SECRETARY') return '/secretary';
+    return '/auth/login';
   }
 }
