@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../environment';
 
 export type ApiContractStatus = 'ACTIVE' | 'INACTIVE';
 
@@ -18,17 +19,23 @@ export interface ApiEngagementContract {
   engagementContractDate: string; // ISO string
   legalEntity: 'Company' | 'Institution' | 'Individual';
   commercialRegisterNumber: string;
+  commercialRegisterDate?: string;
   taxNumber: string;
   unifiedNumber: string;
+  nationality?: string;
+  postalCode?: string;
+  address?: string;
+  email?: string;
+  region?: string;
   status: ApiContractStatus;
+  // أضف أي حقول أخرى تأتي من الـ API وتحتاجها في التعديل
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class SeretaryEngagementContractService {
-  // لو عندك environment حط baseUrl هناك بدل كده
-  private readonly baseUrl = '';
+  private readonly baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -39,7 +46,18 @@ export class SeretaryEngagementContractService {
     if (opts.limit != null) params = params.set('limit', String(opts.limit));
     if (opts.search) params = params.set('search', opts.search.trim());
 
-    // لو الـ endpoint عندك كامل (مثلاً /api/engagement-contracts) عدّل هنا
     return this.http.get<EngagementContractsResponse>(`${this.baseUrl}/engagement-contracts`, { params });
+  }
+
+  createContract(formData: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/engagement-contracts`, formData);
+  }
+
+  // --- New: Update Method ---
+  updateContract(id: string, formData: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/engagement-contracts/${id}`, formData);
+  }
+  getContractById(id: string): Observable<any> { // يفضل استبدال any بـ Interface دقيق
+    return this.http.get<any>(`${this.baseUrl}/engagement-contracts/${id}`);
   }
 }

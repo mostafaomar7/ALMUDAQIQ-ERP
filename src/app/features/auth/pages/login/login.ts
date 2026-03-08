@@ -75,18 +75,16 @@ export class Login implements OnInit {
   const role = res?.user?.role;
   const mustChangePassword = !!res?.mustChangePassword;
 
-  // لو subscriber ولازم يغير باسورد → ودّيه على صفحة التغيير
+  // لو مش ADMIN ولازم يغير باسورد
   if (role !== 'ADMIN' && mustChangePassword) {
     this.router.navigate(['/auth/change-password']);
     return;
   }
 
-  // غير كده التوجيه الطبيعي
   if (role === 'ADMIN') this.router.navigate(['/dashboard']);
-  if (role === 'SUBSCRIBER_OWNER') this.router.navigate(['/subscriber']);
-  if (role === 'SECRETARY') this.router.navigate(['/secretary']);
-
-  // else this.router.navigate(['/subscriber']);
+  else if (role === 'SUBSCRIBER_OWNER') this.router.navigate(['/subscriber']);
+  else if (role === 'SECRETARY' || role === 'AUDIT_MANAGER') this.router.navigate(['/secretary']);
+  else this.router.navigate(['/auth/login']);
 });
 
   }

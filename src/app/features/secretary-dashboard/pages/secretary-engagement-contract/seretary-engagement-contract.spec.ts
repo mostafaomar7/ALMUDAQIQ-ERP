@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SeretaryEngagementContract } from './seretary-engagement-contract';
+import { SecretaryEngagementContract } from './secretary-engagement-contract';
 
 describe('SeretaryEngagementContract', () => {
-  let service: SeretaryEngagementContract;
+  let service: SecretaryEngagementContract;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SeretaryEngagementContract);
+    service = TestBed.inject(SecretaryEngagementContract);
   });
 
   it('should be created', () => {

@@ -38,7 +38,7 @@ export const routes: Routes = [
   {
     path: 'secretary',
     canActivate: [AuthGuard],
-    data: { roles: ['SECRETARY'] },
+  data: { roles: ['SECRETARY', 'AUDIT_MANAGER'] },
     loadChildren: () =>
       import('./features/secretary-dashboard/secretary.routes').then(r => r.SecretaryRoutes),
   },

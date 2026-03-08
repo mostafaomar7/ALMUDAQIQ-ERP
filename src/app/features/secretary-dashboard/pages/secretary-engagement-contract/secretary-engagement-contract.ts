@@ -1,63 +1,302 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { finalize, map } from 'rxjs/operators';
-
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth';
 import {
   SeretaryEngagementContractService,
   ApiEngagementContract,
   EngagementContractsResponse,
 } from './seretary-engagement-contract.service';
 
-interface Contract {
-  id: string; // Contract No. (contractNumber)
-  establishmentName: string; // customerName
-  contractDate: string; // ISO date string (formatted in HTML)
-  legalEntity: 'Company' | 'Institution' | 'Individual';
-  crNumber: string;
-  taxNumber: string;
-  unifiedNumber: string;
-  status: 'Active' | 'Inactive';
+// --- تعديل Interface Contract ---
+// قمنا بإضافة الخصائص التي يستخدمها الجدول (HTML) بشكل صريح
+interface Contract extends ApiEngagementContract {
   selected: boolean;
+  // View Model Specific Properties (لحل مشكلة TS4111)
+  establishmentName: string;
+  contractDate: string;
+  crNumber: string;
+
+  // Index signature للسماح بأي خصائص إضافية
+  [key: string]: any;
 }
 
 @Component({
   selector: 'app-secretary-engagement-contract',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './secretary-engagement-contract.html',
   styleUrl: './secretary-engagement-contract.css',
 })
-export class SecretaryEngagementContract implements OnInit {
-  // Search model
+export class SecretaryEngagementContract implements OnInit, OnDestroy {
   searchTerm = '';
   jumpToPage = 1;
 
-  // Data
   contracts: Contract[] = [];
   loading = false;
 
-  // Pagination from API
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
   totalItems = 0;
 
-  // UI range
   startItem = 0;
   endItem = 0;
 
-  constructor(private contractsApi: SeretaryEngagementContractService) {}
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
+  // --- Modal & Form Variables ---
+  isModalOpen = false;
+  isSubmitting = false;
+  currentStep = 1;
+  totalSteps = 4;
+
+  // متغيرات وضع التعديل
+  isEditMode = false;
+  editingContractId: string | null = null;
+
+  contractForm!: FormGroup;
+  selectedFiles: { [key: string]: File } = {};
+
+  constructor(
+    private contractsApi: SeretaryEngagementContractService,
+    private fb: FormBuilder ,
+    private router: Router ,
+    private route: ActivatedRoute,
+     private auth: AuthService
+  ) {
+    this.initForm();
+  }
+userRole: string = '';
   ngOnInit() {
+      const user = this.auth.getUser();
+  this.userRole = user?.role || '';
     this.loadContracts();
+
+    this.searchSubject
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((value) => {
+        this.searchTerm = value;
+        this.currentPage = 1;
+        this.jumpToPage = 1;
+        this.loadContracts(1);
+      });
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // --- Form Initialization ---
+  initForm() {
+    this.contractForm = this.fb.group({
+      // Step 1
+      contractNumber: [{ value: '0008', disabled: true }],
+      legalEntity: ['', Validators.required],
+      legalEntityType: ['', Validators.required],
+      nationality: ['', Validators.required],
+      customerName: ['', Validators.required],
+      commercialRegisterNumber: ['', Validators.required],
+      commercialRegisterDate: ['', Validators.required],
+      taxNumber: ['', Validators.required],
+      unifiedNumber: ['', Validators.required],
+      engagementContractDate: ['', Validators.required],
+
+      // Files Step 1
+      vatCertificate: [null],
+      unifiedCertificate: [null],
+      articlesOfAssociation: [null],
+      commercialRegisterActivity: [null],
+
+      // Step 2
+      postalCode: ['', Validators.required],
+      address: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      region: ['', Validators.required],
+
+      // Step 3
+      contactPersonName: ['', Validators.required],
+      contactPhone: ['', Validators.required],
+      whatsappPhone: ['', Validators.required],
+
+      // Step 4
+      facilityLink: [''],
+      facilityLogo: [null],
+      language: [''],
+      currency: ['']
+    });
+  }
+
+  // --- Modal Actions ---
+
+  // 1. فتح المودال للإضافة الجديدة
+  onAdd() {
+    this.isEditMode = false;
+    this.editingContractId = null;
+    this.selectedFiles = {};
+    this.currentStep = 1;
+    this.contractForm.reset({ contractNumber: '0008' }); // Reset form
+    this.isModalOpen = true;
+  }
+
+  // 2. فتح المودال للتعديل
+  onEdit() {
+    const selectedRows = this.contracts.filter(c => c.selected);
+
+    if (selectedRows.length === 0) {
+      alert('Please select a contract to edit.');
+      return;
+    }
+    if (selectedRows.length > 1) {
+      alert('Please select only one contract to edit.');
+      return;
+    }
+
+    const contract = selectedRows[0];
+    this.isEditMode = true;
+    this.editingContractId = contract.id;
+    this.currentStep = 1;
+    this.selectedFiles = {}; // Clear new files
+
+    // Helper to format date for input[type="date"] (YYYY-MM-DD)
+    const formatDate = (dateStr: string | undefined) => {
+      if (!dateStr) return '';
+      return new Date(dateStr).toISOString().split('T')[0];
+    };
+
+    // Fill form with data
+    this.contractForm.patchValue({
+      contractNumber: contract.contractNumber,
+      legalEntity: contract.legalEntity,
+      legalEntityType: contract['legalEntityType'] || '',
+      nationality: contract.nationality,
+      customerName: contract.customerName,
+      commercialRegisterNumber: contract.commercialRegisterNumber,
+      commercialRegisterDate: formatDate(contract.commercialRegisterDate),
+      taxNumber: contract.taxNumber,
+      unifiedNumber: contract.unifiedNumber,
+      engagementContractDate: formatDate(contract.engagementContractDate),
+
+      postalCode: contract.postalCode,
+      address: contract.address,
+      email: contract.email,
+      region: contract.region,
+
+      contactPersonName: contract['contactPersonName'],
+      contactPhone: contract['contactPhone'],
+      whatsappPhone: contract['whatsappPhone'],
+
+      facilityLink: contract['facilityLink'],
+      language: contract['language'],
+      currency: contract['currency']
+    });
+
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.isEditMode = false;
+    this.editingContractId = null;
+  }
+
+  // --- Wizard Navigation ---
+  nextStep() {
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+    } else {
+      this.submitContract();
+    }
+  }
+
+  prevStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  // --- File Handling ---
+  onFileSelect(event: any, fieldName: string) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFiles[fieldName] = file;
+      this.contractForm.patchValue({ [fieldName]: file });
+    }
+  }
+
+  getFileName(fieldName: string): string {
+    return this.selectedFiles[fieldName]?.name || '';
+  }
+
+  // --- Submit Logic (Create or Update) ---
+  submitContract() {
+    if (this.contractForm.invalid) {
+      this.contractForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+    const formData = new FormData();
+    const formValues = this.contractForm.getRawValue();
+
+    // 1. Append Text Fields
+    const fileKeys = ['vatCertificate', 'unifiedCertificate', 'articlesOfAssociation', 'commercialRegisterActivity', 'facilityLogo'];
+
+    Object.keys(formValues).forEach(key => {
+      if (!fileKeys.includes(key) && formValues[key] !== null && formValues[key] !== undefined) {
+        formData.append(key, formValues[key]);
+      }
+    });
+
+    // 2. Append IDs (Required by Backend)
+    // IMPORTANT: Replace with actual logged-in user data
+    // formData.append('subscriberId', '1');
+    // formData.append('branchId', '1');
+
+    // 3. Append Files (Only if new files are selected)
+    if (this.selectedFiles['vatCertificate']) formData.append('vatCertificate', this.selectedFiles['vatCertificate']);
+    if (this.selectedFiles['unifiedCertificate']) formData.append('unifiedNumberCertificate', this.selectedFiles['unifiedCertificate']);
+    if (this.selectedFiles['articlesOfAssociation']) formData.append('articlesOfAssociation', this.selectedFiles['articlesOfAssociation']);
+    if (this.selectedFiles['commercialRegisterActivity']) formData.append('commercialRegisterActivity', this.selectedFiles['commercialRegisterActivity']);
+    if (this.selectedFiles['facilityLogo']) formData.append('facilityLogo', this.selectedFiles['facilityLogo']);
+
+    // 4. Determine Request Type (POST vs PUT)
+    let request$;
+    if (this.isEditMode && this.editingContractId) {
+      request$ = this.contractsApi.updateContract(this.editingContractId, formData);
+    } else {
+      request$ = this.contractsApi.createContract(formData);
+    }
+
+    request$.subscribe({
+      next: (res) => {
+        console.log(this.isEditMode ? 'Updated' : 'Created', res);
+        this.isSubmitting = false;
+        this.closeModal();
+        this.loadContracts();
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        this.isSubmitting = false;
+        const msg = err.error?.customMessage || err.error?.message || 'Unknown Error';
+        alert(`Error: ${msg}`);
+      }
+    });
+  }
+
+  // --- Table Logic ---
   loadContracts(page: number = this.currentPage) {
     this.loading = true;
-
-    this.contractsApi
-      .getContracts({ page, limit: this.pageSize, search: this.searchTerm })
+    this.contractsApi.getContracts({ page, limit: this.pageSize, search: this.searchTerm.trim() })
       .pipe(
         map((res: EngagementContractsResponse) => {
           const mapped = res.data.map((c) => this.toVM(c));
@@ -71,66 +310,51 @@ export class SecretaryEngagementContract implements OnInit {
           this.totalItems = res.total;
           this.currentPage = res.page;
           this.pageSize = res.limit;
-
           this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize));
-
           this.startItem = this.totalItems === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
           this.endItem = Math.min(this.totalItems, this.currentPage * this.pageSize);
         },
-        error: (err) => {
-          console.error('Failed to load engagement contracts', err);
+        error: () => {
           this.contracts = [];
-          this.totalItems = 0;
-          this.totalPages = 1;
-          this.startItem = 0;
-          this.endItem = 0;
+          this.loading = false;
         },
       });
   }
 
+  // --- تعديل دالة toVM لملء الخصائص المضافة ---
   private toVM(c: ApiEngagementContract): Contract {
     return {
-      id: c.contractNumber,
+      ...c, // نسخ جميع بيانات ال API الأصلية (لأجل الفورم)
+
+      // تعيين القيم التي يحتاجها الجدول (HTML) بشكل صريح
       establishmentName: c.customerName,
-      contractDate: c.engagementContractDate, // ✅ ISO string
-      legalEntity: c.legalEntity,
+      contractDate: c.engagementContractDate,
       crNumber: c.commercialRegisterNumber,
-      taxNumber: c.taxNumber,
-      unifiedNumber: c.unifiedNumber,
-      status: c.status === 'ACTIVE' ? 'Active' : 'Inactive',
+
       selected: false,
     };
   }
 
-  // Selection
-  toggleSelection(contract: Contract) {
-    contract.selected = !contract.selected;
-  }
+  toggleSelection(contract: Contract) { contract.selected = !contract.selected; }
 
   toggleAll() {
     const allSelected = this.contracts.length > 0 && this.contracts.every((c) => c.selected);
     this.contracts.forEach((c) => (c.selected = !allSelected));
   }
 
-  // Search
-  onSearch() {
-    this.currentPage = 1;
-    this.jumpToPage = 1;
-    this.loadContracts(1);
+  onSearchInput(value: string) { this.searchSubject.next(value ?? ''); }
+  nextPage() { if (this.currentPage < this.totalPages) this.loadContracts(this.currentPage + 1); }
+  prevPage() { if (this.currentPage > 1) this.loadContracts(this.currentPage - 1); }
+  changePage(page: number) { if (page !== this.currentPage && page >= 1 && page <= this.totalPages) { this.jumpToPage = page; this.loadContracts(page); } }
+  goToPage() { const p = Math.min(Math.max(1, Number(this.jumpToPage || 1)), this.totalPages); this.jumpToPage = p; this.loadContracts(p); }
+  get visiblePages(): number[] {
+    const pages: number[] = [];
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(this.totalPages, this.currentPage + 2);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   }
-
-  // Pagination
-  nextPage() {
-    if (this.currentPage < this.totalPages) this.loadContracts(this.currentPage + 1);
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) this.loadContracts(this.currentPage - 1);
-  }
-
-  goToPage() {
-    const p = Math.min(Math.max(1, Number(this.jumpToPage || 1)), this.totalPages);
-    this.jumpToPage = p;
-    this.loadContracts(p);
+  navigateToDetails(contractId: string) {
+this.router.navigate([contractId], { relativeTo: this.route });
   }
 }

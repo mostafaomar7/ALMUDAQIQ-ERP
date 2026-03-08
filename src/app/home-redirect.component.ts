@@ -16,7 +16,7 @@ export class HomeRedirectComponent implements OnInit {
 
     if (role === 'ADMIN') this.router.navigateByUrl('/dashboard');
     else if (role === 'SUBSCRIBER_OWNER') this.router.navigateByUrl('/subscriber');
-    else if (role === 'SECRETARY') this.router.navigateByUrl('/secretary');
+    else if (role === 'SECRETARY' || user?.role === 'AUDIT_MANAGER') this.router.navigateByUrl('/secretary');
     else this.router.navigateByUrl('/auth/login');
   }
 }
