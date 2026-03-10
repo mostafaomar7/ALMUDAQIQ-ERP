@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import { EngagemenDetails} from './engagemen-details.service';
+import { EngagemenDetails } from './engagemen-details';
 
-describe('SeretaryEngagementContractService', () => {
+describe('EngagemenDetails', () => {
   let service: EngagemenDetails;
 
   beforeEach(() => {

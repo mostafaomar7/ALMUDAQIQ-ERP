@@ -10,17 +10,17 @@ import {
   ApiEngagementContract,
   EngagementContractsResponse,
 } from './seretary-engagement-contract.service';
+import Swal from 'sweetalert2';
 
 // --- تعديل Interface Contract ---
-// قمنا بإضافة الخصائص التي يستخدمها الجدول (HTML) بشكل صريح
 interface Contract extends ApiEngagementContract {
   selected: boolean;
-  // View Model Specific Properties (لحل مشكلة TS4111)
+  // View Model Specific Properties
   establishmentName: string;
   contractDate: string;
   crNumber: string;
 
-  // Index signature للسماح بأي خصائص إضافية
+  // Index signature
   [key: string]: any;
 }
 
@@ -61,20 +61,21 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
 
   contractForm!: FormGroup;
   selectedFiles: { [key: string]: File } = {};
+  userRole: string = '';
 
   constructor(
     private contractsApi: SeretaryEngagementContractService,
-    private fb: FormBuilder ,
-    private router: Router ,
+    private fb: FormBuilder,
+    private router: Router,
     private route: ActivatedRoute,
-     private auth: AuthService
+    private auth: AuthService
   ) {
     this.initForm();
   }
-userRole: string = '';
+
   ngOnInit() {
-      const user = this.auth.getUser();
-  this.userRole = user?.role || '';
+    const user = this.auth.getUser();
+    this.userRole = user?.role || '';
     this.loadContracts();
 
     this.searchSubject
@@ -153,11 +154,11 @@ userRole: string = '';
     const selectedRows = this.contracts.filter(c => c.selected);
 
     if (selectedRows.length === 0) {
-      alert('Please select a contract to edit.');
+      Swal.fire('تنبيه', 'يرجى اختيار عقد للتعديل', 'warning');
       return;
     }
     if (selectedRows.length > 1) {
-      alert('Please select only one contract to edit.');
+      Swal.fire('تنبيه', 'يرجى اختيار عقد واحد فقط للتعديل', 'warning');
       return;
     }
 
@@ -241,6 +242,12 @@ userRole: string = '';
   submitContract() {
     if (this.contractForm.invalid) {
       this.contractForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: 'بيانات غير مكتملة',
+        text: 'يرجى التأكد من ملء جميع الحقول المطلوبة بشكل صحيح.',
+        confirmButtonText: 'حسناً'
+      });
       return;
     }
 
@@ -258,7 +265,6 @@ userRole: string = '';
     });
 
     // 2. Append IDs (Required by Backend)
-    // IMPORTANT: Replace with actual logged-in user data
     // formData.append('subscriberId', '1');
     // formData.append('branchId', '1');
 
@@ -278,17 +284,39 @@ userRole: string = '';
     }
 
     request$.subscribe({
-      next: (res) => {
+      next: (res: any) => {
         console.log(this.isEditMode ? 'Updated' : 'Created', res);
         this.isSubmitting = false;
         this.closeModal();
         this.loadContracts();
+
+        // --- Success Swal ---
+        // نعرض رسالة الباك إند إذا كانت موجودة، أو رسالة افتراضية
+        const backendMessage = res?.message || res?.data?.message || (this.isEditMode ? 'تم تعديل العقد بنجاح' : 'تم إضافة العقد بنجاح');
+
+        Swal.fire({
+          icon: 'success',
+          title: 'نجاح',
+          text: backendMessage,
+          confirmButtonText: 'حسناً',
+          confirmButtonColor: '#3085d6'
+        });
       },
       error: (err) => {
         console.error('Error:', err);
         this.isSubmitting = false;
-        const msg = err.error?.customMessage || err.error?.message || 'Unknown Error';
-        alert(`Error: ${msg}`);
+
+        // --- Error Swal ---
+        // استخراج رسالة الخطأ من الباك إند
+        const msg = err.error?.customMessage || err.error?.message || err.message || 'حدث خطأ غير متوقع';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'خطأ',
+          text: msg,
+          confirmButtonText: 'حسناً',
+          confirmButtonColor: '#d33'
+        });
       }
     });
   }
@@ -314,9 +342,21 @@ userRole: string = '';
           this.startItem = this.totalItems === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
           this.endItem = Math.min(this.totalItems, this.currentPage * this.pageSize);
         },
-        error: () => {
+        error: (err) => {
           this.contracts = [];
           this.loading = false;
+
+          // عرض خطأ في حالة فشل جلب البيانات (اختياري ولكن مفضل)
+          const msg = err.error?.message || 'فشل في تحميل البيانات';
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ في التحميل',
+            text: msg,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+          });
         },
       });
   }
@@ -324,13 +364,10 @@ userRole: string = '';
   // --- تعديل دالة toVM لملء الخصائص المضافة ---
   private toVM(c: ApiEngagementContract): Contract {
     return {
-      ...c, // نسخ جميع بيانات ال API الأصلية (لأجل الفورم)
-
-      // تعيين القيم التي يحتاجها الجدول (HTML) بشكل صريح
+      ...c,
       establishmentName: c.customerName,
       contractDate: c.engagementContractDate,
       crNumber: c.commercialRegisterNumber,
-
       selected: false,
     };
   }
@@ -347,6 +384,7 @@ userRole: string = '';
   prevPage() { if (this.currentPage > 1) this.loadContracts(this.currentPage - 1); }
   changePage(page: number) { if (page !== this.currentPage && page >= 1 && page <= this.totalPages) { this.jumpToPage = page; this.loadContracts(page); } }
   goToPage() { const p = Math.min(Math.max(1, Number(this.jumpToPage || 1)), this.totalPages); this.jumpToPage = p; this.loadContracts(p); }
+
   get visiblePages(): number[] {
     const pages: number[] = [];
     const start = Math.max(1, this.currentPage - 2);
@@ -354,7 +392,8 @@ userRole: string = '';
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   }
+
   navigateToDetails(contractId: string) {
-this.router.navigate([contractId], { relativeTo: this.route });
+    this.router.navigate([contractId], { relativeTo: this.route });
   }
-}
+} 

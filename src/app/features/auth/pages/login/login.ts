@@ -83,7 +83,10 @@ export class Login implements OnInit {
 
   if (role === 'ADMIN') this.router.navigate(['/dashboard']);
   else if (role === 'SUBSCRIBER_OWNER') this.router.navigate(['/subscriber']);
-  else if (role === 'SECRETARY' || role === 'AUDIT_MANAGER') this.router.navigate(['/secretary']);
+  else if (role === 'SECRETARY' || role === 'AUDIT_MANAGER' || role === 'TECHNICAL_AUDITOR' ||
+    role ===   "ASSISTANT_TECHNICAL_AUDITOR" || role === "FIELD_AUDITOR" || role ===  "CONTACT_PERSON"
+  )
+    this.router.navigate(['/secretary']);
   else this.router.navigate(['/auth/login']);
 });
 
