@@ -814,9 +814,19 @@
   <button class="btn border px-4" *ngIf="currentStep > 1" (click)="prevStep()">{{ t('back') }}</button>
   <button class="btn btn-success px-4" *ngIf="currentStep < totalSteps" (click)="nextStep()">{{ t('next') }}</button>
 
-  <button class="btn btn-success px-4" *ngIf="currentStep === totalSteps" (click)="submitNewUser()">
+<button
+  class="btn btn-success px-4"
+  *ngIf="currentStep === totalSteps"
+  (click)="submitNewUser()"
+  [disabled]="isSubmitting"
+>
+  <span *ngIf="!isSubmitting">
     {{ isEditMode ? t('update') : t('submit') }}
-  </button>
+  </span>
+  <span *ngIf="isSubmitting">
+    <i class="fas fa-spinner fa-spin me-2"></i> Submitting...
+  </span>
+</button>
 </div>
   </div>
 </div>

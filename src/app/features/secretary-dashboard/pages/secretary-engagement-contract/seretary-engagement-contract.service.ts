@@ -60,4 +60,7 @@ export class SeretaryEngagementContractService {
   getContractById(id: string): Observable<any> { // يفضل استبدال any بـ Interface دقيق
     return this.http.get<any>(`${this.baseUrl}/engagement-contracts/${id}`);
   }
+    getProfile(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/subscribers/profile`);
+  }
 }

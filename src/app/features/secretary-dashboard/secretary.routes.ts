@@ -18,11 +18,17 @@ export const SecretaryRoutes: Routes = [
 
       // 2. صفحة التفاصيل (الجديدة)
       {
-        path: 'EngagementContract/:id', 
+        path: 'EngagementContract/:id',
         loadComponent: () =>
           import('./pages/secretary-engagement-contract-details/secretary-engagement-contract-details')
             .then(m => m.SecretaryEngagementContractDetailsComponent)
-      }
+      },
+       {
+        path: 'Profile',
+        loadComponent: () =>
+          import('./pages/secretary-profle/secretary-profle')
+            .then(m => m.SecretaryProfle)
+      },
     ]
   }
 ];

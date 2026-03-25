@@ -23,7 +23,7 @@ export class Login implements OnInit {
   error: string | null = null;
 
   currentLang: 'en' | 'ar' = (localStorage.getItem('lang') as 'en' | 'ar') || 'en';
-  translations: any = {}; // سيتم تخزين الترجمة هنا
+  translations: any = {}; 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],

@@ -1,3 +1,4 @@
+<div class="container-fluid" id="dashboardToExport" [class.rtl]="isRtl">
 <div class="dashboard-container">
   <header class="dashboard-header">
     <div class="header-titles">
@@ -11,16 +12,17 @@
         <span class="material-symbols-outlined icon-sm">expand_more</span>
       </div>
       <button class="btn-primary">
-        <span class="material-symbols-outlined icon-sm">upload</span> Export
+        <span class="material-symbols-outlined icon-sm" (click)="exportDashboard()">upload</span> Export
       </button>
     </div>
   </header>
 
+ @if (stats) {
   <section class="stats-row">
     <div class="stat-card">
       <div class="stat-info">
         <span class="stat-title">Total Users</span>
-        <span class="stat-value">15,342</span>
+        <span class="stat-value">{{ stats.users.total }}</span>
       </div>
       <div class="stat-icon icon-purple">
         <span class="material-symbols-outlined">group</span>
@@ -29,7 +31,7 @@
     <div class="stat-card">
       <div class="stat-info">
         <span class="stat-title">Number of Files Created</span>
-        <span class="stat-value">1,342,454</span>
+        <span class="stat-value">{{ stats.files.totalFiles }}</span>
       </div>
       <div class="stat-icon icon-green">
         <span class="material-symbols-outlined">description</span>
@@ -38,7 +40,7 @@
     <div class="stat-card">
       <div class="stat-info">
         <span class="stat-title">Total File Size Used</span>
-        <span class="stat-value">320 GB</span>
+        <span class="stat-value">{{ stats.files.totalSizeUsed }}</span>
       </div>
       <div class="stat-icon icon-yellow">
         <span class="material-symbols-outlined">inventory_2</span>
@@ -51,14 +53,14 @@
       <div class="section-header">
         <h2>Engagement Contracts Overview</h2>
         <select class="branch-select">
-          <option>All Branches</option>
+          <option>{{ stats.contracts.filteredByBranch }}</option>
         </select>
       </div>
       <div class="contracts-grid">
         <div class="contract-card">
           <div class="contract-info">
             <span class="contract-title">Total Contracts</span>
-            <span class="contract-value">142</span>
+            <span class="contract-value">{{ stats.contracts.total }}</span>
           </div>
           <div class="contract-icon icon-blue">
             <span class="material-symbols-outlined">layers</span>
@@ -67,7 +69,7 @@
         <div class="contract-card">
           <div class="contract-info">
             <span class="contract-title">Active Contracts</span>
-            <span class="contract-value">73</span>
+            <span class="contract-value">{{ stats.contracts.active }}</span>
           </div>
           <div class="contract-icon icon-light-green">
             <span class="material-symbols-outlined">verified</span>
@@ -76,7 +78,7 @@
         <div class="contract-card">
           <div class="contract-info">
             <span class="contract-title">Inactive Contracts</span>
-            <span class="contract-value">15</span>
+            <span class="contract-value">{{ stats.contracts.inactive }}</span>
           </div>
           <div class="contract-icon icon-orange">
             <span class="material-symbols-outlined">block</span>
@@ -85,7 +87,7 @@
         <div class="contract-card">
           <div class="contract-info">
             <span class="contract-title">Archived Contracts</span>
-            <span class="contract-value">68</span>
+            <span class="contract-value">{{ stats.contracts.archived }}</span>
           </div>
           <div class="contract-icon icon-pink">
             <span class="material-symbols-outlined">archive</span>
@@ -94,84 +96,90 @@
       </div>
     </div>
 
-    <div class="support-tickets">
-      <h2>Support Tickets Information</h2>
-      <div class="chart-container">
-        <div class="donut-chart"></div>
-      </div>
-      <div class="chart-legend">
-        <div class="legend-item"><span class="dot dot-dark-green"></span> Open</div>
-        <div class="legend-item"><span class="dot dot-green"></span> Closed</div>
-        <div class="legend-item"><span class="dot dot-light-green"></span> Pending</div>
-      </div>
-    </div>
-  </section>
+    <div class="support-tickets" *ngIf="stats?.complaints">
+  <h2>Support Tickets Information (Total: {{ stats.complaints.total }})</h2>
 
-  <section class="table-section">
-    <div class="table-header">
-      <h2>Engagement Contract</h2>
-      <div class="table-actions">
-        <div class="search-box">
-          <span class="material-symbols-outlined icon-sm text-muted">search</span>
-          <input type="text" placeholder="Search" />
-        </div>
-        <button class="btn-outline">
-          <span class="material-symbols-outlined icon-sm">cloud_download</span> Export
-        </button>
-      </div>
+  <div class="chart-container">
+    <div class="donut-chart" [ngStyle]="complaintsChartStyle"></div>
+  </div>
+
+  <div class="chart-legend">
+    <div class="legend-item">
+      <span class="dot dot-dark-green"></span>
+      Open ({{ stats.complaints.open }}) - {{ stats.complaints.percentages.open }}
     </div>
-    <div class="table-responsive">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>
-              <span class="material-symbols-outlined icon-sm primary-text" style="cursor: pointer;">indeterminate_check_box</span>
-            </th>
-            <th>Contract No. <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-            <th>Establishment Name <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-            <th>Contract Date <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-            <th>Legal Entity <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-            <th>CR No.</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>0001</td>
-            <td>Al Noor Trading Co.</td>
-            <td>15 Mar 2024</td>
-            <td>Company</td>
-            <td>1010101...</td>
-          </tr>
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>0002</td>
-            <td>Al Noor Trading Co.</td>
-            <td>15 Mar 2024</td>
-            <td>Institution</td>
-            <td>1010101...</td>
-          </tr>
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>0003</td>
-            <td>Al Noor Trading Co.</td>
-            <td>15 Mar 2024</td>
-            <td>Individual</td>
-            <td>1010101...</td>
-          </tr>
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>0004</td>
-            <td>Al Noor Trading Co.</td>
-            <td>15 Mar 2024</td>
-            <td>Company</td>
-            <td>1010101...</td>
-          </tr>
-        </tbody>
-      </table>
+
+    <div class="legend-item">
+      <span class="dot dot-green"></span>
+      Closed ({{ stats.complaints.closed }}) - {{ stats.complaints.percentages.closed }}
     </div>
-    <div class="table-footer">
-      <a href="#" class="view-all">View all</a>
-    </div>
+  </div>
+</div>
   </section>
+} @else {
+  <div class="loading-state">
+    <p>Loading Dashboard Stats...</p>
+  </div>
+}
+<section class="table-section">
+  <div class="table-header">
+    <h2>Engagement Contract</h2>
+
+    <div class="table-actions">
+      <div class="search-box">
+        <span class="material-symbols-outlined icon-sm text-muted">search</span>
+        <input type="text" placeholder="Search" />
+      </div>
+
+      <button class="btn-outline">
+        <span class="material-symbols-outlined icon-sm">cloud_download</span>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>
+            <span
+              class="material-symbols-outlined icon-sm primary-text"
+              style="cursor: pointer;"
+            >
+              indeterminate_check_box
+            </span>
+          </th>
+          <th>Contract No. <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+          <th>Establishment Name <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+          <th>Contract Date <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+          <th>Legal Entity <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+          <th>CR No.</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let contract of displayedContracts">
+          <td><input type="checkbox" /></td>
+          <td>{{ contract.contractNumber }}</td>
+          <td>{{ contract.customerName }}</td>
+          <td>{{ contract.engagementContractDate | date:'dd MMM yyyy' }}</td>
+          <td>{{ contract.legalEntity }}</td>
+          <td>{{ contract.commercialRegisterNumber }}</td>
+        </tr>
+
+        <tr *ngIf="displayedContracts.length === 0">
+          <td colspan="6" style="text-align: center;">No contracts found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer">
+    <a class="view-all" (click)="goToSubscriberService()" style="cursor: pointer;">
+      View all
+    </a>
+  </div>
+</section>
+</div>
 </div>

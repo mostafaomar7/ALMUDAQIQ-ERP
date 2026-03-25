@@ -39,4 +39,27 @@ export class EngagemenDetails {
   assignStaff(contractId: string, payload: { userId: number, role: string }): Observable<any> {
     return this.http.post(`${this.api_url}/engagement-contracts/${contractId}/assign-staff`, payload);
   }
+
+  // --- Trial Balance Endpoints ---
+  getTrialBalance(contractId: string): Observable<any> {
+    return this.http.get(`${this.api_url}/contracts/${contractId}/trial-balance`);
+  }
+
+  uploadTrialBalance(contractId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.api_url}/contracts/${contractId}/trial-balance/upload`, formData);
+  }
+
+  exportTrialBalance(contractId: string): Observable<Blob> {
+    return this.http.get(`${this.api_url}/contracts/${contractId}/trial-balance/export/excel`, {
+      responseType: 'blob'
+    });
+  }
+  // --- Financial Statements Endpoint ---
+  exportFinancialStatementPdf(contractId: string): Observable<Blob> {
+    return this.http.get(`${this.api_url}/contracts/${contractId}/trial-balance/export/pdf`, {
+      responseType: 'blob'
+    });
+  }
 }

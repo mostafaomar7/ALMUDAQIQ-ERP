@@ -90,6 +90,7 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
         this.jumpToPage = 1;
         this.loadContracts(1);
       });
+        this.loadProfile();
   }
 
   ngOnDestroy() {
@@ -396,4 +397,10 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
   navigateToDetails(contractId: string) {
     this.router.navigate([contractId], { relativeTo: this.route });
   }
-} 
+  authorityLinks: any;
+loadProfile() {
+  this.contractsApi.getProfile().subscribe((res) => {
+    this.authorityLinks = res?.data?.location?.authorityLinks;
+  });
+}
+}

@@ -44,7 +44,7 @@ export class SecretarySidebar  {
     { key: 'EngagementContract', icon: 'fa-solid fa-chart-line', route: '/secretary/EngagementContract' },
     // { key: 'reports', icon: 'fa-solid fa-file-contract', route: '/subscriber' },
     { key: 'FinancialStatements', icon: 'fa-regular fa-money-bill-1', route: '/subscriber/subscriber-service' },
-{ key: 'profile', icon: 'fa-regular fa-user', route: '/subscriber/profile' },
+{ key: 'profile', icon: 'fa-regular fa-user', route: '/secretary/Profile' },
   ];
 
 

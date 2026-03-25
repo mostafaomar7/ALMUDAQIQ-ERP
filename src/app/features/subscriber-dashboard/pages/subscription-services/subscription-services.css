@@ -33,6 +33,7 @@
   border-bottom: 1px solid var(--border-color);
   flex-wrap: wrap;
   gap: 16px;
+  width: 70%;
 }
 
 .card-title {
@@ -273,4 +274,27 @@
     flex-wrap: wrap;
     justify-content: center;
   }
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.status-badge .dot-icon {
+  font-size: 6px;
+}
+.badge-active {
+  background-color: #e6f6eb; /* لون خلفية أخضر فاتح */
+  color: #0f8a3c; /* لون نص أخضر */
+}
+.badge-inactive {
+  background-color: #feeceb; /* لون خلفية أحمر فاتح */
+  color: #d62f2f; /* لون نص أحمر */
+}
+.cursor-pointer {
+  cursor: pointer;
 }

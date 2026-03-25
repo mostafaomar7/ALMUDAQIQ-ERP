@@ -449,21 +449,6 @@ loadingStaff: boolean = false;
 
 // ... (داخل الكلاس) ...
 
-// تحديث دالة setActiveTab عشان تجيب بيانات الـ Team لما نفتح التبويب
-setActiveTab(tab: string) {
-  this.activeTab = tab;
-
-  if ((tab === 'review' || tab === 'docs') && this.contractId) {
-     this.fetchReviewGuides();
-  }
-  if (tab === 'pending' && this.contractId) {
-    this.fetchPendingGuides();
-  }
-  // إضافة استدعاء الـ Staff عند فتح تاب الـ team
-  if (tab === 'team' && this.contractId) {
-    this.fetchEligibleStaff();
-  }
-}
 
 // --- دوال الـ Team Independence ---
 
@@ -540,4 +525,174 @@ onStaffSelectionChange(staff: any) {
     console.log(`User un-selected: ${staff.fullName}`);
   }
 }
+// Add these variables at the top of your class
+  trialBalanceData: any[] = [];
+  trialBalanceFileName: string = 'Trial_Balance.xlsx';
+  loadingTrialBalance: boolean = false;
+  isUploadingTrial: boolean = false;
+  trialSearchQuery: string = '';
+
+  // Update your existing setActiveTab method
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+
+    if ((tab === 'review' || tab === 'docs') && this.contractId) {
+       this.fetchReviewGuides();
+    }
+    if (tab === 'pending' && this.contractId) {
+      this.fetchPendingGuides();
+    }
+    if (tab === 'team' && this.contractId) {
+      this.fetchEligibleStaff();
+    }
+    // 👇 Add this condition
+    if (tab === 'Trial' && this.contractId) {
+      this.fetchTrialBalance();
+    }
+  }
+
+  // --- Trial Balance Logic ---
+
+  get filteredTrialBalance() {
+    if (!this.trialSearchQuery) return this.trialBalanceData;
+    return this.trialBalanceData.filter(item =>
+      item.accountName?.toLowerCase().includes(this.trialSearchQuery.toLowerCase()) ||
+      item.accountCode?.toString().includes(this.trialSearchQuery)
+    );
+  }
+
+ // أضف هذا المتغير مع باقي المتغيرات
+  trialBalanceSummary: any = null;
+
+  // تعديل دالة fetchTrialBalance
+  fetchTrialBalance() {
+    if (!this.contractId) return;
+    this.loadingTrialBalance = true;
+
+    this.engagementService.getTrialBalance(this.contractId).subscribe({
+      next: (res) => {
+        // قراءة المصفوفة والإجماليات من الـ Response
+        this.trialBalanceData = res.data || [];
+        this.trialBalanceSummary = res.summary || null;
+
+        // إذا كان هناك اسم ملف راجع من الـ API يمكن تعيينه هنا
+        // this.trialBalanceFileName = res.fileName || 'VAT_Certificate_2024.xlsx';
+
+        this.loadingTrialBalance = false;
+      },
+      error: (err) => {
+        console.error('Error fetching trial balance:', err);
+        this.trialBalanceData = [];
+        this.trialBalanceSummary = null;
+        this.loadingTrialBalance = false;
+      }
+    });
+  }
+  onTrialFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadTrialBalanceFile(file);
+    }
+    event.target.value = null; // Reset input
+  }
+
+  uploadTrialBalanceFile(file: File) {
+    if (!this.contractId) return;
+
+    this.isUploadingTrial = true;
+    this.engagementService.uploadTrialBalance(this.contractId, file).subscribe({
+      next: (res) => {
+        this.isUploadingTrial = false;
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'File uploaded successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        this.fetchTrialBalance(); // Refresh table data
+      },
+      error: (err) => {
+        this.isUploadingTrial = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: err.error?.message || 'Failed to upload Trial Balance',
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
+  }
+
+  exportTrialBalance() {
+    if (!this.contractId) return;
+
+    Swal.fire({ title: 'Downloading...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+    this.engagementService.exportTrialBalance(this.contractId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = this.trialBalanceFileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        Swal.close();
+      },
+      error: (err) => {
+        console.error('Export error', err);
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to export file' });
+      }
+    });
+  }
+  // --- Financial Statements Logic ---
+
+  financialPdfFileName: string = 'Financial_Statements.pdf'; // اسم الملف الافتراضي
+
+  handleFinancialPdf(action: 'view' | 'download') {
+    if (!this.contractId) return;
+
+    // إظهار رسالة تحميل
+    Swal.fire({
+      title: action === 'view' ? 'جاري فتح الملف...' : 'جاري تحميل الملف...',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
+
+    this.engagementService.exportFinancialStatementPdf(this.contractId).subscribe({
+      next: (blob) => {
+        Swal.close();
+
+        // إنشاء رابط مؤقت للملف (Object URL)
+        const url = window.URL.createObjectURL(blob);
+
+        if (action === 'view') {
+          // فتح الـ PDF في نافذة/تبويبة جديدة للمعاينة
+          window.open(url, '_blank');
+        } else if (action === 'download') {
+          // إنشاء عنصر <a> وهمي لتحميل الملف
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = this.financialPdfFileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // مسح الرابط المؤقت لتنظيف الذاكرة
+          setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        }
+      },
+      error: (err) => {
+        console.error('PDF Fetch Error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'خطأ',
+          text: 'حدث خطأ أثناء جلب ملف الـ PDF'
+        });
+      }
+    });
+  }
 }

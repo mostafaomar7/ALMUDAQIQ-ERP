@@ -8,12 +8,11 @@ import { AR } from '../home/i18n/ar';
 import { SubscriberService } from './subscriber.service';
 import Swal from 'sweetalert2';
 import { environment } from '../../../../../environment';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatDatepickerModule, MatDatepicker } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-
 // 🛑 الحل القاتل: استيراد moment-hijri مباشرة كـ default
 // @ts-ignore
 import moment from 'moment-hijri';
@@ -112,6 +111,7 @@ providers: [
   ]
 })
 export class Subscribers implements OnInit {
+  isSubmitting = false;
   // 1. تحويل الـ Moment (الهجري) إلى نص ميلادي ليعرض في الـ input type="date"
 convertToGregorian(momentDate: any): string {
   if (momentDate && moment.isMoment(momentDate)) {
@@ -372,18 +372,15 @@ validateStep(step: number): boolean {
   generatedLink: string = 'www.almudaqiq.khalil.com'; // الرابط الوهمي
   errorMessage: string = '';
 submitNewUser() {
-  // دالة مساعدة لتحويل الـ Moment object إلى نص ميلادي نظيف
-  const formatMoment = (val: any) => {
-  // التأكد من أنه Moment Object فعلاً
-  if (val && (moment.isMoment(val) || val._isAMomentObject)) {
-    // .clone() لعدم التأثير على الكائن الأصلي في الواجهة
-    // .locale('en') لضمان أرقام إنجليزية وتقويم ميلادي
-    return val.clone().locale('en').format('YYYY-MM-DD');
-  }
-  return val;
-};
+  if (this.isSubmitting) return;
 
-  // ✅ التحقق من اختيار الدولة والمدينة والخطوات الإلزامية
+  const formatMoment = (val: any) => {
+    if (val && (moment.isMoment(val) || val._isAMomentObject)) {
+      return val.clone().locale('en').format('YYYY-MM-DD');
+    }
+    return val;
+  };
+
   if (!this.formData.countryId || !this.formData.cityId) {
     Swal.fire({
       icon: 'error',
@@ -403,22 +400,20 @@ submitNewUser() {
     return;
   }
 
+  this.isSubmitting = true;
   this.submissionStatus = 'loading';
 
   const fd = new FormData();
 
-  // ✅ نمر على كل المفاتيح ونحول التواريخ قبل الإضافة للـ FormData
   for (const key in this.formData) {
     let value = this.formData[key];
 
-    // لو الحقل عبارة عن تاريخ Moment، نحوله لـ String ميلادي
     if (
       key.toLowerCase().includes('date') ||
       key === 'commercialExpireDate' ||
       key === 'subscriptionStartDate' ||
-      key === 'subscriptionEndDate' || 
-        key === 'fiscalYear'
-
+      key === 'subscriptionEndDate' ||
+      key === 'fiscalYear'
     ) {
       value = formatMoment(value);
     }
@@ -435,35 +430,45 @@ submitNewUser() {
     request$ = this.subscriberService.createSubscriber(fd);
   }
 
-  request$.subscribe({
-    next: (res) => {
-      this.submissionStatus = 'success';
-      this.generatedLink = res.data.subdomain;
-      this.showAddUserModal = false;
-      Swal.fire({
-        icon: 'success',
-        title: this.isEditMode ? 'Subscriber Updated!' : 'Subscriber Added!',
-        text: `Subscriber link: ${this.generatedLink}`,
-        confirmButtonText: 'OK'
-      });
-      this.isEditMode = false;
-      this.editingSubscriberId = null;
-      this.loadSubscribers();
-    },
-    error: (err) => {
-      this.submissionStatus = 'error';
-this.errorMessage =
-  err?.error?.error ||     // License already exists ✅
-  err?.error?.message ||   // fallback
-  'Something went wrong';
-      Swal.fire({
-  icon: 'error',
-  title: 'Error',
-  text: this.errorMessage
-});
-      console.error('Error:', err);
-    }
-  });
+  request$
+    .pipe(
+      finalize(() => {
+        this.isSubmitting = false;
+      })
+    )
+    .subscribe({
+      next: (res) => {
+        this.submissionStatus = 'success';
+        this.generatedLink = res.data.subdomain;
+        this.showAddUserModal = false;
+
+        Swal.fire({
+          icon: 'success',
+          title: this.isEditMode ? 'Subscriber Updated!' : 'Subscriber Added!',
+          text: `Subscriber link: ${this.generatedLink}`,
+          confirmButtonText: 'OK'
+        });
+
+        this.isEditMode = false;
+        this.editingSubscriberId = null;
+        this.loadSubscribers();
+      },
+      error: (err) => {
+        this.submissionStatus = 'error';
+        this.errorMessage =
+          err?.error?.error ||
+          err?.error?.message ||
+          'Something went wrong';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.errorMessage
+        });
+
+        console.error('Error:', err);
+      }
+    });
 }
 loadCountries() {
   this.subscriberService.getCountries().subscribe({

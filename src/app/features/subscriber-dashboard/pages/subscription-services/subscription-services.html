@@ -2,18 +2,18 @@
   <div class="table-card">
 
     <div class="card-header">
-      <h2 class="card-title">Engagement Contract</h2>
+  <h2 class="card-title">Engagement Contract</h2>
 
-      <div class="header-actions">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" placeholder="Search" />
-        </div>
-        <button class="btn-outline">
-          <i class="fa-solid fa-cloud-arrow-down"></i> Export
-        </button>
-      </div>
+  <div class="header-actions">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Search" (input)="onSearchInput($event)" />
     </div>
+    <button class="btn-outline">
+      <i class="fa-solid fa-cloud-arrow-down"></i> Export
+    </button>
+  </div>
+</div>
 
     <div class="table-responsive">
       <table class="data-table">
@@ -26,98 +26,47 @@
             <th>Establishment Name <i class="fa-solid fa-chevron-down icon-xs"></i></th>
             <th>Contract Date <i class="fa-solid fa-chevron-down icon-xs"></i></th>
             <th>Legal Entity <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>CR No.</th>
-          </tr>
+            <th>CR Number <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>Tax No. <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>Unified No. <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>Status <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th></th> </tr>
         </thead>
+
         <tbody>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0001</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Company</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0002</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Institution</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0003</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Individual</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0004</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Company</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0005</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Institution</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0006</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Company</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0007</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Institution</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0008</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Company</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0009</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Institution</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0010</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Individual</td>
-            <td class="text-main">1010...</td>
-          </tr>
-          <tr>
-            <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
-            <td class="text-muted">0011</td>
-            <td class="fw-bold">Al Noor Trading Co.</td>
-            <td class="text-main">15 Mar 2024</td>
-            <td class="text-main">Company</td>
-            <td class="text-main">1010...</td>
-          </tr>
+          @if (isLoading) {
+            <tr>
+              <td colspan="10" class="text-center py-4">Loading data...</td>
+            </tr>
+          } @else {
+            @for (contract of contracts; track contract.id) {
+              <tr>
+                <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
+                <td class="text-muted">{{ contract.contractNumber }}</td>
+                <td class="fw-bold">{{ contract.customerName }}</td>
+                <td class="text-main">{{ contract.engagementContractDate | date:'dd MMM yyyy' }}</td>
+                <td class="text-main">{{ contract.legalEntity }}</td>
+                <td class="text-main">{{ contract.commercialRegisterNumber }}</td>
+                <td class="text-main">{{ contract.taxNumber }}</td>
+                <td class="text-main">{{ contract.unifiedNumber }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="contract.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'">
+                    <i class="fa-solid fa-circle dot-icon"></i>
+                    {{ contract.status | titlecase }}
+                  </span>
+                </td>
+                <td class="text-muted text-center cursor-pointer">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </td>
+              </tr>
+            }
+
+            @empty {
+              <tr>
+                <td colspan="10" class="text-center py-4 text-muted">No contracts found.</td>
+              </tr>
+            }
+          }
         </tbody>
       </table>
 
@@ -126,32 +75,48 @@
       </div>
     </div>
 
-    <div class="pagination-wrapper">
-      <div class="page-info">
-        110-120 of 1,250
-      </div>
-
-      <div class="pagination-controls">
-        <button class="page-btn text-muted"><i class="fa-solid fa-chevron-left icon-xs"></i> Back</button>
-        <button class="page-btn">1</button>
-        <span class="page-dots">...</span>
-        <button class="page-btn">98</button>
-        <button class="page-btn">99</button>
-        <button class="page-btn">100</button>
-        <button class="page-btn active">101</button>
-        <button class="page-btn">102</button>
-        <button class="page-btn">103</button>
-        <span class="page-dots">...</span>
-        <button class="page-btn">125</button>
-        <button class="page-btn text-muted">Next <i class="fa-solid fa-chevron-right icon-xs"></i></button>
-      </div>
-
-      <div class="page-jump">
-        <span>Page</span>
-        <input type="text" value="101" class="jump-input" />
-        <button class="go-btn">Go</button>
-      </div>
-    </div>
-
+<div class="pagination-wrapper">
+  <div class="page-info">
+    {{ totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }}
   </div>
+
+  <div class="pagination-controls">
+    <button class="page-btn text-muted"
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+            [class.disabled-btn]="currentPage === 1">
+      <i class="fa-solid fa-chevron-left icon-xs"></i> Back
+    </button>
+
+    @for (page of pagesArray; track $index) {
+      @if (page === '...') {
+        <span class="page-dots">...</span>
+      } @else {
+        <button class="page-btn"
+                [class.active]="page === currentPage"
+                (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+      }
+    }
+
+    <button class="page-btn text-muted"
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+            [class.disabled-btn]="currentPage === totalPages">
+      Next <i class="fa-solid fa-chevron-right icon-xs"></i>
+    </button>
+  </div>
+
+  <div class="page-jump">
+    <span>Page</span>
+    <input type="number"
+           [(ngModel)]="jumpToPageInput"
+           (keyup.enter)="jumpToPage()"
+           class="jump-input"
+           min="1"
+           [max]="totalPages" />
+    <button class="go-btn" (click)="jumpToPage()">Go</button>
+  </div>
+</div>
 </div>
