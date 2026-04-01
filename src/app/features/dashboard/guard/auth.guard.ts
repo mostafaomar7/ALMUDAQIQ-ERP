@@ -36,8 +36,9 @@ export class AuthGuard implements CanActivate {
   private getHomeByRole(role: string): string {
   if (role === 'ADMIN') return '/dashboard';
   if (role === 'SUBSCRIBER_OWNER') return '/subscriber';
-  if (role === 'SECRETARY' || role === 'AUDIT_MANAGER' || role == 'TECHNICAL_AUDITOR'
-    || role ===   "ASSISTANT_TECHNICAL_AUDITOR" || role === "FIELD_AUDITOR" || role ===  "CONTACT_PERSON"
+  if (role === 'SECRETARY' || role === 'AUDIT_MANAGER' || role === 'TECHNICAL_AUDITOR' ||
+    role ===   "ASSISTANT_TECHNICAL_AUDITOR" || role === "FIELD_AUDITOR" || role ===  "CONTACT_PERSON" || role ===  "QUALITY_CONTROL"
+    || role ===  "MANAGING_PARTNER" || role === "REGULATORY_FILINGS_OFFICER" || role === "ARCHIVE_OFFICER"
   ) return '/secretary';
   return '/auth/login';
 }

@@ -3,16 +3,12 @@
   height: 100vh;
   position: fixed;
   top: 0;
-  overflow-y: auto;
-  background: #fff;
-  padding-top: 20px;
-  border-radius: 8px 0 8px 0;
-  z-index: 100;
-  transition: all 0.3s;
-
-  /* الوضع الافتراضي LTR على اليسار */
   left: 0;
   right: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #fff;
+  z-index: 100;
 }
 
 /* إذا كانت الصفحة RTL، ضع sidebar على اليمين */

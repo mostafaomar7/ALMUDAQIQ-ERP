@@ -53,6 +53,7 @@ searchQuery: string = '';
         this.fetchPendingGuides();
       }
     }
+      this.loadAuthorityLinksByCountry();
   }
 
   getUserRoleFromStorage() {
@@ -695,4 +696,216 @@ onStaffSelectionChange(staff: any) {
       }
     });
   }
+  isEditMode: boolean = false;
+isSavingEdit: boolean = false;
+editableContract: any = {};
+startEdit() {
+  this.isEditMode = true;
+  this.editableContract = { ...this.contract };
+}
+
+cancelEdit() {
+  this.isEditMode = false;
+  this.editableContract = { ...this.contract };
+}
+saveEditAndSendInactive() {
+  if (!this.contractId) return;
+
+  this.isSavingEdit = true;
+
+  const updatePayload = {
+    contractNumber: this.editableContract.contractNumber,
+    customerName: this.editableContract.customerName,
+    legalEntity: this.editableContract.legalEntity,
+    legalEntityType: this.editableContract.legalEntityType,
+    nationality: this.editableContract.nationality,
+    commercialRegisterNumber: this.editableContract.commercialRegisterNumber,
+    taxNumber: this.editableContract.taxNumber,
+    unifiedNumber: this.editableContract.unifiedNumber,
+    commercialRegisterDate: this.editableContract.commercialRegisterDate,
+    engagementContractDate: this.editableContract.engagementContractDate,
+    email: this.editableContract.email,
+    postalCode: this.editableContract.postalCode,
+    region: this.editableContract.region,
+    address: this.editableContract.address,
+    contactPersonName: this.editableContract.contactPersonName,
+    contactPhone: this.editableContract.contactPhone,
+    whatsappPhone: this.editableContract.whatsappPhone,
+    facilityLink: this.editableContract.facilityLink,
+    language: this.editableContract.language,
+    currency: this.editableContract.currency
+  };
+
+  this.engagementService.updateContract(this.contractId, updatePayload).subscribe({
+    next: (updateRes) => {
+      const reviewPayload = {
+        status: 'INACTIVE',
+        comments: 'تم الاعتماد، جاهز للفحص الفني'
+      };
+
+      this.engagementService.submitContractReview(this.contractId!, reviewPayload).subscribe({
+        next: (reviewRes) => {
+          this.contract = { ...this.editableContract, status: 'INACTIVE' };
+          this.isEditMode = false;
+          this.isSavingEdit = false;
+
+          Swal.fire({
+            icon: 'success',
+            title: 'تم الحفظ بنجاح',
+            text: 'تم تعديل العقد وتحويل حالته إلى INACTIVE',
+            confirmButtonColor: '#00875A'
+          });
+        },
+        error: (err) => {
+          this.isSavingEdit = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ',
+            text: err.error?.message || 'تم التعديل لكن فشل تحديث الحالة',
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
+    },
+    error: (err) => {
+      this.isSavingEdit = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ',
+        text: err.error?.message || 'فشل تعديل العقد',
+        confirmButtonColor: '#d33'
+      });
+    }
+  });
+}
+isTrialEditMode: boolean = false;
+editingTrialRowId: string | null = null;
+editableTrialRow: any = null;
+isSavingTrialRow: boolean = false;
+startTrialEdit() {
+  this.isTrialEditMode = true;
+}
+
+cancelTrialEditMode() {
+  this.isTrialEditMode = false;
+  this.editingTrialRowId = null;
+  this.editableTrialRow = null;
+}
+
+editTrialRow(row: any) {
+  this.editingTrialRowId = row.id;
+  this.editableTrialRow = { ...row };
+}
+
+cancelTrialRowEdit() {
+  this.editingTrialRowId = null;
+  this.editableTrialRow = null;
+}
+saveTrialRow() {
+  if (!this.editableTrialRow?.id) return;
+
+  this.isSavingTrialRow = true;
+
+  const payload = {
+    accountCode: this.editableTrialRow.accountCode,
+    accountName: this.editableTrialRow.accountName,
+    beginningDebit: this.editableTrialRow.beginningDebit,
+    beginningCredit: this.editableTrialRow.beginningCredit,
+    debitMovement: this.editableTrialRow.debitMovement,
+    creditMovement: this.editableTrialRow.creditMovement,
+    beginningDebitAdjustment: this.editableTrialRow.beginningDebitAdjustment,
+    beginningCreditAdjustment: this.editableTrialRow.beginningCreditAdjustment,
+    debitMovementAdjustment: this.editableTrialRow.debitMovementAdjustment,
+    creditMovementAdjustment: this.editableTrialRow.creditMovementAdjustment,
+    adjustedBeginningBalance: this.editableTrialRow.adjustedBeginningBalance,
+    netMovement: this.editableTrialRow.netMovement,
+    finalBalance: this.editableTrialRow.finalBalance,
+    balanceType: this.editableTrialRow.balanceType
+  };
+
+  this.engagementService.updateTrialBalanceAccount(this.editableTrialRow.id, payload).subscribe({
+    next: (res) => {
+      const index = this.trialBalanceData.findIndex(
+        item => item.id === this.editableTrialRow.id
+      );
+
+      if (index !== -1) {
+        this.trialBalanceData[index] = { ...this.editableTrialRow };
+      }
+
+      this.isSavingTrialRow = false;
+      this.editingTrialRowId = null;
+      this.editableTrialRow = null;
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Row updated successfully',
+        showConfirmButton: false,
+        timer: 1500
+      });
+
+      this.fetchTrialBalance();
+    },
+    error: (err) => {
+      this.isSavingTrialRow = false;
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: err.error?.message || 'Failed to update row',
+        confirmButtonColor: '#d33'
+      });
+    }
+  });
+}
+authorityLinks = {
+  cpa: '',
+  tax: '',
+  ministry: '',
+};
+loadAuthorityLinksByCountry(): void {
+  const userRaw = localStorage.getItem('user');
+
+  if (!userRaw) {
+    this.authorityLinks = { cpa: '', tax: '', ministry: '' };
+    return;
+  }
+
+  let user: any;
+
+  try {
+    user = JSON.parse(userRaw);
+  } catch (error) {
+    console.error('Invalid user in localStorage', error);
+    this.authorityLinks = { cpa: '', tax: '', ministry: '' };
+    return;
+  }
+
+  const countryName = user?.countryName?.trim();
+
+  if (!countryName) {
+    this.authorityLinks = { cpa: '', tax: '', ministry: '' };
+    return;
+  }
+
+  this.engagementService.getCountries().subscribe({
+    next: (countries) => {
+      const selectedCountry = countries.find(
+        (country) => country.name?.toLowerCase() === countryName.toLowerCase()
+      );
+
+      this.authorityLinks = {
+        cpa: selectedCountry?.cpaWebsite || '',
+        tax: selectedCountry?.taxWebsite || '',
+        ministry: selectedCountry?.commerceWebsite || '',
+      };
+    },
+    error: (err) => {
+      console.error('Failed to load countries', err);
+      this.authorityLinks = { cpa: '', tax: '', ministry: '' };
+    }
+  });
+}
 }

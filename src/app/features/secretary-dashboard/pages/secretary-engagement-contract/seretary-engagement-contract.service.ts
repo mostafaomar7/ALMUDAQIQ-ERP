@@ -16,7 +16,7 @@ export interface ApiEngagementContract {
   id: string;
   contractNumber: string;
   customerName: string;
-  engagementContractDate: string; // ISO string
+  engagementContractDate: string;
   legalEntity: 'Company' | 'Institution' | 'Individual';
   commercialRegisterNumber: string;
   commercialRegisterDate?: string;
@@ -28,7 +28,17 @@ export interface ApiEngagementContract {
   email?: string;
   region?: string;
   status: ApiContractStatus;
-  // أضف أي حقول أخرى تأتي من الـ API وتحتاجها في التعديل
+}
+
+export interface Country {
+  id: number;
+  name: string;
+  cpaWebsite: string | null;
+  commerceWebsite: string | null;
+  taxWebsite: string | null;
+  createdAt: string;
+  updatedAt: string;
+  cities: any[];
 }
 
 @Injectable({
@@ -53,14 +63,19 @@ export class SeretaryEngagementContractService {
     return this.http.post(`${this.baseUrl}/engagement-contracts`, formData);
   }
 
-  // --- New: Update Method ---
   updateContract(id: string, formData: FormData): Observable<any> {
     return this.http.put(`${this.baseUrl}/engagement-contracts/${id}`, formData);
   }
-  getContractById(id: string): Observable<any> { // يفضل استبدال any بـ Interface دقيق
+
+  getContractById(id: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/engagement-contracts/${id}`);
   }
-    getProfile(): Observable<any> {
+
+  getProfile(): Observable<any> {
     return this.http.get(`${this.baseUrl}/subscribers/profile`);
+  }
+
+  getCountries(): Observable<Country[]> {
+    return this.http.get<Country[]>(`${this.baseUrl}/countries`);
   }
 }

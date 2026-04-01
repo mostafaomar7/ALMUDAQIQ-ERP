@@ -90,7 +90,7 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
         this.jumpToPage = 1;
         this.loadContracts(1);
       });
-        this.loadProfile();
+        this.loadAuthorityLinksByCountry();
   }
 
   ngOnDestroy() {
@@ -397,10 +397,52 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
   navigateToDetails(contractId: string) {
     this.router.navigate([contractId], { relativeTo: this.route });
   }
-  authorityLinks: any;
-loadProfile() {
-  this.contractsApi.getProfile().subscribe((res) => {
-    this.authorityLinks = res?.data?.location?.authorityLinks;
+ authorityLinks = {
+  ministry: '',
+  tax: '',
+  cpa: '',
+};
+loadAuthorityLinksByCountry() {
+  const userRaw = localStorage.getItem('user');
+
+  if (!userRaw) {
+    this.authorityLinks = { ministry: '', tax: '', cpa: '' };
+    return;
+  }
+
+  let user: any;
+
+  try {
+    user = JSON.parse(userRaw);
+  } catch (error) {
+    console.error('Invalid user data in localStorage', error);
+    this.authorityLinks = { ministry: '', tax: '', cpa: '' };
+    return;
+  }
+
+  const countryName = user?.countryName?.trim();
+
+  if (!countryName) {
+    this.authorityLinks = { ministry: '', tax: '', cpa: '' };
+    return;
+  }
+
+  this.contractsApi.getCountries().subscribe({
+    next: (countries) => {
+      const selectedCountry = countries.find(
+        (country) => country.name?.toLowerCase() === countryName.toLowerCase()
+      );
+
+      this.authorityLinks = {
+        ministry: selectedCountry?.commerceWebsite || '',
+        tax: selectedCountry?.taxWebsite || '',
+        cpa: selectedCountry?.cpaWebsite || '',
+      };
+    },
+    error: (err) => {
+      console.error('Failed to load countries', err);
+      this.authorityLinks = { ministry: '', tax: '', cpa: '' };
+    }
   });
 }
 }

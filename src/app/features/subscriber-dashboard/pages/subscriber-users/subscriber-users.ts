@@ -62,7 +62,11 @@ export class SubscriberUsers implements OnInit {
     { id: 6, name: 'TECHNICAL_AUDITOR' },
     { id: 7, name: 'ASSISTANT_TECHNICAL_AUDITOR' },
     { id: 8, name: 'FIELD_AUDITOR' },
-    { id: 9, name:  'CONTACT_PERSON' }
+    { id: 9, name:  'CONTACT_PERSON' },
+    { id: 10, name:  'QUALITY_CONTROL' },
+    { id: 11, name:  'MANAGING_PARTNER' },
+    { id: 12, name:  'REGULATORY_FILINGS_OFFICER' },
+    { id: 13, name:  'ARCHIVE_OFFICER' },
   ];
 
   branchesList: any[] = [];

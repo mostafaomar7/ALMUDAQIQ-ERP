@@ -3,6 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environment';
 import { Observable } from 'rxjs';
 
+export interface Country {
+  id: number;
+  name: string;
+  cpaWebsite: string | null;
+  commerceWebsite: string | null;
+  taxWebsite: string | null;
+  createdAt: string;
+  updatedAt: string;
+  cities: any[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -11,7 +22,7 @@ export class EngagemenDetails {
 
   constructor(private http: HttpClient) {}
 
-  submitContractReview(id: string, data: { status: string, comments: string }): Observable<any> {
+  submitContractReview(id: string, data: { status: string; comments: string }): Observable<any> {
     return this.http.patch(`${this.api_url}/engagement-contracts/${id}/review`, data);
   }
 
@@ -32,15 +43,15 @@ export class EngagemenDetails {
     formData.append('document', file);
     return this.http.post(`${this.api_url}/contract-review-guides/${guideId}/documents`, formData);
   }
+
   getEligibleStaff(contractId: string): Observable<any> {
     return this.http.get(`${this.api_url}/engagement-contracts/${contractId}/eligible-staff`);
   }
 
-  assignStaff(contractId: string, payload: { userId: number, role: string }): Observable<any> {
+  assignStaff(contractId: string, payload: { userId: number; role: string }): Observable<any> {
     return this.http.post(`${this.api_url}/engagement-contracts/${contractId}/assign-staff`, payload);
   }
 
-  // --- Trial Balance Endpoints ---
   getTrialBalance(contractId: string): Observable<any> {
     return this.http.get(`${this.api_url}/contracts/${contractId}/trial-balance`);
   }
@@ -56,10 +67,22 @@ export class EngagemenDetails {
       responseType: 'blob'
     });
   }
-  // --- Financial Statements Endpoint ---
+
   exportFinancialStatementPdf(contractId: string): Observable<Blob> {
     return this.http.get(`${this.api_url}/contracts/${contractId}/trial-balance/export/pdf`, {
       responseType: 'blob'
     });
+  }
+
+  updateContract(id: string, payload: any): Observable<any> {
+    return this.http.put(`${this.api_url}/engagement-contracts/${id}`, payload);
+  }
+
+  updateTrialBalanceAccount(accountId: string, payload: any): Observable<any> {
+    return this.http.patch(`${this.api_url}/contracts/trial-balance/accounts/${accountId}`, payload);
+  }
+
+  getCountries(): Observable<Country[]> {
+    return this.http.get<Country[]>(`${this.api_url}/countries`);
   }
 }
