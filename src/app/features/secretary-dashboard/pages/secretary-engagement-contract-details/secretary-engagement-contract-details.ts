@@ -76,20 +76,131 @@ searchQuery: string = '';
     return this.userRole?.toUpperCase() === 'SECRETARY';
   }
 
-  fetchContractDetails(id: string) {
-    this.loading = true;
-    this.contractsApi.getContractById(id).subscribe({
-      next: (res) => {
-        this.contract = res.data || res;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error fetching details:', err);
-        this.loading = false;
-      }
-    });
-  }
+fetchContractDetails(id: string) {
+  this.loading = true;
+  this.contractsApi.getContractById(id).subscribe({
+    next: (res) => {
+      this.contract = res.data || res;
+      this.editableContract = JSON.parse(JSON.stringify(this.contract));
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error fetching details:', err);
+      this.loading = false;
+    }
+  });
+}
+enableEditMode() {
+  this.isEditMode = true;
+  this.editableContract = JSON.parse(JSON.stringify(this.contract));
+}
 
+cancelEditMode() {
+  this.isEditMode = false;
+  this.editableContract = JSON.parse(JSON.stringify(this.contract));
+}
+
+submitContractUpdates() {
+  if (!this.contractId) return;
+
+  const payload = {
+    ...this.editableContract,
+    status: 'ACTIVE' // أو أي status الباك إند مستنيه
+  };
+
+  this.isSubmittingUpdate = true;
+
+  this.engagementService.updateContract(this.contractId, payload).subscribe({
+    next: (res) => {
+      this.contract = JSON.parse(JSON.stringify(payload));
+      this.editableContract = JSON.parse(JSON.stringify(payload));
+      this.isEditMode = false;
+      this.isSubmittingUpdate = false;
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: res?.message || 'Contract updated successfully',
+        confirmButtonColor: '#00875A'
+      });
+    },
+    error: (err) => {
+      this.isSubmittingUpdate = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.error?.message || 'Failed to update contract',
+        confirmButtonColor: '#d33'
+      });
+    }
+  });
+}
+saveEditOnly() {
+  if (!this.contractId || !this.editableContract) return;
+
+  this.isSavingEdit = true;
+
+  const payload = {
+    contractNumber: this.editableContract.contractNumber,
+    legalEntity: this.editableContract.legalEntity,
+    legalEntityType: this.editableContract.legalEntityType,
+    articlesOfAssociation: this.editableContract.articlesOfAssociation,
+    nationality: this.editableContract.nationality,
+    customerName: this.editableContract.customerName,
+    commercialRegisterNumber: this.editableContract.commercialRegisterNumber,
+    taxNumber: this.editableContract.taxNumber,
+    vatCertificate: this.editableContract.vatCertificate,
+    unifiedNumber: this.editableContract.unifiedNumber,
+    unifiedNumberCertificate: this.editableContract.unifiedNumberCertificate,
+    commercialRegisterActivity: this.editableContract.commercialRegisterActivity,
+    commercialRegisterDate: this.editableContract.commercialRegisterDate,
+    commercialRegisterDateHijri: this.editableContract.commercialRegisterDateHijri,
+    engagementContractDate: this.editableContract.engagementContractDate,
+    postalCode: this.editableContract.postalCode,
+    address: this.editableContract.address,
+    email: this.editableContract.email,
+    region: this.editableContract.region,
+    contactPersonName: this.editableContract.contactPersonName,
+    contactPhone: this.editableContract.contactPhone,
+    whatsappPhone: this.editableContract.whatsappPhone,
+    facilityLink: this.editableContract.facilityLink,
+    facilityLogo: this.editableContract.facilityLogo,
+    language: this.editableContract.language,
+    currency: this.editableContract.currency,
+    managerComments: this.editableContract.managerComments,
+  };
+
+  this.engagementService.updateContract(this.contractId, payload).subscribe({
+    next: (res) => {
+      this.contract = {
+        ...this.contract,
+        ...payload,
+        status: res?.data?.status || this.contract.status
+      };
+
+      this.editableContract = { ...this.contract };
+      this.isEditMode = false;
+      this.isSavingEdit = false;
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: res?.message || 'Contract updated successfully',
+        confirmButtonColor: '#00875A'
+      });
+    },
+    error: (err) => {
+      this.isSavingEdit = false;
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err?.error?.message || 'Failed to update contract',
+        confirmButtonColor: '#d33'
+      });
+    }
+  });
+}
   getFileName(path: string | null): string {
     if (!path) return 'No File';
     return path.replace(/^.*[\\\/]/, '');
@@ -699,6 +810,8 @@ onStaffSelectionChange(staff: any) {
   isEditMode: boolean = false;
 isSavingEdit: boolean = false;
 editableContract: any = {};
+isSubmittingUpdate = false;
+
 startEdit() {
   this.isEditMode = true;
   this.editableContract = { ...this.contract };
@@ -908,4 +1021,5 @@ loadAuthorityLinksByCountry(): void {
     }
   });
 }
+
 }

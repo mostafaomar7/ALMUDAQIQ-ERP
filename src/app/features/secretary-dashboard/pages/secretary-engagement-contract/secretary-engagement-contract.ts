@@ -11,7 +11,7 @@ import {
   EngagementContractsResponse,
 } from './seretary-engagement-contract.service';
 import Swal from 'sweetalert2';
-
+import { Country } from 'country-state-city';
 // --- تعديل Interface Contract ---
 interface Contract extends ApiEngagementContract {
   selected: boolean;
@@ -62,7 +62,7 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
   contractForm!: FormGroup;
   selectedFiles: { [key: string]: File } = {};
   userRole: string = '';
-
+countriesList: any[] = [];
   constructor(
     private contractsApi: SeretaryEngagementContractService,
     private fb: FormBuilder,
@@ -91,6 +91,7 @@ export class SecretaryEngagementContract implements OnInit, OnDestroy {
         this.loadContracts(1);
       });
         this.loadAuthorityLinksByCountry();
+  this.loadCountriesFromLibrary(); // 👈 دي المهمة
   }
 
   ngOnDestroy() {
@@ -444,5 +445,9 @@ loadAuthorityLinksByCountry() {
       this.authorityLinks = { ministry: '', tax: '', cpa: '' };
     }
   });
+}
+ 
+loadCountriesFromLibrary() {
+  this.countriesList = Country.getAllCountries();
 }
 }
