@@ -113,7 +113,8 @@ countriesList: any[] = [];
       taxNumber: ['', Validators.required],
       unifiedNumber: ['', Validators.required],
       engagementContractDate: ['', Validators.required],
-
+      fiscalYearStart: ['', Validators.required],
+      fiscalYearEnd: ['', Validators.required],
       // Files Step 1
       vatCertificate: [null],
       unifiedCertificate: [null],
@@ -178,31 +179,33 @@ countriesList: any[] = [];
 
     // Fill form with data
     this.contractForm.patchValue({
-      contractNumber: contract.contractNumber,
-      legalEntity: contract.legalEntity,
-      legalEntityType: contract['legalEntityType'] || '',
-      nationality: contract.nationality,
-      customerName: contract.customerName,
-      commercialRegisterNumber: contract.commercialRegisterNumber,
-      commercialRegisterDate: formatDate(contract.commercialRegisterDate),
-      taxNumber: contract.taxNumber,
-      unifiedNumber: contract.unifiedNumber,
-      engagementContractDate: formatDate(contract.engagementContractDate),
+  contractNumber: contract.contractNumber,
+  legalEntity: contract.legalEntity,
+  legalEntityType: contract['legalEntityType'] || '',
+  nationality: contract.nationality,
+  customerName: contract.customerName,
+  commercialRegisterNumber: contract.commercialRegisterNumber,
+  commercialRegisterDate: formatDate(contract.commercialRegisterDate),
+  taxNumber: contract.taxNumber,
+  unifiedNumber: contract.unifiedNumber,
+  engagementContractDate: formatDate(contract.engagementContractDate),
 
-      postalCode: contract.postalCode,
-      address: contract.address,
-      email: contract.email,
-      region: contract.region,
+  fiscalYearStart: formatDate(contract['fiscalYearStart']),
+  fiscalYearEnd: formatDate(contract['fiscalYearEnd']),
 
-      contactPersonName: contract['contactPersonName'],
-      contactPhone: contract['contactPhone'],
-      whatsappPhone: contract['whatsappPhone'],
+  postalCode: contract.postalCode,
+  address: contract.address,
+  email: contract.email,
+  region: contract.region,
 
-      facilityLink: contract['facilityLink'],
-      language: contract['language'],
-      currency: contract['currency']
-    });
+  contactPersonName: contract['contactPersonName'],
+  contactPhone: contract['contactPhone'],
+  whatsappPhone: contract['whatsappPhone'],
 
+  facilityLink: contract['facilityLink'],
+  language: contract['language'],
+  currency: contract['currency']
+});
     this.isModalOpen = true;
   }
 
