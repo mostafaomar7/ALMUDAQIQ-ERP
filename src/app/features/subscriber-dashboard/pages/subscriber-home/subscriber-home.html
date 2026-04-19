@@ -1,185 +1,186 @@
 <div class="container-fluid" id="dashboardToExport" [class.rtl]="isRtl">
-<div class="dashboard-container">
-  <header class="dashboard-header">
-    <div class="header-titles">
-      <h1>Good morning, khalil <span class="wave">👋</span></h1>
-      <p>Here's a quick overview of your organization's activity.</p>
-    </div>
-    <div class="header-actions">
-      <div class="date-picker">
-        <span class="material-symbols-outlined icon-sm">calendar_month</span>
-        <span>15 Oct 2024</span>
-        <span class="material-symbols-outlined icon-sm">expand_more</span>
+  <div class="dashboard-container">
+    <header class="dashboard-header">
+      <div class="header-titles">
+        <h1>{{ t('goodMorning') }}, khalil <span class="wave">👋</span></h1>
+        <p>{{ t('organizationActivityOverview') }}</p>
       </div>
-      <button class="btn-primary">
-        <span class="material-symbols-outlined icon-sm" (click)="exportDashboard()">upload</span> Export
-      </button>
-    </div>
-  </header>
 
- @if (stats) {
-  <section class="stats-row">
-    <div class="stat-card">
-      <div class="stat-info">
-        <span class="stat-title">Total Users</span>
-        <span class="stat-value">{{ stats.users.total }}</span>
-      </div>
-      <div class="stat-icon icon-purple">
-        <span class="material-symbols-outlined">group</span>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-info">
-        <span class="stat-title">Number of Files Created</span>
-        <span class="stat-value">{{ stats.files.totalFiles }}</span>
-      </div>
-      <div class="stat-icon icon-green">
-        <span class="material-symbols-outlined">description</span>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-info">
-        <span class="stat-title">Total File Size Used</span>
-        <span class="stat-value">{{ stats.files.totalSizeUsed }}</span>
-      </div>
-      <div class="stat-icon icon-yellow">
-        <span class="material-symbols-outlined">inventory_2</span>
-      </div>
-    </div>
-  </section>
+      <div class="header-actions">
+        <div class="date-picker">
+          <span class="material-symbols-outlined icon-sm">calendar_month</span>
+          <span>15 Oct 2024</span>
+          <span class="material-symbols-outlined icon-sm">expand_more</span>
+        </div>
 
-  <section class="middle-row">
-    <div class="contracts-overview">
-      <div class="section-header">
-        <h2>Engagement Contracts Overview</h2>
-        <select class="branch-select">
-          <option>{{ stats.contracts.filteredByBranch }}</option>
-        </select>
+        <button class="btn-primary" (click)="exportDashboard()">
+          <span class="material-symbols-outlined icon-sm">upload</span>
+          {{ t('export') }}
+        </button>
       </div>
-      <div class="contracts-grid">
-        <div class="contract-card">
-          <div class="contract-info">
-            <span class="contract-title">Total Contracts</span>
-            <span class="contract-value">{{ stats.contracts.total }}</span>
+    </header>
+
+    @if (stats) {
+      <section class="stats-row">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-title">{{ t('totalUsers') }}</span>
+            <span class="stat-value">{{ stats.users.total }}</span>
           </div>
-          <div class="contract-icon icon-blue">
-            <span class="material-symbols-outlined">layers</span>
+          <div class="stat-icon icon-purple">
+            <span class="material-symbols-outlined">group</span>
           </div>
         </div>
-        <div class="contract-card">
-          <div class="contract-info">
-            <span class="contract-title">Active Contracts</span>
-            <span class="contract-value">{{ stats.contracts.active }}</span>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-title">{{ t('numberOfFilesCreated') }}</span>
+            <span class="stat-value">{{ stats.files.totalFiles }}</span>
           </div>
-          <div class="contract-icon icon-light-green">
-            <span class="material-symbols-outlined">verified</span>
-          </div>
-        </div>
-        <div class="contract-card">
-          <div class="contract-info">
-            <span class="contract-title">Inactive Contracts</span>
-            <span class="contract-value">{{ stats.contracts.inactive }}</span>
-          </div>
-          <div class="contract-icon icon-orange">
-            <span class="material-symbols-outlined">block</span>
+          <div class="stat-icon icon-green">
+            <span class="material-symbols-outlined">description</span>
           </div>
         </div>
-        <div class="contract-card">
-          <div class="contract-info">
-            <span class="contract-title">Archived Contracts</span>
-            <span class="contract-value">{{ stats.contracts.archived }}</span>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-title">{{ t('totalFileSizeUsed') }}</span>
+            <span class="stat-value">{{ stats.files.totalSizeUsed }}</span>
           </div>
-          <div class="contract-icon icon-pink">
-            <span class="material-symbols-outlined">archive</span>
+          <div class="stat-icon icon-yellow">
+            <span class="material-symbols-outlined">inventory_2</span>
           </div>
         </div>
+      </section>
+
+      <section class="middle-row">
+        <div class="contracts-overview">
+          <div class="section-header">
+            <h2>{{ t('engagementContractsOverview') }}</h2>
+            <select class="branch-select">
+              <option>{{ stats.contracts.filteredByBranch }}</option>
+            </select>
+          </div>
+
+          <div class="contracts-grid">
+            <div class="contract-card">
+              <div class="contract-info">
+                <span class="contract-title">{{ t('totalContracts') }}</span>
+                <span class="contract-value">{{ stats.contracts.total }}</span>
+              </div>
+              <div class="contract-icon icon-blue">
+                <span class="material-symbols-outlined">layers</span>
+              </div>
+            </div>
+
+            <div class="contract-card">
+              <div class="contract-info">
+                <span class="contract-title">{{ t('activeContracts') }}</span>
+                <span class="contract-value">{{ stats.contracts.active }}</span>
+              </div>
+              <div class="contract-icon icon-light-green">
+                <span class="material-symbols-outlined">verified</span>
+              </div>
+            </div>
+
+            <div class="contract-card">
+              <div class="contract-info">
+                <span class="contract-title">{{ t('inactiveContracts') }}</span>
+                <span class="contract-value">{{ stats.contracts.inactive }}</span>
+              </div>
+              <div class="contract-icon icon-orange">
+                <span class="material-symbols-outlined">block</span>
+              </div>
+            </div>
+
+            <div class="contract-card">
+              <div class="contract-info">
+                <span class="contract-title">{{ t('archivedContracts') }}</span>
+                <span class="contract-value">{{ stats.contracts.archived }}</span>
+              </div>
+              <div class="contract-icon icon-pink">
+                <span class="material-symbols-outlined">archive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-tickets" *ngIf="stats?.complaints">
+          <h2>
+            {{ t('supportTicketsInformation') }}
+            ({{ t('total') }}: {{ stats.complaints.total }})
+          </h2>
+
+          <div class="chart-container">
+            <div class="donut-chart" [ngStyle]="complaintsChartStyle"></div>
+          </div>
+
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="dot dot-dark-green"></span>
+              {{ t('open') }} ({{ stats.complaints.open }}) - {{ stats.complaints.percentages.open }}
+            </div>
+
+            <div class="legend-item">
+              <span class="dot dot-green"></span>
+              {{ t('closed') }} ({{ stats.complaints.closed }}) - {{ stats.complaints.percentages.closed }}
+            </div>
+          </div>
+        </div>
+      </section>
+    } @else {
+      <div class="loading-state">
+        <p>{{ t('loadingDashboardStats') }}</p>
       </div>
-    </div>
+    }
 
-    <div class="support-tickets" *ngIf="stats?.complaints">
-  <h2>Support Tickets Information (Total: {{ stats.complaints.total }})</h2>
-
-  <div class="chart-container">
-    <div class="donut-chart" [ngStyle]="complaintsChartStyle"></div>
-  </div>
-
-  <div class="chart-legend">
-    <div class="legend-item">
-      <span class="dot dot-dark-green"></span>
-      Open ({{ stats.complaints.open }}) - {{ stats.complaints.percentages.open }}
-    </div>
-
-    <div class="legend-item">
-      <span class="dot dot-green"></span>
-      Closed ({{ stats.complaints.closed }}) - {{ stats.complaints.percentages.closed }}
-    </div>
-  </div>
-</div>
-  </section>
-} @else {
-  <div class="loading-state">
-    <p>Loading Dashboard Stats...</p>
-  </div>
-}
-<section class="table-section">
-  <div class="table-header">
-    <h2>Engagement Contract</h2>
-
-    <div class="table-actions">
-      <div class="search-box">
-        <span class="material-symbols-outlined icon-sm text-muted">search</span>
-        <input type="text" placeholder="Search" />
+    <section class="table-section">
+      <div class="table-header">
+        <h2>{{ t('engagementContract') }}</h2>
       </div>
 
-      <button class="btn-outline">
-        <span class="material-symbols-outlined icon-sm">cloud_download</span>
-        Export
-      </button>
-    </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>
+                <span
+                  class="material-symbols-outlined icon-sm primary-text"
+                  style="cursor: pointer;"
+                >
+                  indeterminate_check_box
+                </span>
+              </th>
+              <th>{{ t('contractNo') }} <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+              <th>{{ t('establishmentName') }} <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+              <th>{{ t('contractDate') }} <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+              <th>{{ t('legalEntity') }} <span class="material-symbols-outlined icon-xs">expand_more</span></th>
+              <th>{{ t('crNo') }}</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let contract of displayedContracts">
+              <td><input type="checkbox" /></td>
+              <td>{{ contract.contractNumber }}</td>
+              <td>{{ contract.customerName }}</td>
+              <td>{{ contract.engagementContractDate | date:'dd MMM yyyy' }}</td>
+              <td>{{ contract.legalEntity }}</td>
+              <td>{{ contract.commercialRegisterNumber }}</td>
+            </tr>
+
+            <tr *ngIf="displayedContracts.length === 0">
+              <td colspan="6" style="text-align: center;">{{ t('noContractsFound') }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <a class="view-all" (click)="goToSubscriberService()" style="cursor: pointer;">
+          {{ t('viewAll') }}
+        </a>
+      </div>
+    </section>
   </div>
-
-  <div class="table-responsive">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>
-            <span
-              class="material-symbols-outlined icon-sm primary-text"
-              style="cursor: pointer;"
-            >
-              indeterminate_check_box
-            </span>
-          </th>
-          <th>Contract No. <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-          <th>Establishment Name <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-          <th>Contract Date <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-          <th>Legal Entity <span class="material-symbols-outlined icon-xs">expand_more</span></th>
-          <th>CR No.</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let contract of displayedContracts">
-          <td><input type="checkbox" /></td>
-          <td>{{ contract.contractNumber }}</td>
-          <td>{{ contract.customerName }}</td>
-          <td>{{ contract.engagementContractDate | date:'dd MMM yyyy' }}</td>
-          <td>{{ contract.legalEntity }}</td>
-          <td>{{ contract.commercialRegisterNumber }}</td>
-        </tr>
-
-        <tr *ngIf="displayedContracts.length === 0">
-          <td colspan="6" style="text-align: center;">No contracts found</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="table-footer">
-    <a class="view-all" (click)="goToSubscriberService()" style="cursor: pointer;">
-      View all
-    </a>
-  </div>
-</section>
-</div>
 </div>

@@ -85,4 +85,33 @@ export class EngagemenDetails {
   getCountries(): Observable<Country[]> {
     return this.http.get<Country[]>(`${this.api_url}/countries`);
   }
+
+  sortTrialBalanceAccounts(worksheetId: string, payload: { accountIds: string[], sortOrder: string }): Observable<any> {
+    // يفضل أن يكون الـ worksheetId ديناميكياً، ولكن تم وضعه بناءً على الرابط المرفق
+    return this.http.post(`${this.api_url}/worksheets/${worksheetId}/sort`, payload);
+  }
+
+  // --- Worksheet Endpoints ---
+  
+  getAccountGuides(): Observable<any> {
+    return this.http.get(`${this.api_url}/worksheets/account-guides`);
+  }
+
+  getUnassignedWorksheet(worksheetId: string): Observable<any> {
+    return this.http.get(`${this.api_url}/worksheets/${worksheetId}/unassigned`);
+  }
+
+  getAssignedWorksheet(worksheetId: string): Observable<any> {
+    return this.http.get(`${this.api_url}/worksheets/${worksheetId}/assigned`);
+  }
+
+  assignAccountGuide(worksheetId: string, payload: any): Observable<any> {
+    return this.http.post(`${this.api_url}/worksheets/${worksheetId}/assign`, payload);
+  }
+
+  // أضف هذه الدالة داخل كلاس EngagemenDetails
+  unassignAccountGuide(accountId: string): Observable<any> {
+    // بناءً على الرابط المرفق: /worksheets/accounts/{accountId}/unassign
+    return this.http.patch(`${this.api_url}/worksheets/accounts/${accountId}/unassign`, {});
+  }
 }

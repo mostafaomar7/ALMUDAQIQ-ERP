@@ -1,9 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { KpiServiceTs } from './kpi.service';
 import { Router } from '@angular/router';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+
+import { KpiServiceTs } from './kpi.service';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
+type TranslationKey = keyof typeof EN;
+
 @Component({
   selector: 'app-subscriber-home',
   standalone: true,
@@ -14,13 +21,28 @@ import jsPDF from 'jspdf';
 export class SubscriberHome implements OnInit {
   private kpiService = inject(KpiServiceTs);
   private router = inject(Router);
-    isRtl = false;
+  private lang = inject(TranslateService);
+
+  translations: typeof EN = EN;
+  isRtl = false;
 
   stats: any = null;
+  engagementContracts: any[] = [];
+  displayedContracts: any[] = [];
+
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+    this.isRtl = lang === 'ar';
+  }
+
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
 
   ngOnInit(): void {
+    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
     this.loadStats();
-        this.loadEngagementContracts();
+    this.loadEngagementContracts();
   }
 
   loadStats() {
@@ -59,9 +81,8 @@ export class SubscriberHome implements OnInit {
       )`
     };
   }
-   engagementContracts: any[] = [];
-  displayedContracts: any[] = [];
-   loadEngagementContracts() {
+
+  loadEngagementContracts() {
     this.kpiService.getEngagementContracts().subscribe({
       next: (res) => {
         if (res && res.data) {
@@ -76,27 +97,20 @@ export class SubscriberHome implements OnInit {
   goToSubscriberService() {
     this.router.navigate(['/subscriber/subscriber-service']);
   }
+
   exportDashboard() {
-  const element = document.getElementById('dashboardToExport');
+    const element = document.getElementById('dashboardToExport');
+    if (!element) return;
 
-  if (!element) return;
+    html2canvas(element, { scale: 2 }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
 
-  html2canvas(element, { scale: 2 }).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    // === EXPORT AS PDF ===
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    pdf.save('dashboard.pdf');
-
-    // === EXPORT AS IMAGE (اختياري) ===
-    // const link = document.createElement('a');
-    // link.href = imgData;
-    // link.download = 'dashboard.png';
-    // link.click();
-  });
-}
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save('dashboard.pdf');
+    });
+  }
 }

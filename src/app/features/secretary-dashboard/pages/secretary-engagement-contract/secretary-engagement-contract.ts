@@ -5,6 +5,11 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+ 
+type TranslationKey = keyof typeof EN;
 import {
   SeretaryEngagementContractService,
   ApiEngagementContract,
@@ -68,12 +73,21 @@ countriesList: any[] = [];
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private auth: AuthService
+    private auth: AuthService ,
+      private lang : TranslateService
   ) {
     this.initForm();
   }
+  translations: typeof EN = EN;
+ loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
 
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
   ngOnInit() {
+        this.lang.lang$.subscribe((l) => this.loadTranslations(l));
     const user = this.auth.getUser();
     this.userRole = user?.role || '';
     this.loadContracts();
@@ -452,5 +466,38 @@ loadAuthorityLinksByCountry() {
  
 loadCountriesFromLibrary() {
   this.countriesList = Country.getAllCountries();
+}
+getModalTitle(): string {
+  return this.isEditMode ? this.t('editEngagementContract') : this.t('addEngagementContract');
+}
+
+getStepSubtitle(): string {
+  switch (this.currentStep) {
+    case 1: return this.t('basicData');
+    case 2: return this.t('facilityAddress');
+    case 3: return this.t('customerPortal');
+    case 4: return this.t('technicalAllocation');
+    default: return '';
+  }
+}
+
+getNextButtonLabel(): string {
+  if (this.currentStep === this.totalSteps) {
+    if (this.isSubmitting) return this.t('saving');
+    return this.isEditMode ? this.t('update') : this.t('submit');
+  }
+  return this.t('next');
+}
+
+getStatusLabel(status: string): string {
+  const normalized = (status || '').toLowerCase();
+
+  if (normalized === 'active') return this.t('active');
+  if (normalized === 'inactive') return this.t('inactive');
+  if (normalized === 'archived') return this.t('archived');
+  if (normalized === 'draft') return this.t('draft');
+  if (normalized === 'pending') return this.t('pending');
+
+  return status || '-';
 }
 }

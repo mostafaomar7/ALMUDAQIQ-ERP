@@ -6,7 +6,11 @@ import { ContractService } from './contract-service.service';
 import { Contract } from './contract.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
 
+type TranslationKey = keyof typeof EN;
 @Component({
   selector: 'app-subscription-services',
   standalone: true,
@@ -15,8 +19,18 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   styleUrl: './subscription-services.css',
 })
 export class SubscriptionServices implements OnInit {
+    translations: typeof EN = EN;
+  
+   loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
   Math = Math;
   private contractService = inject(ContractService);
+    private lang = inject(TranslateService) ;
 
   contracts: Contract[] = [];
   totalItems: number = 0;
@@ -35,6 +49,7 @@ export class SubscriptionServices implements OnInit {
 
   ngOnInit(): void {
     this.loadContracts();
+    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
 
     // الاستماع لتغييرات البحث مع تأخير 500 ملي ثانية
     this.searchSubject.pipe(

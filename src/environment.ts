@@ -6,7 +6,7 @@ export const environment = {
     apiUrl: 'https://api.mudqiq.com' , //dev
 
     // apiUrl: 'http://localhost:4000/api/v1'
-    // apiUrl: 'http://192.168.1.230:4000',
+    // apiUrl: 'http://192.168.1.11:4000',
   // defaultTenant: 'rrrrrrrr'  //local
   // defaultTenant: 'mostafa'  //dev
 

@@ -1,38 +1,55 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, DatePipe } from '@angular/common'; // استدعاء CommonModule و DatePipe
-import { Ticket } from './ticket.service';
+import { CommonModule, DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
+
+import { Ticket } from './ticket.service';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
+type TranslationKey = keyof typeof EN;
 
 @Component({
   selector: 'app-subscription-ticket',
   standalone: true,
-  imports: [FormsModule, CommonModule], // ضفنا CommonModule
-  providers: [DatePipe], // عشان نظبط شكل التاريخ
+  imports: [FormsModule, CommonModule],
+  providers: [DatePipe],
   templateUrl: './subscription-ticket.html',
   styleUrl: './subscription-ticket.css',
 })
 export class SubscriptionTicket implements OnInit {
+  translations: typeof EN = EN;
+
   phone = '';
   type = '';
   message = '';
   user: any;
-
-  // متغير لتخزين التيكتات
   myTickets: any[] = [];
 
-  constructor(private ticketService: Ticket, private datePipe: DatePipe) {}
+  constructor(
+    private ticketService: Ticket,
+    private datePipe: DatePipe,
+    private lang: TranslateService
+  ) {}
 
-  ngOnInit(): void {
-    this.user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.loadMyTickets(); // استدعاء جلب التيكتات أول ما الصفحة تفتح
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
   }
 
-  // دالة لجلب التيكتات من الـ API
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
+
+  ngOnInit(): void {
+    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
+    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.loadMyTickets();
+  }
+
   loadMyTickets() {
     this.ticketService.getMyTickets().subscribe({
       next: (res) => {
-        // الرد جاي جواه property اسمها data
         this.myTickets = res.data || [];
       },
       error: (err) => {
@@ -55,20 +72,20 @@ export class SubscriptionTicket implements OnInit {
       next: (res) => {
         Swal.fire({
           icon: 'success',
-          title: 'Success',
-          text: res?.message || 'Ticket sent successfully',
-          confirmButtonText: 'OK',
+          title: this.t('success'),
+          text: res?.message || this.t('ticketSentSuccessfully'),
+          confirmButtonText: this.t('ok'),
         });
 
         this.resetForm();
-        this.loadMyTickets(); // تحديث الجدول بعد إضافة تيكت جديدة
+        this.loadMyTickets();
       },
       error: (err) => {
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: err?.error?.message || 'Something went wrong',
-          confirmButtonText: 'Try again',
+          title: this.t('error'),
+          text: err?.error?.message || this.t('somethingWentWrong'),
+          confirmButtonText: this.t('tryAgain'),
         });
       },
     });
@@ -80,12 +97,19 @@ export class SubscriptionTicket implements OnInit {
     this.message = '';
   }
 
-  // دالة مساعدة لتحديد شكل ولون الـ Badge بناءً على الرد
-  getStatus(ticket: any): { label: string, class: string } {
-    // لو فيه response و respondedAt يبقي اتحلت، لو مفيش يبقي Open
+  getStatus(ticket: any): { label: string; class: string } {
     if (ticket.response && ticket.respondedAt) {
-      return { label: 'Resolved', class: 'badge-resolved' };
+      return { label: this.t('resolved'), class: 'badge-resolved' };
     }
-    return { label: 'Open', class: 'badge-open' };
+    return { label: this.t('open'), class: 'badge-open' };
+  }
+
+  getCategoryLabel(type: string): string {
+    const normalized = (type || '').toLowerCase();
+
+    if (normalized === 'technical') return this.t('technical');
+    if (normalized === 'commerce') return this.t('commerce');
+
+    return type || '-';
   }
 }

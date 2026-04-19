@@ -2,18 +2,24 @@
   <div class="table-card">
 
     <div class="card-header">
-  <h2 class="card-title">Engagement Contract</h2>
+      <h2 class="card-title">{{ t('engagementContractTitle') }}</h2>
 
-  <div class="header-actions">
-    <div class="search-box">
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input type="text" placeholder="Search" (input)="onSearchInput($event)" />
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input
+            type="text"
+            [placeholder]="t('search')"
+            (input)="onSearchInput($event)"
+          />
+        </div>
+
+        <button class="btn-outline">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+          {{ t('export') }}
+        </button>
+      </div>
     </div>
-    <button class="btn-outline">
-      <i class="fa-solid fa-cloud-arrow-down"></i> Export
-    </button>
-  </div>
-</div>
 
     <div class="table-responsive">
       <table class="data-table">
@@ -22,26 +28,30 @@
             <th class="checkbox-col">
               <i class="fa-regular fa-square-minus text-primary fs-18"></i>
             </th>
-            <th>Contract No. <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>Establishment Name <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>Contract Date <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>Legal Entity <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>CR Number <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>Tax No. <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>Unified No. <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th>Status <i class="fa-solid fa-chevron-down icon-xs"></i></th>
-            <th></th> </tr>
+            <th>{{ t('contractNo') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('establishmentName') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('contractDate') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('legalEntity') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('crNumber') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('taxNo') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('unifiedNo') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th>{{ t('status') }} <i class="fa-solid fa-chevron-down icon-xs"></i></th>
+            <th></th>
+          </tr>
         </thead>
 
         <tbody>
           @if (isLoading) {
             <tr>
-              <td colspan="10" class="text-center py-4">Loading data...</td>
+              <td colspan="10" class="text-center py-4">{{ t('loadingData') }}</td>
             </tr>
           } @else {
             @for (contract of contracts; track contract.id) {
               <tr>
-                <td class="checkbox-col"><input type="checkbox" class="custom-checkbox" /></td>
+                <td class="checkbox-col">
+                  <input type="checkbox" class="custom-checkbox" />
+                </td>
+
                 <td class="text-muted">{{ contract.contractNumber }}</td>
                 <td class="fw-bold">{{ contract.customerName }}</td>
                 <td class="text-main">{{ contract.engagementContractDate | date:'dd MMM yyyy' }}</td>
@@ -49,12 +59,17 @@
                 <td class="text-main">{{ contract.commercialRegisterNumber }}</td>
                 <td class="text-main">{{ contract.taxNumber }}</td>
                 <td class="text-main">{{ contract.unifiedNumber }}</td>
+
                 <td>
-                  <span class="status-badge" [ngClass]="contract.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'">
+                  <span
+                    class="status-badge"
+                    [ngClass]="contract.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'"
+                  >
                     <i class="fa-solid fa-circle dot-icon"></i>
-                    {{ contract.status | titlecase }}
+                    {{ contract.status === 'ACTIVE' ? t('active') : t('inactive') }}
                   </span>
                 </td>
+
                 <td class="text-muted text-center cursor-pointer">
                   <i class="fa-solid fa-ellipsis-vertical"></i>
                 </td>
@@ -63,7 +78,9 @@
 
             @empty {
               <tr>
-                <td colspan="10" class="text-center py-4 text-muted">No contracts found.</td>
+                <td colspan="10" class="text-center py-4 text-muted">
+                  {{ t('noContractsFound') }}
+                </td>
               </tr>
             }
           }
@@ -75,48 +92,60 @@
       </div>
     </div>
 
-<div class="pagination-wrapper">
-  <div class="page-info">
-    {{ totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }}
-  </div>
+    <div class="pagination-wrapper">
+      <div class="page-info">
+        {{ totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, totalItems) }}
+        {{ t('of') }}
+        {{ totalItems }}
+      </div>
 
-  <div class="pagination-controls">
-    <button class="page-btn text-muted"
-            (click)="onPageChange(currentPage - 1)"
-            [disabled]="currentPage === 1"
-            [class.disabled-btn]="currentPage === 1">
-      <i class="fa-solid fa-chevron-left icon-xs"></i> Back
-    </button>
-
-    @for (page of pagesArray; track $index) {
-      @if (page === '...') {
-        <span class="page-dots">...</span>
-      } @else {
-        <button class="page-btn"
-                [class.active]="page === currentPage"
-                (click)="onPageChange(page)">
-          {{ page }}
+      <div class="pagination-controls">
+        <button
+          class="page-btn text-muted"
+          (click)="onPageChange(currentPage - 1)"
+          [disabled]="currentPage === 1"
+          [class.disabled-btn]="currentPage === 1"
+        >
+          <i class="fa-solid fa-chevron-left icon-xs"></i> {{ t('back') }}
         </button>
-      }
-    }
 
-    <button class="page-btn text-muted"
-            (click)="onPageChange(currentPage + 1)"
-            [disabled]="currentPage === totalPages"
-            [class.disabled-btn]="currentPage === totalPages">
-      Next <i class="fa-solid fa-chevron-right icon-xs"></i>
-    </button>
-  </div>
+        @for (page of pagesArray; track $index) {
+          @if (page === '...') {
+            <span class="page-dots">...</span>
+          } @else {
+            <button
+              class="page-btn"
+              [class.active]="page === currentPage"
+              (click)="onPageChange(page)"
+            >
+              {{ page }}
+            </button>
+          }
+        }
 
-  <div class="page-jump">
-    <span>Page</span>
-    <input type="number"
-           [(ngModel)]="jumpToPageInput"
-           (keyup.enter)="jumpToPage()"
-           class="jump-input"
-           min="1"
-           [max]="totalPages" />
-    <button class="go-btn" (click)="jumpToPage()">Go</button>
+        <button
+          class="page-btn text-muted"
+          (click)="onPageChange(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+          [class.disabled-btn]="currentPage === totalPages"
+        >
+          {{ t('next') }} <i class="fa-solid fa-chevron-right icon-xs"></i>
+        </button>
+      </div>
+
+      <div class="page-jump">
+        <span>{{ t('page') }}</span>
+        <input
+          type="number"
+          [(ngModel)]="jumpToPageInput"
+          (keyup.enter)="jumpToPage()"
+          class="jump-input"
+          min="1"
+          [max]="totalPages"
+        />
+        <button class="go-btn" (click)="jumpToPage()">{{ t('go') }}</button>
+      </div>
+    </div>
+
   </div>
-</div>
 </div>

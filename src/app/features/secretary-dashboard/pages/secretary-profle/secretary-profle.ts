@@ -1,7 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
 import { ProfileUser } from './profile-user.service';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
+
+type TranslationKey = keyof typeof EN;
 
 @Component({
   selector: 'app-secretary-profle',
@@ -13,9 +19,11 @@ import { ProfileUser } from './profile-user.service';
 export class SecretaryProfle implements OnInit {
   private profileService = inject(ProfileUser);
   private fb = inject(FormBuilder);
+  private lang = inject(TranslateService);
 
   profileForm!: FormGroup;
   userData: any = {};
+  translations: typeof EN = EN;
 
   editModes = {
     profileInfo: false,
@@ -23,7 +31,16 @@ export class SecretaryProfle implements OnInit {
     securityAccess: false
   };
 
+  loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  }
+
   ngOnInit(): void {
+    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
     this.initForm();
     this.loadProfile();
   }
@@ -49,7 +66,6 @@ export class SecretaryProfle implements OnInit {
   loadProfile() {
     this.profileService.getProfile().subscribe({
       next: (res) => {
-        // التأكد إن الداتا موجودة في res.user
         if (res && res.user) {
           this.userData = res.user;
           this.patchFormValues();
@@ -62,12 +78,10 @@ export class SecretaryProfle implements OnInit {
   patchFormValues() {
     const user = this.userData;
 
-    // تظبيط التاريخ لو موجود
     const startDateFormatted = user.startDate
       ? new Date(user.startDate).toISOString().split('T')[0]
       : '';
 
-    // إستخدام || '' عشان لو القيمة null متعملش مشكلة في الفورم
     this.profileForm.patchValue({
       fullName: user.fullName || '',
       suggestedUsername: user.suggestedUsername || '',
@@ -95,7 +109,7 @@ export class SecretaryProfle implements OnInit {
     const updatedData = this.profileForm.getRawValue();
 
     this.profileService.updateProfile(updatedData).subscribe({
-      next: (res) => {
+      next: () => {
         this.editModes[section] = false;
         const controls = this.getControlsForSection(section);
         controls.forEach(c => this.profileForm.get(c)?.disable());
@@ -112,10 +126,9 @@ export class SecretaryProfle implements OnInit {
       default: return [];
     }
   }
-  // ضيف ده جوه كلاس SecretaryProfle
-get userInitials(): string {
-  // بنجيب القيمة من الفورم، ولو فاضية بنجيبها من الداتا، ولو مفيش بنرجع string فاضي
-  const name = this.profileForm.get('fullName')?.value || this.userData?.fullName || '';
-  return name.substring(0, 2).toUpperCase();
-}
+
+  get userInitials(): string {
+    const name = this.profileForm.get('fullName')?.value || this.userData?.fullName || '';
+    return name.substring(0, 2).toUpperCase();
+  }
 }

@@ -6,7 +6,11 @@ import { environment } from '../../../../../environment';
 import { EngagemenDetails } from './engagemen-details.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { TranslateService } from '../../../../core/services/translate.service';
+import { EN } from './i18n/en';
+import { AR } from './i18n/ar';
 
+type TranslationKey = keyof typeof EN;
 @Component({
   selector: 'app-secretary-engagement-contract-details',
   standalone: true,
@@ -36,12 +40,16 @@ searchQuery: string = '';
     private router: Router,
     private contractsApi: SeretaryEngagementContractService,
     private engagementService: EngagemenDetails,
+      private lang : TranslateService
   ) {}
 
   ngOnInit() {
+    this.lang.lang$.subscribe((l) => this.loadTranslations(l));
+
     this.getUserRoleFromStorage();
 
     this.contractId = this.route.snapshot.paramMap.get('id');
+    this.worksheetId = this.contractId
     if (this.contractId) {
       this.fetchContractDetails(this.contractId);
 
@@ -52,10 +60,35 @@ searchQuery: string = '';
       if (this.activeTab === 'pending') {
         this.fetchPendingGuides();
       }
+      if (this.activeTab === 'worksheet') {
+        this.fetchAccountGuides();
+        this.fetchWorksheetData();
+      }
     }
       this.loadAuthorityLinksByCountry();
   }
+    translations: typeof EN = EN;
 
+ loadTranslations(lang: 'en' | 'ar') {
+    this.translations = lang === 'en' ? EN : AR;
+  }
+getStatusLabel(status: string | null | undefined): string {
+  const normalized = (status || '').toLowerCase();
+
+  if (normalized === 'active') return this.t('active');
+  if (normalized === 'inactive') return this.t('inactive');
+  if (normalized === 'draft') return this.t('draft');
+  if (normalized === 'pending') return this.t('pending');
+  return status || this.t('active');
+}
+
+getStepperButtonLabel(): string {
+  if (this.isSubmittingFinal) return this.t('processing');
+  return this.isLastTab ? this.t('submit') : this.t('next');
+}
+  t(key: TranslationKey): string {
+    return this.translations[key] || key;
+  } 
   getUserRoleFromStorage() {
     try {
       const userString = localStorage.getItem('user');
@@ -461,18 +494,17 @@ isSubmittingFinal: boolean = false;
 
 // 1. مصفوفة الـ Tabs المتاحة بناءً على الـ Role
 get availableTabs(): string[] {
-  const tabs = ['contract', 'review', 'pending', 'docs'];
+    const tabs = ['contract', 'review', 'pending', 'docs'];
 
-  if (this.userRole === 'AUDIT_MANAGER') {
-    tabs.push('team');
+    if (this.userRole === 'AUDIT_MANAGER') {
+      tabs.push('team');
+    }
+    if (this.userRole === 'TECHNICAL_AUDITOR') {
+      tabs.push('Trial', 'worksheet', 'Financial'); // تمت إضافة worksheet هنا
+    }
+
+    return tabs;
   }
-  if (this.userRole === 'TECHNICAL_AUDITOR') {
-    tabs.push('Trial', 'Financial');
-  }
-
-  return tabs;
-}
-
 // 2. التحقق هل إحنا في أول Tab
 get isFirstTab(): boolean {
   return this.availableTabs.indexOf(this.activeTab) === 0;
@@ -657,12 +689,14 @@ onStaffSelectionChange(staff: any) {
     if (tab === 'team' && this.contractId) {
       this.fetchEligibleStaff();
     }
-    // 👇 Add this condition
     if (tab === 'Trial' && this.contractId) {
       this.fetchTrialBalance();
     }
+    if (tab === 'worksheet') {
+      this.fetchAccountGuides(); // جلب قائمة الحسابات للـ Dropdown
+      this.fetchWorksheetData(); // جلب الجدول
+    }
   }
-
   // --- Trial Balance Logic ---
 
   get filteredTrialBalance() {
@@ -683,19 +717,15 @@ onStaffSelectionChange(staff: any) {
 
     this.engagementService.getTrialBalance(this.contractId).subscribe({
       next: (res) => {
-        // قراءة المصفوفة والإجماليات من الـ Response
         this.trialBalanceData = res.data || [];
         this.trialBalanceSummary = res.summary || null;
 
-        // إذا كان هناك اسم ملف راجع من الـ API يمكن تعيينه هنا
-        // this.trialBalanceFileName = res.fileName || 'VAT_Certificate_2024.xlsx';
-
+console.log(res);
+        
         this.loadingTrialBalance = false;
       },
       error: (err) => {
         console.error('Error fetching trial balance:', err);
-        this.trialBalanceData = [];
-        this.trialBalanceSummary = null;
         this.loadingTrialBalance = false;
       }
     });
@@ -932,6 +962,8 @@ saveTrialRow() {
     creditMovementAdjustment: this.editableTrialRow.creditMovementAdjustment,
     adjustedBeginningBalance: this.editableTrialRow.adjustedBeginningBalance,
     netMovement: this.editableTrialRow.netMovement,
+    closingDebit: this.editableTrialRow.closingDebit,
+    closingCredit: this.editableTrialRow.closingCredit,
     finalBalance: this.editableTrialRow.finalBalance,
     balanceType: this.editableTrialRow.balanceType
   };
@@ -1021,5 +1053,218 @@ loadAuthorityLinksByCountry(): void {
     }
   });
 }
+// أضف هذه المتغيرات مع باقي متغيرات الكلاس (في الجزء الخاص بالـ Trial Balance)
+  showSortMenu: boolean = false;
+  isSorting: boolean = false;
+worksheetId: string | null = null;
+// --- Worksheet Variables ---
+  worksheetFilter: 'unassigned' | 'assigned' = 'unassigned';
+  worksheetData: any[] = [];
+  loadingWorksheet: boolean = false;
+  
+  accountGuides: any[] = [];
+  filteredAccountGuides: any[] = [];
+  guideSearchQuery: string = '';
+  activeDropdownRowId: string | null = null; // لتتبع أي صف مفتوح فيه الـ Dropdown
+  // دالة لتحديد أو إلغاء تحديد كل الصفوف
+  toggleAllSelection(event: any) {
+    const isChecked = event.target.checked;
+    this.filteredTrialBalance.forEach(row => {
+      row.selected = isChecked;
+    });
+  }
 
+  // دالة لجلب الـ IDs الخاصة بالصفوف المحددة فقط
+  getSelectedAccountIds(): string[] {
+    return this.trialBalanceData
+      .filter(row => row.selected)
+      .map(row => row.id); // بافتراض أن row.id هو المعرف المطلوب للـ API
+  }
+
+  // دالة تنفيذ الترتيب
+  sortSelectedAccounts(order: 'asc' | 'desc') {
+    if (!this.worksheetId) return;
+    const selectedIds = this.getSelectedAccountIds();
+
+    if (selectedIds.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'تنبيه',
+        text: 'يرجى تحديد صف واحد على الأقل للترتيب.',
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    this.isSorting = true;
+    const payload = {
+      accountIds: selectedIds,
+      sortOrder: order
+    };
+
+    this.engagementService.sortTrialBalanceAccounts(this.worksheetId, payload).subscribe({
+      next: (res) => {
+        this.isSorting = false;
+        this.showSortMenu = false; // إخفاء القائمة بعد الاختيار
+        
+        // إعادة جلب البيانات بعد الترتيب لتحديث الجدول
+        this.fetchTrialBalance(); 
+        
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'تم ترتيب الحسابات بنجاح',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      },
+      error: (err) => {
+        this.isSorting = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'خطأ',
+          text: err.error?.message || 'حدث خطأ أثناء محاولة الترتيب',
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
+  }
+  // --- Worksheet Logic ---
+
+  setWorksheetFilter(filter: 'unassigned' | 'assigned') {
+  this.worksheetFilter = filter;
+  
+  if (this.worksheetId) {
+    this.fetchWorksheetData();
+  } else {
+    // لو لسه مفيش worksheetId، ممكن تنادي fetchTrialBalance الأول أو تظهر رسالة
+    console.warn("Worksheet ID not found yet.");
+  }
+}
+
+  fetchWorksheetData() {
+    if (!this.worksheetId) return;
+    this.loadingWorksheet = true;
+    this.activeDropdownRowId = null; // إغلاق أي قائمة مفتوحة
+
+    const request = this.worksheetFilter === 'unassigned' 
+      ? this.engagementService.getUnassignedWorksheet(this.worksheetId)
+      : this.engagementService.getAssignedWorksheet(this.worksheetId);
+
+    request.subscribe({
+      next: (res) => {
+        this.worksheetData = res.data || [];
+        this.loadingWorksheet = false;
+      },
+      error: (err) => {
+        console.error('Error fetching worksheet:', err);
+        this.worksheetData = [];
+        this.loadingWorksheet = false;
+      }
+    });
+  }
+
+  fetchAccountGuides() {
+    this.engagementService.getAccountGuides().subscribe({
+      next: (res) => {
+        this.accountGuides = res.data || [];
+        this.filteredAccountGuides = [...this.accountGuides];
+      },
+      error: (err) => console.error('Error fetching guides:', err)
+    });
+  }
+
+  // دوال التحكم في الـ Dropdown والبحث
+  toggleGuideDropdown(rowId: string) {
+    if (this.activeDropdownRowId === rowId) {
+      this.activeDropdownRowId = null; // إغلاق لو كان مفتوحاً
+    } else {
+      this.activeDropdownRowId = rowId;
+      this.guideSearchQuery = ''; // تصفير البحث عند الفتح
+      this.filteredAccountGuides = [...this.accountGuides];
+    }
+  }
+
+  filterGuides() {
+    if (!this.guideSearchQuery) {
+      this.filteredAccountGuides = [...this.accountGuides];
+    } else {
+      const lowerQuery = this.guideSearchQuery.toLowerCase();
+      this.filteredAccountGuides = this.accountGuides.filter(g => 
+        g.accountName?.toLowerCase().includes(lowerQuery) ||
+        g.accountNumber?.toString().includes(lowerQuery)
+      );
+    }
+  }
+
+  // إرسال الـ Assign
+  assignGuideToRow(row: any, guide: any) {
+    if (!this.worksheetId) return;
+    const payload = {
+      assignments: [
+        {
+          accountId: row.id,
+          accountGuideId: guide.id
+        }
+      ]
+    };
+
+    // إغلاق القائمة مؤقتاً أثناء التحميل
+    this.activeDropdownRowId = null;
+
+    this.engagementService.assignAccountGuide(this.worksheetId, payload).subscribe({
+      next: (res) => {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Account Assigned Successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        // إعادة تحميل الجدول لتحديث البيانات (الرو هيختفي من unassigned ويروح للـ assigned)
+        this.fetchWorksheetData(); 
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Assignment Failed',
+          text: err.error?.message || 'Something went wrong',
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
+  }
+  // أضف هذه الدالة مع دوال الـ Worksheet
+  unassignGuideFromRow(row: any) {
+    if (!row.id) return;
+
+    // إغلاق القائمة المنسدلة فوراً
+    this.activeDropdownRowId = null;
+
+    this.engagementService.unassignAccountGuide(row.id).subscribe({
+      next: (res) => {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Unassigned Successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        
+        // إعادة تحميل الجدول (الصف هيختفي من قائمة Assigned ويرجع لـ Unassigned)
+        this.fetchWorksheetData();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Unassign Failed',
+          text: err.error?.message || 'Failed to unassign account guide',
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
+  }
 }
