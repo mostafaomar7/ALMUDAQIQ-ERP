@@ -14,42 +14,57 @@
         <i class="fa-solid" [ngClass]="themeService.isDark() ? 'fa-sun' : 'fa-circle-half-stroke'"></i>
       </button>
 
-      <button mat-icon-button class="icon-btn" [matMenuTriggerFor]="notificationsMenu" style="padding: calc(calc(var(--mat-icon-button-state-layer-size, 27px) - var(--mat-icon-button-icon-size, 24px)) / 2);" class="icon-btn">
-        <div class="badge-dot"></div> <i class="fa-solid fa-bell"></i>
-      </button>
+      <button mat-icon-button class="icon-btn position-relative" [matMenuTriggerFor]="notificationsMenu" style="padding: calc(calc(var(--mat-icon-button-state-layer-size, 27px) - var(--mat-icon-button-icon-size, 24px)) / 2);">
+  <div class="badge-dot" *ngIf="unreadCount > 0" style="position: absolute; top: 0; right: 0; background: red; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; line-height: 1;">
+    {{ unreadCount }}
+  </div> 
+  <i class="fa-solid fa-bell"></i>
+</button>
 
-      <mat-menu #notificationsMenu="matMenu" xPosition="before" class="notification-menu-panel">
-        <div class="notif-container" (click)="$event.stopPropagation()">
+<mat-menu #notificationsMenu="matMenu" xPosition="before" class="notification-menu-panel">
+  <div class="notif-container" (click)="$event.stopPropagation()">
 
-          <div class="notif-header">
-            <div class="tab-item" [class.active]="activeTab === 'All'" (click)="selectTab('All', $event)">
-              All <span class="badge-count">2</span>
-            </div>
-            <div class="tab-item" [class.active]="activeTab === 'Unread'" (click)="selectTab('Unread', $event)">Unread</div>
-            <div class="tab-item" [class.active]="activeTab === 'System'" (click)="selectTab('System', $event)">System Errors</div>
-          </div>
-
-          <div class="notif-list">
-            <div class="notif-item" *ngFor="let item of notifications">
-
-              <div class="notif-icon-box" [ngClass]="item.type">
-                <i class="fa-solid" [ngClass]="item.icon"></i>
-              </div>
-
-              <div class="notif-content">
-                <div class="d-flex justify-content-between">
-                  <span class="notif-title">{{ item.title }}</span>
-                  <span *ngIf="!item.read" class="unread-dot"></span>
-                </div>
-                <p class="notif-desc">{{ item.desc }}</p>
-                <span class="notif-time">{{ item.time }}</span>
-              </div>
-
-            </div>
-          </div>
-
+    <div class="notif-header d-flex justify-content-between align-items-center">
+      <div class="tabs d-flex">
+        <div class="tab-item" [class.active]="activeTab === 'All'" (click)="selectTab('All', $event)">
+          All <span class="badge-count">{{ notifications.length }}</span>
         </div>
-      </mat-menu>
+        <div class="tab-item" [class.active]="activeTab === 'Unread'" (click)="selectTab('Unread', $event)">
+          Unread <span class="badge-count" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </div>
+        <div class="tab-item" [class.active]="activeTab === 'System'" (click)="selectTab('System', $event)">System Errors</div>
+      </div>
+      
+      <button mat-button color="primary" style="font-size: 12px; min-width: auto; padding: 0 8px;" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+        Mark all read
+      </button>
+    </div>
+
+    <div class="notif-list">
+      <div class="notif-item" *ngFor="let item of filteredNotifications" (click)="markAsRead(item, $event)" [style.cursor]="!item.isRead ? 'pointer' : 'default'">
+
+        <div class="notif-icon-box" [ngClass]="getNotificationIcon(item.type).class">
+          <i class="fa-solid" [ngClass]="getNotificationIcon(item.type).icon"></i>
+        </div>
+
+        <div class="notif-content">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="notif-title">{{ item.title }}</span>
+            <span *ngIf="!item.isRead" class="unread-dot" style="width: 8px; height: 8px; background: red; border-radius: 50%; display: inline-block;"></span>
+          </div>
+          <p class="notif-desc">{{ item.message }}</p>
+          <span class="notif-time">{{ item.createdAt | date:'medium' }}</span> 
+        </div>
+
+      </div>
+      
+      <div *ngIf="filteredNotifications.length === 0" class="text-center p-3 text-muted">
+        No notifications found.
+      </div>
+    </div>
+
+  </div>
+</mat-menu>
 
     </div>
 

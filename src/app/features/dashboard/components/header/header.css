@@ -177,7 +177,9 @@
   height: 2px;
   background-color: #212529;
 }
-
+.tabs{
+  gap:12px;
+}
 .badge-count {
   background-color: #dc3545;
   color: white;
